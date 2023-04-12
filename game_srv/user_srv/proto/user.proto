@@ -1,0 +1,41 @@
+syntax = "proto3";
+option go_package = ".;proto";
+
+service User{
+  //用户注册
+  rpc CreateUser(CreateUserInfo) returns (UserInfoResponse);
+  //用户登录
+  rpc UserLogin(UserLoginInfo)returns(UserInfoResponse);
+  //通过id获得用户信息
+  rpc GetUserById(UserIdInfo) returns (UserInfoResponse);
+  //更改信息
+  rpc UpdateUser(UpdateUserInfo)returns (UserInfoResponse);
+}
+
+message UserBaseInfo{
+  string id=1;
+}
+
+message CreateUserInfo{
+  UserBaseInfo base=1;
+  string name=2;
+}
+
+message UserInfoResponse{
+  UserBaseInfo base=1;
+  string name =2;
+}
+
+message UserIdInfo{
+  UserBaseInfo base=1;
+}
+
+message UpdateUserInfo{
+  UserBaseInfo base=1;
+  string name=2;
+  //to add
+}
+
+message UserLoginInfo{
+  UserBaseInfo base=1;
+}
