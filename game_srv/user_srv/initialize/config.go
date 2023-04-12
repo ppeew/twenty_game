@@ -1,0 +1,51 @@
+package initialize
+
+import (
+	"encoding/json"
+	"github.com/nacos-group/nacos-sdk-go/clients"
+	"github.com/nacos-group/nacos-sdk-go/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/vo"
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
+	"user_srv/global"
+)
+
+func InitConfig() {
+	v := viper.New()
+	v.SetConfigFile("config-pro.yaml")
+	err := v.ReadInConfig()
+	if err != nil {
+		zap.S().Fatalf("[InitConfig]读取nacos配置错误:%s", err.Error())
+	}
+	if err := v.Unmarshal(&global.NacosConfig); err != nil {
+		zap.S().Fatalf("[InitConfig]读取nacos配置错误:%s", err.Error())
+	}
+	//读取yaml文件，去nacos配置中心找配置文件
+	clientConfig := constant.ClientConfig{
+		NamespaceId: global.NacosConfig.Namespace,
+	}
+	serverConfigs := []constant.ServerConfig{
+		{
+			IpAddr: global.NacosConfig.Host,
+			Port:   global.NacosConfig.Port,
+		},
+	}
+	client, err := clients.CreateConfigClient(map[string]interface{}{
+		"serverConfigs": serverConfigs,
+		"clientConfig":  clientConfig,
+	})
+	if err != nil {
+		zap.S().Fatalf("[InitConfig]连接nacos错误:%s", err.Error())
+	}
+	content, err := client.GetConfig(vo.ConfigParam{
+		DataId: global.NacosConfig.DataId,
+		Group:  global.NacosConfig.Group,
+	})
+	if err != nil {
+		zap.S().Fatalf("[InitConfig]读取nacos服务器的配置信息错误:%s", err.Error())
+	}
+	err = json.Unmarshal([]byte(content), global.ServerConfig)
+	if err != nil {
+		zap.S().Fatalf("[InitConfig]反序列化ServerConfig失败:%s", err.Error())
+	}
+}
