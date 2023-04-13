@@ -18,13 +18,13 @@ service User{
 message CreateUserInfo{
   string name=1;
   string openID=2; //唯一的
-  bool gender=3;
+  string gender=3;
 }
 
 message UserInfoResponse{
   string name=1;
   string openID=2;
-  bool gender=3;
+  string gender=3;
   uint32 id=4;
 }
 

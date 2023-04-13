@@ -16,5 +16,5 @@ type User struct {
 	BaseModel
 	Name   string `gorm:"unique;type:varchar(11);not null"`
 	OpenID string `gorm:"index;not null"`
-	Gender bool   `gorm:"default:1;"`
+	Gender string `gorm:"not null;"`
 }

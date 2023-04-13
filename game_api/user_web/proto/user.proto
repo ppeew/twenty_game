@@ -1,0 +1,52 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option go_package = ".;proto";
+
+service User{
+  //创建用户
+  rpc CreateUser(CreateUserInfo) returns (UserInfoResponse);
+  //校验openid
+  rpc CheckOpenID(CheckOpenIDInfo) returns(CheckResponse);
+  //通过openid获得用户信息
+  rpc GetUserByOpenID(UserOpenIDInfo) returns (UserInfoResponse);
+  //通过id获取用户信息
+  rpc GetUserByID(UserIDInfo)returns(UserInfoResponse);
+  //更改用户信息
+  rpc UpdateUser(UpdateUserInfo)returns (google.protobuf.Empty);
+}
+
+message CreateUserInfo{
+  string name=1;
+  string openID=2; //唯一的
+  string gender=3;
+}
+
+message UserInfoResponse{
+  string name=1;
+  string openID=2;
+  string gender=3;
+  uint32 id=4;
+}
+
+message CheckOpenIDInfo{
+  string openID=1;
+  string encodeOpenID=2;
+}
+
+message CheckResponse{
+  bool success=1;
+}
+
+message UserOpenIDInfo{
+  string openID=1;
+}
+
+message UserIDInfo{
+  uint32 id=1;
+}
+
+message UpdateUserInfo{
+  string name=1;
+  string gender=2;
+  uint32 id=3;
+}
