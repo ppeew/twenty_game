@@ -2,17 +2,28 @@ package initialize
 
 import (
 	"encoding/json"
+	"user_srv/global"
+
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"user_srv/global"
 )
 
+func GetEnvInfo(env string) bool {
+	viper.AutomaticEnv()
+	return viper.GetBool(env)
+}
+
 func InitConfig() {
+	debug := GetEnvInfo("PPEEW_DEBUG")
 	v := viper.New()
-	v.SetConfigFile("config-pro.yaml")
+	fileName := "config-pro.yaml"
+	if debug {
+		fileName = "config-debug.yaml"
+	}
+	v.SetConfigFile(fileName)
 	err := v.ReadInConfig()
 	if err != nil {
 		zap.S().Fatalf("[InitConfig]读取nacos配置错误:%s", err.Error())

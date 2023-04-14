@@ -2,10 +2,12 @@ package initialize
 
 import (
 	"fmt"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
 	"user_web/global"
 	"user_web/proto"
+
+	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 func InitSrvConn() {
@@ -21,4 +23,5 @@ func InitSrvConn() {
 
 	userSrvClient := proto.NewUserClient(userConn)
 	global.UserSrvClient = userSrvClient
+
 }

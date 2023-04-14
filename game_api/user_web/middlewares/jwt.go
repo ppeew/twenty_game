@@ -2,12 +2,13 @@ package middlewares
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
 	"user_web/global"
 	"user_web/models"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 func JWTAuth() gin.HandlerFunc {
@@ -40,7 +41,6 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 		c.Set("claims", claims)
-		c.Set("userId", claims.ID)
 		c.Next()
 	}
 }

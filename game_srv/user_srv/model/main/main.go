@@ -1,9 +1,10 @@
 package main
 
 import (
+	"user_srv/model"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"user_srv/model"
 )
 
 func main() {

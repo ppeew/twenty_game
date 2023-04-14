@@ -2,14 +2,15 @@ package utils
 
 import (
 	"fmt"
+	"user_srv/global"
+
 	"github.com/google/uuid"
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"user_srv/global"
 )
 
-func RegistAndHealthCheak(server *grpc.Server, port int) (*api.Client, string) {
+func RegistAndHealthCheck(server *grpc.Server, port int) (*api.Client, string) {
 	//grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
 	cfg := api.DefaultConfig()
@@ -22,6 +23,7 @@ func RegistAndHealthCheak(server *grpc.Server, port int) (*api.Client, string) {
 	reg := new(api.AgentServiceRegistration)
 	reg.Name = global.ServerConfig.ConsulInfo.Name //服务name
 	serverID := uuid.NewString()
+	//serverID := uuid.New().String()
 	reg.ID = serverID //服务id
 	reg.Port = port
 	reg.Address = "192.168.159.1" //消费者访问服务地址

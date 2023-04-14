@@ -21,12 +21,12 @@ const _ = grpc.SupportPackageIsVersion7
 type UserClient interface {
 	// 创建用户
 	CreateUser(ctx context.Context, in *CreateUserInfo, opts ...grpc.CallOption) (*UserInfoResponse, error)
-	// 校验openid
-	CheckOpenID(ctx context.Context, in *CheckOpenIDInfo, opts ...grpc.CallOption) (*CheckResponse, error)
-	// 通过openid获得用户信息
-	GetUserByOpenID(ctx context.Context, in *UserOpenIDInfo, opts ...grpc.CallOption) (*UserInfoResponse, error)
+	// 校验密码
+	CheckPassword(ctx context.Context, in *CheckPasswordInfo, opts ...grpc.CallOption) (*CheckPasswordResponse, error)
 	// 通过id获取用户信息
 	GetUserByID(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserInfoResponse, error)
+	// 通过用户名获取信息
+	GetUserByUsername(ctx context.Context, in *UserNameInfo, opts ...grpc.CallOption) (*UserInfoResponse, error)
 	// 更改用户信息
 	UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -48,18 +48,9 @@ func (c *userClient) CreateUser(ctx context.Context, in *CreateUserInfo, opts ..
 	return out, nil
 }
 
-func (c *userClient) CheckOpenID(ctx context.Context, in *CheckOpenIDInfo, opts ...grpc.CallOption) (*CheckResponse, error) {
-	out := new(CheckResponse)
-	err := c.cc.Invoke(ctx, "/User/CheckOpenID", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userClient) GetUserByOpenID(ctx context.Context, in *UserOpenIDInfo, opts ...grpc.CallOption) (*UserInfoResponse, error) {
-	out := new(UserInfoResponse)
-	err := c.cc.Invoke(ctx, "/User/GetUserByOpenID", in, out, opts...)
+func (c *userClient) CheckPassword(ctx context.Context, in *CheckPasswordInfo, opts ...grpc.CallOption) (*CheckPasswordResponse, error) {
+	out := new(CheckPasswordResponse)
+	err := c.cc.Invoke(ctx, "/User/CheckPassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,6 +60,15 @@ func (c *userClient) GetUserByOpenID(ctx context.Context, in *UserOpenIDInfo, op
 func (c *userClient) GetUserByID(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserInfoResponse, error) {
 	out := new(UserInfoResponse)
 	err := c.cc.Invoke(ctx, "/User/GetUserByID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetUserByUsername(ctx context.Context, in *UserNameInfo, opts ...grpc.CallOption) (*UserInfoResponse, error) {
+	out := new(UserInfoResponse)
+	err := c.cc.Invoke(ctx, "/User/GetUserByUsername", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,12 +90,12 @@ func (c *userClient) UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ..
 type UserServer interface {
 	// 创建用户
 	CreateUser(context.Context, *CreateUserInfo) (*UserInfoResponse, error)
-	// 校验openid
-	CheckOpenID(context.Context, *CheckOpenIDInfo) (*CheckResponse, error)
-	// 通过openid获得用户信息
-	GetUserByOpenID(context.Context, *UserOpenIDInfo) (*UserInfoResponse, error)
+	// 校验密码
+	CheckPassword(context.Context, *CheckPasswordInfo) (*CheckPasswordResponse, error)
 	// 通过id获取用户信息
 	GetUserByID(context.Context, *UserIDInfo) (*UserInfoResponse, error)
+	// 通过用户名获取信息
+	GetUserByUsername(context.Context, *UserNameInfo) (*UserInfoResponse, error)
 	// 更改用户信息
 	UpdateUser(context.Context, *UpdateUserInfo) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServer()
@@ -108,14 +108,14 @@ type UnimplementedUserServer struct {
 func (UnimplementedUserServer) CreateUser(context.Context, *CreateUserInfo) (*UserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedUserServer) CheckOpenID(context.Context, *CheckOpenIDInfo) (*CheckResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckOpenID not implemented")
-}
-func (UnimplementedUserServer) GetUserByOpenID(context.Context, *UserOpenIDInfo) (*UserInfoResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserByOpenID not implemented")
+func (UnimplementedUserServer) CheckPassword(context.Context, *CheckPasswordInfo) (*CheckPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckPassword not implemented")
 }
 func (UnimplementedUserServer) GetUserByID(context.Context, *UserIDInfo) (*UserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
+}
+func (UnimplementedUserServer) GetUserByUsername(context.Context, *UserNameInfo) (*UserInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByUsername not implemented")
 }
 func (UnimplementedUserServer) UpdateUser(context.Context, *UpdateUserInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
@@ -151,38 +151,20 @@ func _User_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_CheckOpenID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckOpenIDInfo)
+func _User_CheckPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckPasswordInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).CheckOpenID(ctx, in)
+		return srv.(UserServer).CheckPassword(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/User/CheckOpenID",
+		FullMethod: "/User/CheckPassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).CheckOpenID(ctx, req.(*CheckOpenIDInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _User_GetUserByOpenID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserOpenIDInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).GetUserByOpenID(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/User/GetUserByOpenID",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetUserByOpenID(ctx, req.(*UserOpenIDInfo))
+		return srv.(UserServer).CheckPassword(ctx, req.(*CheckPasswordInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -201,6 +183,24 @@ func _User_GetUserByID_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).GetUserByID(ctx, req.(*UserIDInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetUserByUsername_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserNameInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserByUsername(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/GetUserByUsername",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserByUsername(ctx, req.(*UserNameInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -235,16 +235,16 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_CreateUser_Handler,
 		},
 		{
-			MethodName: "CheckOpenID",
-			Handler:    _User_CheckOpenID_Handler,
-		},
-		{
-			MethodName: "GetUserByOpenID",
-			Handler:    _User_GetUserByOpenID_Handler,
+			MethodName: "CheckPassword",
+			Handler:    _User_CheckPassword_Handler,
 		},
 		{
 			MethodName: "GetUserByID",
 			Handler:    _User_GetUserByID_Handler,
+		},
+		{
+			MethodName: "GetUserByUsername",
+			Handler:    _User_GetUserByUsername_Handler,
 		},
 		{
 			MethodName: "UpdateUser",

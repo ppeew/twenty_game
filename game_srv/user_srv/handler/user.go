@@ -4,75 +4,62 @@ import (
 	"context"
 	"crypto/sha512"
 	"fmt"
-	"github.com/anaskhan96/go-password-encoder"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"strings"
 	"user_srv/global"
 	"user_srv/model"
 	"user_srv/proto"
+
+	"github.com/anaskhan96/go-password-encoder"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type UserServer struct {
 	proto.UnimplementedUserServer
 }
 
-func ModelToResponse(user model.User) *proto.UserInfoResponse {
+func ModelToResponse(user *model.User) *proto.UserInfoResponse {
 	userInfoRep := &proto.UserInfoResponse{
-		Name:   user.Name,
-		OpenID: user.OpenID,
-		Gender: user.Gender,
+		Nickname: user.Nickname,
+		Gender:   user.Gender,
+		UserName: user.UserName,
+		Password: user.Password,
+		Id:       user.ID,
 	}
 	return userInfoRep
-}
-
-func MakeEncodeOpenID(openID string) string {
-	option := &password.Options{
-		//对openid做加密
-		SaltLen:      16,
-		Iterations:   100,
-		KeyLen:       32,
-		HashFunction: sha512.New,
-	}
-	salt, encodePassword := password.Encode(openID, option)
-	return fmt.Sprintf("%s$%s", salt, encodePassword)
 }
 
 // 用户注册
 func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) (*proto.UserInfoResponse, error) {
 	//先查询用户是否存在
-	encodeOpenID := MakeEncodeOpenID(req.OpenID)
 	var user model.User
-	result := global.DB.Where("open_id = ?", encodeOpenID).First(&user)
+	result := global.DB.Where("user_name = ?", req.UserName).First(&user)
 	if result.RowsAffected == 1 {
 		return nil, status.Error(codes.AlreadyExists, "用户已经存在")
 	}
+
+	options := &password.Options{
+		SaltLen:      16,
+		Iterations:   100,
+		KeyLen:       32,
+		HashFunction: sha512.New,
+	}
+	salt, encoded := password.Encode(req.Password, options)
+	encodePassword := fmt.Sprintf("%s$%s", salt, encoded)
+
 	user = model.User{
-		Name:   req.Name,
-		OpenID: encodeOpenID,
-		Gender: req.Gender,
+		Nickname: req.Nickname,
+		Gender:   req.Gender,
+		UserName: req.UserName,
+		Password: encodePassword,
 	}
 
 	res := global.DB.Create(&user)
 	if res.Error != nil {
 		return nil, status.Errorf(codes.Internal, result.Error.Error())
 	}
-	return ModelToResponse(user), nil
-}
-
-// 通过openid获得用户信息
-func (s *UserServer) GetUserByOpenID(ctx context.Context, req *proto.UserOpenIDInfo) (*proto.UserInfoResponse, error) {
-	var user model.User
-	encodeOpenID := MakeEncodeOpenID(req.OpenID)
-	result := global.DB.Where("open_id = ?", encodeOpenID).First(&user)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	if result.RowsAffected == 0 {
-		return nil, status.Error(codes.NotFound, "用户不存在")
-	}
-	return ModelToResponse(user), nil
+	return ModelToResponse(&user), nil
 }
 
 // 通过id获得用户信息
@@ -85,20 +72,31 @@ func (s *UserServer) GetUserByID(ctx context.Context, req *proto.UserIDInfo) (*p
 	if result.RowsAffected == 0 {
 		return nil, status.Error(codes.NotFound, "用户不存在")
 	}
-	return ModelToResponse(user), nil
+	return ModelToResponse(&user), nil
 }
 
-// openid验证密码
-func (s *UserServer) CheckOpenID(ctx context.Context, req *proto.CheckOpenIDInfo) (*proto.CheckResponse, error) {
+func (s *UserServer) GetUserByUsername(ctx context.Context, req *proto.UserNameInfo) (*proto.UserInfoResponse, error) {
+	var user model.User
+	result := global.DB.Where("user_name = ?", req.UserName).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "用户不存在")
+	}
+	return ModelToResponse(&user), nil
+}
+
+func (s *UserServer) CheckPassword(ctx context.Context, req *proto.CheckPasswordInfo) (*proto.CheckPasswordResponse, error) {
 	options := &password.Options{
 		SaltLen:      16,
 		Iterations:   100,
 		KeyLen:       32,
 		HashFunction: sha512.New,
 	}
-	info := strings.Split(req.EncodeOpenID, "$")
-	verify := password.Verify(req.OpenID, info[0], info[1], options)
-	return &proto.CheckResponse{Success: verify}, nil
+	info := strings.Split(req.EncodePassword, "$")
+	verify := password.Verify(req.Password, info[0], info[1], options)
+	return &proto.CheckPasswordResponse{Success: verify}, nil
 }
 
 // 更改用户信息
@@ -112,11 +110,22 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) 
 		return nil, status.Error(codes.NotFound, "用户不存在")
 	}
 
+	options := &password.Options{
+		SaltLen:      16,
+		Iterations:   100,
+		KeyLen:       32,
+		HashFunction: sha512.New,
+	}
+	salt, encoded := password.Encode(req.Password, options)
+	encodePassword := fmt.Sprintf("%s$%s", salt, encoded)
+
 	res := global.DB.Model(&user).Where("id = ?", fmt.Sprintf("%d", req.Id)).Updates(map[string]interface{}{
-		"name":   req.Name,
-		"gender": req.Gender,
+		"nickname":  req.Nickname,
+		"gender":    req.Gender,
+		"user_name": req.UserName,
+		"password":  encodePassword,
 	})
-	if res != nil {
+	if res.RowsAffected == 0 {
 		return nil, status.Error(codes.Internal, "更新用户失败")
 	}
 	return &emptypb.Empty{}, nil

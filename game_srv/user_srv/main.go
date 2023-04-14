@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
 	"net"
 	"os"
 	"os/signal"
@@ -12,6 +10,9 @@ import (
 	"user_srv/initialize"
 	"user_srv/proto"
 	"user_srv/utils"
+
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -34,7 +35,7 @@ func main() {
 	}
 
 	//服务注册及健康检查
-	consulClient, serverID := utils.RegistAndHealthCheak(server, port)
+	consulClient, serverID := utils.RegistAndHealthCheck(server, port)
 
 	//启动微服务
 	go func() {
