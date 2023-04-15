@@ -12,6 +12,8 @@ import (
 	"user_web/models"
 	"user_web/proto"
 
+	"github.com/google/uuid"
+
 	"github.com/DanPlayer/randomname"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -94,8 +96,8 @@ func UserRegister(ctx *gin.Context) {
 		info, err = global.UserSrvClient.CreateUser(context.Background(), &proto.CreateUserInfo{
 			Nickname: register.Nickname,
 			Gender:   ToBool(register.Gender),
-			UserName: randomname.GenerateName(),
-			Password: "123456",
+			UserName: uuid.NewString(),
+			Password: "12345",
 		})
 		if err == nil {
 			break
