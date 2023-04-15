@@ -56,6 +56,12 @@ func ToBool(s string) bool {
 	return false
 }
 
+func GetRandomNickName(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"nickname": randomname.GenerateName(),
+	})
+}
+
 // 查询用户信息,通过id查询
 func GetUserInfo(ctx *gin.Context) {
 	queryID, _ := strconv.Atoi(ctx.Query("id"))
@@ -97,7 +103,10 @@ func UserRegister(ctx *gin.Context) {
 		code, _ := status.FromError(err)
 		if code.Code() != codes.AlreadyExists {
 			//服务错误
-			GrpcErrorToHttp(err, ctx)
+			//GrpcErrorToHttp(err, ctx)
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"msg": err,
+			})
 			return
 		}
 		//数据库存在，持续循环直到可以添加

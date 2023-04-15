@@ -56,7 +56,12 @@ func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 	}
 
 	res := global.DB.Create(&user)
+
 	if res.Error != nil {
+		return nil, result.Error
+	}
+
+	if res.RowsAffected == 0 {
 		return nil, status.Errorf(codes.Internal, result.Error.Error())
 	}
 	return ModelToResponse(&user), nil

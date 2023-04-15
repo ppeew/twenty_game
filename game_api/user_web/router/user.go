@@ -13,4 +13,5 @@ func InitUserRouter(group *gin.RouterGroup) {
 	group.POST("modify", middlewares.JWTAuth(), api.UserUpdate)
 	group.GET("search", middlewares.JWTAuth(), api.GetUserInfo)
 	// add
+	group.GET("getUsername", api.GetRandomNickName)
 }
