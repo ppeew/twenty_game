@@ -19,9 +19,10 @@ type NacosConfig struct {
 }
 
 type ConsulConfig struct {
-	Name string `json:"name"` //服务在注册中心的名字
-	Host string `json:"host"`
-	Port int    `json:"port"`
+	Name       string `json:"name"` //服务在注册中心的名字
+	Host       string `json:"host"`
+	Port       int    `json:"port"`
+	ServerHost string `json:"server_host"`
 }
 
 type ServerConfig struct {

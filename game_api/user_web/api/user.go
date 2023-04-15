@@ -105,7 +105,7 @@ func UserRegister(ctx *gin.Context) {
 			//服务错误
 			//GrpcErrorToHttp(err, ctx)
 			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"msg": err,
+				"msg": err.Error(),
 			})
 			return
 		}
