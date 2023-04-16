@@ -35,7 +35,7 @@ func RegistAndHealthCheck(server *grpc.Server, port int) (*api.Client, string) {
 	if !global.DEBUG {
 		reg.Check = &api.AgentServiceCheck{
 			GRPC:     fmt.Sprintf("%s:%d", global.ServerConfig.Host, port),
-			Interval: "3600",
+			Interval: "60s",
 		}
 
 	}
