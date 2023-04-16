@@ -1,0 +1,16 @@
+{
+    "host":"127.0.0.1",
+    "mysql": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "database": "twelve_game_user_srv",
+        "user": "root",
+        "password": "123456"
+    },
+    "consul": {
+        "name": "twelve_game_user_srv",
+        "host": "192.168.159.134",
+        "port": 8500,
+        "server_host": "192.168.159.1"
+    }
+}
