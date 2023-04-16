@@ -34,7 +34,8 @@ func RegistAndHealthCheck(server *grpc.Server, port int) (*api.Client, string) {
 	reg.Address = global.ServerConfig.ConsulInfo.ServerHost //消费者访问服务地址
 	if !global.DEBUG {
 		reg.Check = &api.AgentServiceCheck{
-			GRPC: fmt.Sprintf("%s:%d", global.ServerConfig.Host, port),
+			GRPC:     fmt.Sprintf("%s:%d", global.ServerConfig.Host, port),
+			Interval: "3600",
 		}
 	}
 
