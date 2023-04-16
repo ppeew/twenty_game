@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"user_srv/global"
 
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
+
 	"github.com/google/uuid"
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
@@ -11,7 +14,9 @@ import (
 )
 
 func RegistAndHealthCheck(server *grpc.Server, port int) (*api.Client, string) {
-	//grpc_health_v1.RegisterHealthServer(server, health.NewServer())
+	if !global.DEBUG {
+		grpc_health_v1.RegisterHealthServer(server, health.NewServer())
+	}
 
 	cfg := api.DefaultConfig()
 	cfg.Address = fmt.Sprintf("%s:%d", global.ServerConfig.ConsulInfo.Host, global.ServerConfig.ConsulInfo.Port)
@@ -27,9 +32,12 @@ func RegistAndHealthCheck(server *grpc.Server, port int) (*api.Client, string) {
 	reg.ID = serverID //服务id
 	reg.Port = port
 	reg.Address = global.ServerConfig.ConsulInfo.ServerHost //消费者访问服务地址
-	//reg.Check = &web.AgentServiceCheck{
-	//	GRPC: fmt.Sprintf("%s:%d", global.ServerConfig.Host, port),
-	//}
+	if !global.DEBUG {
+		reg.Check = &api.AgentServiceCheck{
+			GRPC: fmt.Sprintf("%s:%d", global.ServerConfig.Host, port),
+		}
+
+	}
 
 	err = client.Agent().ServiceRegister(reg)
 	if err != nil {
