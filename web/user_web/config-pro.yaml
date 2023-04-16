@@ -3,5 +3,5 @@ port: 8848
 namespace: 'b8269140-ced0-4bae-9862-2297682d49c2'
 user: 'nacos'
 password: 'nacos'
-dataid: 'game_web.json'
+dataid: 'user_web.json'
 group: 'pro'

@@ -1,0 +1,19 @@
+{
+    "port": 8083,
+    "game_srv": {
+        "name": "twelve_game_game_srv"
+    },
+    "jwt": {
+        "key": "9fl_qct+PUj!U8(5O8$OttbKFhBo3mG%yTW(yO%81UbtHWX4@Nyb_G5Zcn4IWMQmICtrOICG&r5762tA6hhoj3aH"
+    },
+    "redis": {
+        "host": "192.168.159.134",
+        "port": 6379,
+        "password": "123456",
+        "database": 0
+    },
+    "consul": {
+        "host": "192.168.159.134",
+        "port": 8500
+    }
+}
