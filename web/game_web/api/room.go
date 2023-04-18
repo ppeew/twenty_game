@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"game_web/global"
+	"game_web/global/response"
 	"game_web/model"
 	"game_web/utils"
 	"net/http"
@@ -55,6 +56,25 @@ func GrpcErrorToHttp(err error, c *gin.Context) {
 	}
 }
 
+func ModelToRoomResponse(room model.Room) response.RoomResponse {
+	resp := response.RoomResponse{
+		RoomID:        room.RoomID,
+		MaxUserNumber: room.MaxUserNumber,
+		GameCount:     room.GameCount,
+		UserNumber:    room.UserNumber,
+		RoomOwner:     room.RoomOwner,
+		RoomWait:      room.RoomWait,
+		Users:         map[int]response.UserResponse{},
+	}
+	for _, user := range room.Users {
+		resp.Users[user.ID] = response.UserResponse{
+			ID:    user.ID,
+			Ready: user.Ready,
+		}
+	}
+	return resp
+}
+
 func SayHello(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg": "hello",
@@ -70,7 +90,7 @@ func GetRoomList(ctx *gin.Context) {
 		})
 		return
 	}
-	var resp []model.Room
+	var resp []response.RoomResponse
 	for _, key := range keys.Val() {
 		var room model.Room
 		get := global.RedisDB.Get(context.Background(), key)
@@ -82,7 +102,7 @@ func GetRoomList(ctx *gin.Context) {
 			return
 		}
 		_ = json.Unmarshal([]byte(result), &room)
-		resp = append(resp, room)
+		resp = append(resp, ModelToRoomResponse(room))
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": resp,
@@ -284,7 +304,7 @@ func RoomInfo(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": retRoom,
+		"data": ModelToRoomResponse(retRoom),
 	})
 }
 

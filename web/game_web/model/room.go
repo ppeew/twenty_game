@@ -9,14 +9,14 @@ import (
 )
 
 type Room struct {
-	RoomID        int               `json:"roomID"`
-	MaxUserNumber int               `json:"maxUserNumber"`
-	GameCount     int               `json:"gameCount"`
-	UserNumber    int               `json:"userNumber"`
-	RoomOwner     int               `json:"roomOwner"`
-	RoomWait      bool              `json:"roomWait"`
-	Users         map[int]*UserItem `json:"users"`
+	RoomID        int  `json:"roomID"`
+	MaxUserNumber int  `json:"maxUserNumber"`
+	GameCount     int  `json:"gameCount"`
+	UserNumber    int  `json:"userNumber"`
+	RoomOwner     int  `json:"roomOwner"`
+	RoomWait      bool `json:"roomWait"`
 
+	Users map[int]*UserItem `json:"users"`
 	//因为房间需要能够广播，设计订阅发布功能
 	Publish *Publisher
 }
@@ -38,7 +38,7 @@ func (r *Room) Select(room Room) (retRoom Room, err error) {
 		err = get.Err()
 		return
 	}
-	json.Unmarshal([]byte(result), &retRoom)
+	_ = json.Unmarshal([]byte(result), &retRoom)
 	return
 }
 
