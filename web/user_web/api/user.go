@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -11,8 +13,6 @@ import (
 	"user_web/middlewares"
 	"user_web/models"
 	"user_web/proto"
-
-	"github.com/google/uuid"
 
 	"github.com/DanPlayer/randomname"
 	"github.com/dgrijalva/jwt-go"
@@ -93,10 +93,12 @@ func UserRegister(ctx *gin.Context) {
 	var err error
 	//保证一定能够生成，多次尝试
 	for true {
+		//
+		username := fmt.Sprintf("%05v", rand.New(rand.NewSource(time.Now().UnixNano())).Intn(100000))
 		info, err = global.UserSrvClient.CreateUser(context.Background(), &proto.CreateUserInfo{
 			Nickname: register.Nickname,
 			Gender:   ToBool(register.Gender),
-			UserName: uuid.NewString(),
+			UserName: username,
 			Password: "12345",
 		})
 		if err == nil {

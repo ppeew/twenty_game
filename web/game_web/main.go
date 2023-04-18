@@ -24,8 +24,6 @@ func main() {
 	}
 
 	//终止信号
-	fmt.Println("okok!!!!!")
-
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
