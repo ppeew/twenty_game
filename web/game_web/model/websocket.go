@@ -85,3 +85,10 @@ func (ws *WSConn) CloseConn() {
 	ws.mutex.Unlock()
 	ws.conn.Close()
 }
+
+func (ws *WSConn) IsClose() bool {
+	if ws.isClose {
+		return true
+	}
+	return false
+}
