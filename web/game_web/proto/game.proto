@@ -66,6 +66,11 @@ message RoomIDInfo {
   uint32 RoomID=1;
 }
 
+message RoomUser{
+  uint32 ID=1;
+  bool Ready=2;
+}
+
 message RoomInfo{
   uint32 RoomID=1;
   uint32 MaxUserNumber=2;
@@ -73,6 +78,8 @@ message RoomInfo{
   uint32 UserNumber=4;
   uint32 RoomOwner=5;
   bool RoomWait=6;
+  repeated RoomUser Users=7;
+
 }
 
 message AllRoomInfo{

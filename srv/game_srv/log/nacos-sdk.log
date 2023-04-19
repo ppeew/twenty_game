@@ -22,3 +22,10 @@
 2023-04-19T10:34:05.459+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>
 2023-04-19T10:49:09.395+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>
 2023-04-19T10:55:22.551+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>
+2023-04-19T15:14:00.705+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>
+2023-04-19T15:33:47.745+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>
+2023-04-19T15:47:10.599+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>
+2023-04-19T15:48:25.011+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>
+2023-04-19T15:50:58.167+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>
+2023-04-19T15:54:49.418+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>
+2023-04-19T16:02:36.445+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty_game\srv\game_srv\cache>

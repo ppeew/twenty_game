@@ -98,14 +98,26 @@ func (s *GameServer) AddItem(ctx context.Context, req *proto.AddItemInfo) (*empt
 }
 
 func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*proto.AllRoomInfo, error) {
-	ret := &proto.AllRoomInfo{AllRoomInfo: nil}
+	ret := &proto.AllRoomInfo{}
 	keys := global.RedisDB.Keys(ctx, "*")
 	if keys.Err() != nil {
 		return nil, keys.Err()
 	}
 	for _, value := range keys.Val() {
+		get := global.RedisDB.Get(ctx, value)
+		result := get.Val()
+		if result == "" {
+			return nil, get.Err()
+		}
 		room := model.Room{}
-		_ = json.Unmarshal([]byte(value), &room)
+		_ = json.Unmarshal([]byte(result), &room)
+		var users []*proto.RoomUser
+		for _, user := range room.Users {
+			users = append(users, &proto.RoomUser{
+				ID:    user.ID,
+				Ready: user.Ready,
+			})
+		}
 		r := &proto.RoomInfo{
 			RoomID:        room.RoomID,
 			MaxUserNumber: room.MaxUserNumber,
@@ -113,6 +125,7 @@ func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*pro
 			UserNumber:    room.UserNumber,
 			RoomOwner:     room.RoomOwner,
 			RoomWait:      room.RoomWait,
+			Users:         users,
 		}
 		ret.AllRoomInfo = append(ret.AllRoomInfo, r)
 	}
@@ -120,6 +133,7 @@ func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*pro
 }
 
 func (s *GameServer) CreateRoom(ctx context.Context, in *proto.RoomInfo) (*emptypb.Empty, error) {
+	var users []model.User
 	room := model.Room{
 		RoomID:        in.RoomID,
 		MaxUserNumber: in.MaxUserNumber,
@@ -127,6 +141,7 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *proto.RoomInfo) (*empty
 		UserNumber:    in.UserNumber,
 		RoomOwner:     in.RoomOwner,
 		RoomWait:      in.RoomWait,
+		Users:         users,
 	}
 	marshal, _ := json.Marshal(room)
 	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
@@ -152,6 +167,12 @@ func (s *GameServer) SearchRoom(ctx context.Context, in *proto.RoomIDInfo) (*pro
 		RoomOwner:     room.RoomOwner,
 		RoomWait:      room.RoomWait,
 	}
+	for _, user := range room.Users {
+		ret.Users = append(ret.Users, &proto.RoomUser{
+			ID:    user.ID,
+			Ready: user.Ready,
+		})
+	}
 	return ret, nil
 }
 
@@ -164,7 +185,14 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *proto.RoomInfo) (*empty
 		RoomOwner:     in.RoomOwner,
 		RoomWait:      in.RoomWait,
 	}
+	for _, user := range in.Users {
+		room.Users = append(room.Users, model.User{
+			ID:    user.ID,
+			Ready: user.Ready,
+		})
+	}
 	marshal, _ := json.Marshal(room)
+
 	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
 	if set.Err() != nil {
 		return &emptypb.Empty{}, set.Err()

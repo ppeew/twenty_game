@@ -32,7 +32,12 @@ func InitWebSocket(conn *websocket.Conn) (ws *WSConn) {
 // 协程接受客户端msg
 func (ws *WSConn) readMsgLoop() {
 	for true {
-		_, data, _ := ws.conn.ReadMessage()
+		_, data, err := ws.conn.ReadMessage()
+		if err != nil {
+			//发生错误,关闭连接，停止协程
+			ws.CloseConn()
+			break
+		}
 		ws.inChan <- data
 	}
 }
@@ -41,7 +46,12 @@ func (ws *WSConn) readMsgLoop() {
 func (ws *WSConn) writeMsgLoop() {
 	for true {
 		data := <-ws.outChan
-		_ = ws.conn.WriteMessage(websocket.TextMessage, data)
+		err := ws.conn.WriteMessage(websocket.TextMessage, data)
+		if err != nil {
+			//发生错误,关闭连接，停止协程
+			ws.CloseConn()
+			break
+		}
 	}
 }
 

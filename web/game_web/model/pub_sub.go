@@ -7,11 +7,8 @@ type Publisher struct {
 }
 
 type Subscriber struct {
-	Ch chan string
+	ch chan string
 
-	//订阅者的id和是否准备
-	UserID  uint32
-	IsReady bool
 	//订阅者的websocket连接信息
 	WS *WSConn
 }
@@ -22,8 +19,10 @@ func NewPublisher() *Publisher {
 
 func NewSubscriber(buffer int, ws *WSConn) *Subscriber {
 	return &Subscriber{
-		Ch: make(chan string, buffer),
+		ch: make(chan string, buffer),
 		WS: ws,
+		//UserID:  userID,
+		//IsReady: isReady,
 	}
 }
 
@@ -35,7 +34,7 @@ func (p *Publisher) AddSubscriber(userID uint32, sub *Subscriber) {
 }
 
 func (p *Publisher) SendTopicMsg(sub *Subscriber, v string) {
-	sub.Ch <- v
+	sub.ch <- v
 }
 
 func (p *Publisher) Publish(s string) {
