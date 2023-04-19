@@ -104,18 +104,17 @@ func CreateRoom(ctx *gin.Context) {
 			global.RoomData[roomID] = roomData
 		}
 		roomData.Publisher = publisher
-
 		//协程主要作用在于处理房间内用户websocket的消息
 		for {
 			select {
 			//读信息并处理(msg有类型，比如订阅信息，比如用户消息，用户的更新房间操作)
 			case msg := <-roomData.Publisher.MsgChan:
 				fmt.Println("收到", msg)
-				go HandlerMsg(roomID, msg) //协程处理消息,处理同步问题
+				HandlerMsg(roomID, msg) //协程处理消息,处理同步问题
 			}
 		}
-		//
 	}(uint32(roomID))
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg": "创建成功",
 	})
