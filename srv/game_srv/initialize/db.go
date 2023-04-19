@@ -3,6 +3,7 @@ package initialize
 import (
 	"fmt"
 	"game_srv/global"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -18,5 +19,12 @@ func InitDB() {
 	if err != nil {
 		zap.S().Fatalf("[InitDB]打开mysql错误:%s", err.Error())
 	}
+	//初始化redis
+	//初始化redis
+	redisInfo := global.ServerConfig.RedisInfo
+	global.RedisDB = redis.NewClient(&redis.Options{
+		Addr: fmt.Sprintf("%s:%d", redisInfo.Host, redisInfo.Port),
+		DB:   redisInfo.Database,
+	})
 
 }

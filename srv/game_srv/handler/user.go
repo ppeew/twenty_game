@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"game_srv/global"
 	"game_srv/model"
@@ -67,7 +69,7 @@ func (s *GameServer) GetUserItemsInfo(ctx context.Context, req *proto.UserIDInfo
 func (s *GameServer) AddGold(ctx context.Context, req *proto.AddGoldRequest) (*emptypb.Empty, error) {
 	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("gold = ?", fmt.Sprintf("%d", req.Count))
 	if res.RowsAffected == 0 {
-		return nil, status.Error(codes.Internal, "更新用户失败")
+		return &emptypb.Empty{}, status.Error(codes.Internal, "更新用户失败")
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -76,7 +78,7 @@ func (s *GameServer) AddGold(ctx context.Context, req *proto.AddGoldRequest) (*e
 func (s *GameServer) AddDiamond(ctx context.Context, req *proto.AddDiamondInfo) (*emptypb.Empty, error) {
 	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", req.Count))
 	if res.RowsAffected == 0 {
-		return nil, status.Error(codes.Internal, "更新用户失败")
+		return &emptypb.Empty{}, status.Error(codes.Internal, "更新用户失败")
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -90,7 +92,93 @@ func (s *GameServer) AddItem(ctx context.Context, req *proto.AddItemInfo) (*empt
 	}
 	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Updates(item)
 	if res.RowsAffected == 0 {
-		return nil, status.Error(codes.Internal, "更新用户失败")
+		return &emptypb.Empty{}, status.Error(codes.Internal, "更新用户失败")
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*proto.AllRoomInfo, error) {
+	ret := &proto.AllRoomInfo{AllRoomInfo: nil}
+	keys := global.RedisDB.Keys(ctx, "*")
+	if keys.Err() != nil {
+		return nil, keys.Err()
+	}
+	for _, value := range keys.Val() {
+		room := model.Room{}
+		_ = json.Unmarshal([]byte(value), &room)
+		r := &proto.RoomInfo{
+			RoomID:        room.RoomID,
+			MaxUserNumber: room.MaxUserNumber,
+			GameCount:     room.GameCount,
+			UserNumber:    room.UserNumber,
+			RoomOwner:     room.RoomOwner,
+			RoomWait:      room.RoomWait,
+		}
+		ret.AllRoomInfo = append(ret.AllRoomInfo, r)
+	}
+	return ret, nil
+}
+
+func (s *GameServer) CreateRoom(ctx context.Context, in *proto.RoomInfo) (*emptypb.Empty, error) {
+	room := model.Room{
+		RoomID:        in.RoomID,
+		MaxUserNumber: in.MaxUserNumber,
+		GameCount:     in.GameCount,
+		UserNumber:    in.UserNumber,
+		RoomOwner:     in.RoomOwner,
+		RoomWait:      in.RoomWait,
+	}
+	marshal, _ := json.Marshal(room)
+	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
+	if set.Err() != nil {
+		return &emptypb.Empty{}, set.Err()
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *GameServer) SearchRoom(ctx context.Context, in *proto.RoomIDInfo) (*proto.RoomInfo, error) {
+	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
+	result := get.Val()
+	if get.Val() == "" {
+		return nil, get.Err()
+	}
+	room := model.Room{}
+	_ = json.Unmarshal([]byte(result), &room)
+	ret := &proto.RoomInfo{
+		RoomID:        room.RoomID,
+		MaxUserNumber: room.MaxUserNumber,
+		GameCount:     room.GameCount,
+		UserNumber:    room.UserNumber,
+		RoomOwner:     room.RoomOwner,
+		RoomWait:      room.RoomWait,
+	}
+	return ret, nil
+}
+
+func (s *GameServer) UpdateRoom(ctx context.Context, in *proto.RoomInfo) (*emptypb.Empty, error) {
+	room := model.Room{
+		RoomID:        in.RoomID,
+		MaxUserNumber: in.MaxUserNumber,
+		GameCount:     in.GameCount,
+		UserNumber:    in.UserNumber,
+		RoomOwner:     in.RoomOwner,
+		RoomWait:      in.RoomWait,
+	}
+	marshal, _ := json.Marshal(room)
+	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
+	if set.Err() != nil {
+		return &emptypb.Empty{}, set.Err()
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *GameServer) DeleteRoom(ctx context.Context, in *proto.RoomIDInfo) (*emptypb.Empty, error) {
+	del := global.RedisDB.Del(ctx, fmt.Sprintf("%d", in.RoomID))
+	if del.Err() != nil {
+		return &emptypb.Empty{}, del.Err()
+	}
+	if del.Val() == 0 {
+		return &emptypb.Empty{}, errors.New("没有该房间")
 	}
 	return &emptypb.Empty{}, nil
 }

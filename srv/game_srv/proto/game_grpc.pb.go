@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameClient interface {
+	// 道具
 	CreateUserItems(ctx context.Context, in *UserItemsInfo, opts ...grpc.CallOption) (*UserItemsInfoResponse, error)
 	// 查询用户的金币钻石及道具
 	GetUserItemsInfo(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserItemsInfoResponse, error)
@@ -28,6 +29,12 @@ type GameClient interface {
 	AddDiamond(ctx context.Context, in *AddDiamondInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 增加道具(道具类型应该区别)
 	AddItem(ctx context.Context, in *AddItemInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 房间
+	SearchAllRoom(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllRoomInfo, error)
+	CreateRoom(ctx context.Context, in *RoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SearchRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*RoomInfo, error)
+	UpdateRoom(ctx context.Context, in *RoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type gameClient struct {
@@ -83,10 +90,56 @@ func (c *gameClient) AddItem(ctx context.Context, in *AddItemInfo, opts ...grpc.
 	return out, nil
 }
 
+func (c *gameClient) SearchAllRoom(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllRoomInfo, error) {
+	out := new(AllRoomInfo)
+	err := c.cc.Invoke(ctx, "/Game/SearchAllRoom", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) CreateRoom(ctx context.Context, in *RoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/Game/CreateRoom", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) SearchRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*RoomInfo, error) {
+	out := new(RoomInfo)
+	err := c.cc.Invoke(ctx, "/Game/SearchRoom", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) UpdateRoom(ctx context.Context, in *RoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/Game/UpdateRoom", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) DeleteRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/Game/DeleteRoom", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GameServer is the server API for Game service.
 // All implementations must embed UnimplementedGameServer
 // for forward compatibility
 type GameServer interface {
+	// 道具
 	CreateUserItems(context.Context, *UserItemsInfo) (*UserItemsInfoResponse, error)
 	// 查询用户的金币钻石及道具
 	GetUserItemsInfo(context.Context, *UserIDInfo) (*UserItemsInfoResponse, error)
@@ -96,6 +149,12 @@ type GameServer interface {
 	AddDiamond(context.Context, *AddDiamondInfo) (*emptypb.Empty, error)
 	// 增加道具(道具类型应该区别)
 	AddItem(context.Context, *AddItemInfo) (*emptypb.Empty, error)
+	// 房间
+	SearchAllRoom(context.Context, *emptypb.Empty) (*AllRoomInfo, error)
+	CreateRoom(context.Context, *RoomInfo) (*emptypb.Empty, error)
+	SearchRoom(context.Context, *RoomIDInfo) (*RoomInfo, error)
+	UpdateRoom(context.Context, *RoomInfo) (*emptypb.Empty, error)
+	DeleteRoom(context.Context, *RoomIDInfo) (*emptypb.Empty, error)
 	mustEmbedUnimplementedGameServer()
 }
 
@@ -117,6 +176,21 @@ func (UnimplementedGameServer) AddDiamond(context.Context, *AddDiamondInfo) (*em
 }
 func (UnimplementedGameServer) AddItem(context.Context, *AddItemInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddItem not implemented")
+}
+func (UnimplementedGameServer) SearchAllRoom(context.Context, *emptypb.Empty) (*AllRoomInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchAllRoom not implemented")
+}
+func (UnimplementedGameServer) CreateRoom(context.Context, *RoomInfo) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRoom not implemented")
+}
+func (UnimplementedGameServer) SearchRoom(context.Context, *RoomIDInfo) (*RoomInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchRoom not implemented")
+}
+func (UnimplementedGameServer) UpdateRoom(context.Context, *RoomInfo) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRoom not implemented")
+}
+func (UnimplementedGameServer) DeleteRoom(context.Context, *RoomIDInfo) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
 }
 func (UnimplementedGameServer) mustEmbedUnimplementedGameServer() {}
 
@@ -221,6 +295,96 @@ func _Game_AddItem_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Game_SearchAllRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).SearchAllRoom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Game/SearchAllRoom",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).SearchAllRoom(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_CreateRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoomInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).CreateRoom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Game/CreateRoom",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).CreateRoom(ctx, req.(*RoomInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_SearchRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoomIDInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).SearchRoom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Game/SearchRoom",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).SearchRoom(ctx, req.(*RoomIDInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_UpdateRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoomInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).UpdateRoom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Game/UpdateRoom",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).UpdateRoom(ctx, req.(*RoomInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_DeleteRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoomIDInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).DeleteRoom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Game/DeleteRoom",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).DeleteRoom(ctx, req.(*RoomIDInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Game_ServiceDesc is the grpc.ServiceDesc for Game service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -247,6 +411,26 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddItem",
 			Handler:    _Game_AddItem_Handler,
+		},
+		{
+			MethodName: "SearchAllRoom",
+			Handler:    _Game_SearchAllRoom_Handler,
+		},
+		{
+			MethodName: "CreateRoom",
+			Handler:    _Game_CreateRoom_Handler,
+		},
+		{
+			MethodName: "SearchRoom",
+			Handler:    _Game_SearchRoom_Handler,
+		},
+		{
+			MethodName: "UpdateRoom",
+			Handler:    _Game_UpdateRoom_Handler,
+		},
+		{
+			MethodName: "DeleteRoom",
+			Handler:    _Game_DeleteRoom_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

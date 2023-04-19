@@ -25,8 +25,16 @@ type ConsulConfig struct {
 	ServerHost string `json:"server_host"`
 }
 
+type RedisConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Password string `json:"password"`
+	Database int    `json:"database"`
+}
+
 type ServerConfig struct {
 	Host       string       `json:"host"`
 	MysqlInfo  MysqlConfig  `json:"mysql"`
 	ConsulInfo ConsulConfig `json:"consul"`
+	RedisInfo  RedisConfig  `json:"redis"`
 }

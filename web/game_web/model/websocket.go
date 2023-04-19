@@ -13,19 +13,15 @@ type WSConn struct {
 	isClose   bool       // 通道closeChan是否已经关闭
 	mutex     sync.Mutex //并发问题
 	conn      *websocket.Conn
-
-	//订阅
-	Subscriber *Subscriber
 }
 
 // 创建websocket实例
 func InitWebSocket(conn *websocket.Conn) (ws *WSConn) {
 	ws = &WSConn{
-		inChan:     make(chan []byte, 1024),
-		outChan:    make(chan []byte, 1024),
-		closeChan:  make(chan []byte, 1024),
-		conn:       conn,
-		Subscriber: NewSubscriber(3),
+		inChan:    make(chan []byte, 1024),
+		outChan:   make(chan []byte, 1024),
+		closeChan: make(chan []byte, 1024),
+		conn:      conn,
 	}
 	// 完善必要协程：读取客户端数据协程/发送数据协程
 	go ws.readMsgLoop()

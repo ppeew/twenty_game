@@ -3,6 +3,7 @@ import "google/protobuf/empty.proto";
 option go_package = ".;proto";
 
 service Game{
+  //道具
   rpc CreateUserItems(UserItemsInfo)returns(UserItemsInfoResponse);
   //查询用户的金币钻石及道具
   rpc GetUserItemsInfo(UserIDInfo) returns(UserItemsInfoResponse);
@@ -12,6 +13,13 @@ service Game{
   rpc AddDiamond(AddDiamondInfo) returns(google.protobuf.Empty);
   //增加道具(道具类型应该区别)
   rpc AddItem(AddItemInfo) returns(google.protobuf.Empty);
+
+  //房间
+  rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);
+  rpc CreateRoom(RoomInfo)returns (google.protobuf.Empty);
+  rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
+  rpc UpdateRoom(RoomInfo)returns (google.protobuf.Empty);
+  rpc DeleteRoom(RoomIDInfo)returns (google.protobuf.Empty);
 }
 
 message UserItemsInfo{
@@ -52,4 +60,21 @@ message AddDiamondInfo{
 message AddItemInfo{
   uint32 id=1;
   repeated uint32 items=2;
+}
+
+message RoomIDInfo {
+  uint32 RoomID=1;
+}
+
+message RoomInfo{
+  uint32 RoomID=1;
+  uint32 MaxUserNumber=2;
+  uint32 GameCount=3;
+  uint32 UserNumber=4;
+  uint32 RoomOwner=5;
+  bool RoomWait=6;
+}
+
+message AllRoomInfo{
+  repeated RoomInfo AllRoomInfo=1;
 }

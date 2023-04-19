@@ -7,6 +7,12 @@
         "user": "root",
         "password": "123456"
     },
+    "redis": {
+        "host": "192.168.159.134",
+        "port": 6379,
+        "password": "123456",
+        "database": 0
+    },
     "consul": {
         "name": "twelve_game_game_srv",
         "host": "192.168.159.134",

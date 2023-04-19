@@ -25,3 +25,12 @@ type UserItem struct {
 	Apple   uint32
 	Banana  uint32
 }
+
+type Room struct {
+	RoomID        uint32 `json:"roomID"`
+	MaxUserNumber uint32 `json:"maxUserNumber"`
+	GameCount     uint32 `json:"gameCount"`
+	UserNumber    uint32 `json:"userNumber"`
+	RoomOwner     uint32 `json:"roomOwner"`
+	RoomWait      bool   `json:"roomWait"`
+}

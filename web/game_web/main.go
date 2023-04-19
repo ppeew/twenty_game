@@ -15,7 +15,6 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitSrvConn()
-	initialize.InitRedis()
 
 	routers := initialize.InitRouters()
 

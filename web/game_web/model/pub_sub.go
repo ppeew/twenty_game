@@ -1,34 +1,45 @@
 package model
 
-// 发布者订阅者模型
+// 类似发布者订阅者模型
 type Publisher struct {
-	Subscribers []*Subscriber
+	MsgChan     chan string            //接受信息管道
+	Subscribers map[uint32]*Subscriber //用户id到订阅者的映射
 }
 
 type Subscriber struct {
-	ch chan interface{}
+	Ch chan string
+
+	//订阅者的id和是否准备
+	UserID  uint32
+	IsReady bool
+	//订阅者的websocket连接信息
+	WS *WSConn
 }
 
 func NewPublisher() *Publisher {
-	return &Publisher{Subscribers: nil}
+	return &Publisher{Subscribers: make(map[uint32]*Subscriber)}
 }
 
-func NewSubscriber(buffer int) *Subscriber {
+func NewSubscriber(buffer int, ws *WSConn) *Subscriber {
 	return &Subscriber{
-		ch: make(chan interface{}, buffer),
+		Ch: make(chan string, buffer),
+		WS: ws,
 	}
 }
 
-func (p *Publisher) AddSubscriber(sub *Subscriber) {
-	p.Subscribers = append(p.Subscribers, sub)
+func (p *Publisher) AddSubscriber(userID uint32, sub *Subscriber) {
+	if p.Subscribers[userID] == nil {
+		p.Subscribers[userID] = new(Subscriber)
+	}
+	p.Subscribers[userID] = sub
 }
 
-func (p *Publisher) SendTopicMsg(sub *Subscriber, v interface{}) {
-	sub.ch <- v
+func (p *Publisher) SendTopicMsg(sub *Subscriber, v string) {
+	sub.Ch <- v
 }
 
-func (p *Publisher) Publish(v interface{}) {
+func (p *Publisher) Publish(s string) {
 	for _, subscriber := range p.Subscribers {
-		go p.SendTopicMsg(subscriber, v)
+		go p.SendTopicMsg(subscriber, s)
 	}
 }

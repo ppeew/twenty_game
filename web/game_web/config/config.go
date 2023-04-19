@@ -13,19 +13,11 @@ type ConsulConfig struct {
 	Port int    `json:"port"`
 }
 
-type RedisConfig struct {
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	Password string `json:"password"`
-	Database int    `json:"database"`
-}
-
 type ServerConfig struct {
 	Port        int           `json:"port"`
 	GameSrvInfo GameSrvConfig `json:"game_srv"`
 	JWTInfo     JWTConfig     `json:"jwt"`
 	ConsulInfo  ConsulConfig  `json:"consul"`
-	RedisInfo   RedisConfig   `json:"redis"`
 }
 
 type NacosConfig struct {
