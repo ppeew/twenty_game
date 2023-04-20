@@ -3,15 +3,13 @@ package model
 // 用户与websocket通讯的消息体
 type Message struct {
 	UserID     uint32     `json:"userID"`
-	Type       MsgType    `json:"type"`
+	Type       uint32     `json:"type"`
 	DeleteData DeleteData `json:"deleteData"`
 	UpdateData UpdateData `json:"updateData"`
 	RoomData   RoomData   `json:"roomData"`
 	ReadyState ReadyState `json:"readyState"`
 	BeginGame  BeginGame  `json:"beginGame"`
 }
-
-type MsgType uint32
 
 const (
 	DeleteRoom = 1 << iota
