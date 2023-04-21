@@ -10,6 +10,7 @@ import (
 	"game_web/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"net/http"
 	"strconv"
@@ -57,7 +58,6 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
-
 	_, err = global.GameSrvClient.CreateRoom(context.Background(), &proto.RoomInfo{
 		RoomID:        uint32(roomID),
 		MaxUserNumber: uint32(maxUserNumber),
@@ -94,40 +94,15 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		return
 	}
-
+	if RoomData[uint32(roomID)] == nil {
+		//没有创房间
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg": "还没创房就进入",
+		})
+		return
+	}
 	//断线重连（因为之前已经在房间，查询是否之前有连接过，重连只需要把订阅者内的连接改一下即可）
-	//Reconn()
-	//if RoomData[uint32(roomID)] == nil {
-	//	//没有创房间
-	//	ctx.JSON(http.StatusBadRequest, gin.H{
-	//		"msg": "还没创房就进入",
-	//	})
-	//	return
-	//}
-	////断线重连机制
-	//for u, _ := range RoomData[uint32(roomID)].UsersConn { // TODO 这里又bug
-	//	if u == userID {
-	//		//存在用户
-	//		conn, err2 := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-	//		if err2 != nil {
-	//			ctx.JSON(http.StatusBadRequest, gin.H{
-	//				"msg": "无法连接房间服务器",
-	//			})
-	//			return
-	//		}
-	//		//初始化websocket（两协程，分别用来读与写）
-	//		ws := model.InitWebSocket(conn, userID)
-	//		if RoomData[uint32(roomID)].UsersConn[userID] == nil {
-	//			RoomData[uint32(roomID)].UsersConn[userID] = new(model.WSConn)
-	//		}
-	//		RoomData[uint32(roomID)].UsersConn[userID] = ws
-	//		ctx.JSON(http.StatusOK, gin.H{
-	//			"msg": "重连房间服务器成功",
-	//		})
-	//		return
-	//	}
-	//}
-
+	ReConn(RoomData[uint32(roomID)].UsersConn, ctx, userID)
 	//房间存在，房间当前人数不应该满了或者房间开始了
 	if room.UserNumber >= room.MaxUserNumber {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -140,7 +115,6 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		return
 	}
-
 	//进入房间,建立websocket连接
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
@@ -151,26 +125,16 @@ func UserIntoRoom(ctx *gin.Context) {
 	}
 	//初始化websocket（两协程，分别用来读与写）
 	ws := model.InitWebSocket(conn, userID)
-
 	if RoomData[uint32(roomID)].UsersConn[userID] == nil {
 		RoomData[uint32(roomID)].UsersConn[userID] = new(model.WSConn)
 	}
 	RoomData[uint32(roomID)].UsersConn[userID] = ws
-
-	var users []*proto.RoomUser
-	users = append(users, &proto.RoomUser{
+	room.Users = append(room.Users, &proto.RoomUser{
 		ID:    userID,
 		Ready: false,
 	})
-	_, err = global.GameSrvClient.UpdateRoom(context.Background(), &proto.RoomInfo{
-		RoomID:        room.RoomID,
-		MaxUserNumber: room.MaxUserNumber,
-		GameCount:     room.GameCount,
-		UserNumber:    room.UserNumber + 1,
-		RoomOwner:     room.RoomOwner,
-		RoomWait:      room.RoomWait,
-		Users:         users,
-	})
+	room.UserNumber += 1
+	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
 	if err != nil {
 		utils.SendErrToUser(ws, "[UserIntoRoom]", err)
 	}
@@ -184,11 +148,37 @@ func UserIntoRoom(ctx *gin.Context) {
 	BroadcastToAllRoomUsers(RoomData[uint32(roomID)], marshal)
 }
 
+func ReConn(usersConn map[uint32]*model.WSConn, ctx *gin.Context, userID uint32) {
+	//断线重连机制
+	for u, _ := range usersConn {
+		if u == userID {
+			//存在用户
+			conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{
+					"msg": "无法连接房间服务器",
+				})
+				return
+			}
+			//初始化websocket（两协程，分别用来读与写）
+			ws := model.InitWebSocket(conn, userID)
+			if usersConn[userID] == nil {
+				usersConn[userID] = new(model.WSConn)
+			}
+			usersConn[userID] = ws
+			ctx.JSON(http.StatusOK, gin.H{
+				"msg": "重连房间服务器成功",
+			})
+			return
+		}
+	}
+}
+
 func BroadcastToAllRoomUsers(coon *model.RoomCoon, message []byte) {
-	for _, wsConn := range coon.UsersConn {
+	for userID, wsConn := range coon.UsersConn {
 		err := wsConn.OutChanWrite(message)
 		if err != nil {
-			wsConn.CloseConn()
+			zap.S().Infof("ID为%d的用户掉线了", userID)
 		}
 	}
 }

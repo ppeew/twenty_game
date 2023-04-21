@@ -35,11 +35,25 @@ func RunGame(roomID uint32) {
 	}
 	//游戏结束计算排名发奖励阶段
 	DoEndGame(game)
-	//完成所有环境，退出游戏，回到房间,将当前用户的连接给房间协程
+
 	for userID, info := range game.Users {
 		RoomData[roomID].UsersConn[userID] = info.WS
 	}
-	RoomData[roomID].RecoverChan <- struct{}{}
+	//更改用户为非准备状态，并且房间为等待状态
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
+	if err != nil {
+		zap.S().Infof("err:%s", err)
+	}
+	room.RoomWait = true
+	for _, user := range room.Users {
+		user.Ready = false
+	}
+	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
+	if err != nil {
+		zap.S().Info("[RunGame]更新房间失败")
+	}
+	//完成所有环境，退出游戏，创建房间协程，回到房间协程来
+	go startRoomThread(roomID)
 }
 
 func DoFlush(game *model.Game) {

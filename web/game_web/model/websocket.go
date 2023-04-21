@@ -7,12 +7,12 @@ import (
 )
 
 type WSConn struct {
-	UserID    uint32      //标识是哪个用户的连接
-	inChan    chan []byte //读客户端发来数据
-	outChan   chan []byte //向客户端写入数据
-	closeChan chan []byte
-	isClose   bool       // 通道closeChan是否已经关闭
-	mutex     sync.Mutex //并发问题
+	UserID    uint32        //标识是哪个用户的连接
+	inChan    chan []byte   //读客户端发来数据
+	outChan   chan []byte   //向客户端写入数据
+	closeChan chan struct{} //标记ws是否关闭，关闭chan后，消费者依然可以读,通过这个标志说明是否关闭
+	isClose   bool          // 通道closeChan是否已经关闭,chan不能多次关闭，所有需要保证只能关闭一次
+	mutex     sync.Mutex    //保证closeChan不会多次关闭
 	conn      *websocket.Conn
 }
 
@@ -22,7 +22,7 @@ func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 		UserID:    userID,
 		inChan:    make(chan []byte, 1024),
 		outChan:   make(chan []byte, 1024),
-		closeChan: make(chan []byte, 1024),
+		closeChan: make(chan struct{}),
 		conn:      conn,
 	}
 	// 完善必要协程：读取客户端数据协程/发送数据协程
@@ -85,12 +85,5 @@ func (ws *WSConn) CloseConn() {
 		ws.isClose = true
 	}
 	ws.mutex.Unlock()
-	ws.conn.Close()
-}
-
-func (ws *WSConn) IsClose() bool {
-	if ws.isClose {
-		return true
-	}
-	return false
+	_ = ws.conn.Close()
 }

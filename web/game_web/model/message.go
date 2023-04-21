@@ -22,7 +22,7 @@ const (
 	// 通用的消息
 	ChatMsgData = 1 << iota
 	// 房间相关的消息
-	DeleteRoom
+	QuitRoom
 	UpdateRoom
 	GetRoomData
 	UserReadyState
