@@ -8,12 +8,21 @@ import (
 	"game_web/global/response"
 	"game_web/model"
 	"game_web/proto"
+	"game_web/utils"
 	"go.uber.org/zap"
 )
 
 type DealFunc func(roomID uint32, message model.Message)
 
 var dealFuncs = make(map[uint32]DealFunc)
+
+func init() {
+	dealFuncs[model.DeleteRoom] = DropRoom
+	dealFuncs[model.GetRoomData] = RoomInfo
+	dealFuncs[model.RoomBeginGame] = BeginGame
+	dealFuncs[model.UserReadyState] = UpdateUserReadyState
+	dealFuncs[model.UpdateRoom] = UpdateRoom
+}
 
 // 全局房间信息
 var RoomData map[uint32]*model.RoomCoon = make(map[uint32]*model.RoomCoon) //房间号->房间数据的映射(每个房间线程访问各自数据)
@@ -97,32 +106,17 @@ func ReadRoomData(roomInfo *model.RoomCoon) {
 	}
 }
 
-func init() {
-	dealFuncs[model.DeleteRoom] = DropRoom
-	dealFuncs[model.GetRoomData] = RoomInfo
-	dealFuncs[model.RoomBeginGame] = BeginGame
-	dealFuncs[model.UserReadyState] = UpdateUserReadyState
-	dealFuncs[model.UpdateRoom] = UpdateRoom
-}
-
 // 房间信息
 func RoomInfo(roomID uint32, message model.Message) {
 	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", err)
 		return
 	}
 	resp := GrpcModelToResponse(room)
 	marshal, _ := json.Marshal(resp)
-	err = users[message.UserID].OutChanWrite(marshal)
-	if err != nil {
-		users[message.UserID].CloseConn()
-	}
+	utils.SendMsgToUser(users[message.UserID], marshal)
 }
 
 // 删除房间（仅房主）
@@ -131,28 +125,16 @@ func DropRoom(roomID uint32, message model.Message) {
 	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", err)
 		return
 	}
 	if room.RoomOwner != message.UserID {
-		ret := errors.New("非房主不可删除房间").Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", errors.New("非房主不可删除房间"))
 		return
 	}
 	_, err = global.GameSrvClient.DeleteRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", err)
 		return
 	}
 	ret := "删除房间成功"
@@ -163,21 +145,12 @@ func DropRoom(roomID uint32, message model.Message) {
 	//房间变化，广播
 	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", err)
 		return
 	}
 	resp := GrpcModelToResponse(searchRoom)
 	marshal, _ := json.Marshal(resp)
-	for _, ws := range users {
-		err := ws.OutChanWrite(marshal)
-		if err != nil {
-			ws.CloseConn()
-		}
-	}
+	BroadcastToAllRoomUsers(RoomData[roomID], marshal)
 }
 
 // 更新房间的房主或者游戏配置(仅房主)
@@ -186,19 +159,11 @@ func UpdateRoom(roomID uint32, message model.Message) {
 	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", err)
 		return
 	}
 	if room.RoomOwner != message.UserID {
-		ret := errors.New("非房主不可更新房间").Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", errors.New("非房主不可修改房间"))
 		return
 	}
 
@@ -233,11 +198,7 @@ func UpdateRoom(roomID uint32, message model.Message) {
 
 	_, err = global.GameSrvClient.UpdateRoom(context.Background(), &roomUpdate)
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", err)
 		return
 	}
 	err = users[message.UserID].OutChanWrite([]byte("更新房间成功"))
@@ -247,21 +208,12 @@ func UpdateRoom(roomID uint32, message model.Message) {
 	//更新房间，发送广播
 	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", err)
 		return
 	}
 	resp := GrpcModelToResponse(searchRoom)
 	marshal, _ := json.Marshal(resp)
-	for _, ws := range users {
-		err := ws.OutChanWrite(marshal)
-		if err != nil {
-			ws.CloseConn()
-		}
-	}
+	BroadcastToAllRoomUsers(RoomData[roomID], marshal)
 }
 
 // 玩家准备状态
@@ -270,11 +222,7 @@ func UpdateUserReadyState(roomID uint32, message model.Message) {
 	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateUserReadyState]", err)
 		return
 	}
 	//users[message.UserID].IsReady = message.ReadyState.IsReady
@@ -283,29 +231,16 @@ func UpdateUserReadyState(roomID uint32, message model.Message) {
 			user.Ready = message.ReadyState.IsReady
 		}
 	}
-
-	err = users[message.UserID].OutChanWrite([]byte("玩家准备状态更新成功"))
-	if err != nil {
-		users[message.UserID].CloseConn()
-	}
+	utils.SendMsgToUser(users[message.UserID], []byte("玩家准备状态更新成功"))
 	//更新房间，发送广播
 	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[UpdateUserReadyState]", err)
 		return
 	}
 	resp := GrpcModelToResponse(searchRoom)
 	marshal, _ := json.Marshal(resp)
-	for _, ws := range users {
-		err := ws.OutChanWrite(marshal)
-		if err != nil {
-			ws.CloseConn()
-		}
-	}
+	BroadcastToAllRoomUsers(RoomData[roomID], marshal)
 }
 
 // 开始游戏按键接口(需要将用户连接（全局）传输到游戏线程，当前线程就不再运行，等待游戏完成信号再启动该线程，设置pausechan)
@@ -314,38 +249,22 @@ func BeginGame(roomID uint32, message model.Message) {
 	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		ret := err.Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendErrToUser(users[message.UserID], "[BeginGame]", err)
 		return
 	}
 	//检查是否是房主
 	if room.RoomOwner != message.UserID {
-		ret := errors.New("非房主不可更新房间").Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		err := errors.New("非房主不可更新房间")
+		utils.SendErrToUser(users[message.UserID], "[BeginGame]", err)
 		return
 	}
 	//检查是否够人了
 	if room.UserNumber != room.MaxUserNumber {
-		ret := errors.New("人数不足，无法开始").Error()
-		err := users[message.UserID].OutChanWrite([]byte(ret))
-		if err != nil {
-			users[message.UserID].CloseConn()
-		}
+		utils.SendMsgToUser(users[message.UserID], []byte("人数不足，无法开始"))
 		return
 	}
-	//都准备好了，可以进入游戏模块,向所有用户发送游戏开始，TODO
-	for _, ws := range users {
-		err := ws.OutChanWrite([]byte("游戏环节开始"))
-		if err != nil {
-			ws.CloseConn()
-		}
-	}
+	//都准备好了，可以进入游戏模块,向所有用户发送游戏开始
+	BroadcastToAllRoomUsers(RoomData[roomID], []byte("游戏环节开始"))
 	//游戏开始,告知房间线程先暂停
 	RoomData[roomID].PauseChan <- struct{}{}
 	go RunGame(roomID)

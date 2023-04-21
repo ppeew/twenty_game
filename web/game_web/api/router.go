@@ -2,10 +2,12 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"game_web/global"
 	"game_web/global/response"
 	"game_web/model"
 	"game_web/proto"
+	"game_web/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -92,36 +94,39 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		return
 	}
+
 	//断线重连（因为之前已经在房间，查询是否之前有连接过，重连只需要把订阅者内的连接改一下即可）
-	if RoomData[uint32(roomID)] == nil {
-		//没有创房间
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": "还没创房就进入",
-		})
-		return
-	}
-	for u, _ := range RoomData[uint32(roomID)].UsersConn { //TODO 这里又bug
-		if u == userID {
-			//存在用户
-			conn, err2 := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-			if err2 != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"msg": "无法连接房间服务器",
-				})
-				return
-			}
-			//初始化websocket（两协程，分别用来读与写）
-			ws := model.InitWebSocket(conn)
-			if RoomData[uint32(roomID)].UsersConn[userID] == nil {
-				RoomData[uint32(roomID)].UsersConn[userID] = new(model.WSConn)
-			}
-			RoomData[uint32(roomID)].UsersConn[userID] = ws
-			ctx.JSON(http.StatusOK, gin.H{
-				"msg": "重连房间服务器成功",
-			})
-			return
-		}
-	}
+	//Reconn()
+	//if RoomData[uint32(roomID)] == nil {
+	//	//没有创房间
+	//	ctx.JSON(http.StatusBadRequest, gin.H{
+	//		"msg": "还没创房就进入",
+	//	})
+	//	return
+	//}
+	////断线重连机制
+	//for u, _ := range RoomData[uint32(roomID)].UsersConn { // TODO 这里又bug
+	//	if u == userID {
+	//		//存在用户
+	//		conn, err2 := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	//		if err2 != nil {
+	//			ctx.JSON(http.StatusBadRequest, gin.H{
+	//				"msg": "无法连接房间服务器",
+	//			})
+	//			return
+	//		}
+	//		//初始化websocket（两协程，分别用来读与写）
+	//		ws := model.InitWebSocket(conn, userID)
+	//		if RoomData[uint32(roomID)].UsersConn[userID] == nil {
+	//			RoomData[uint32(roomID)].UsersConn[userID] = new(model.WSConn)
+	//		}
+	//		RoomData[uint32(roomID)].UsersConn[userID] = ws
+	//		ctx.JSON(http.StatusOK, gin.H{
+	//			"msg": "重连房间服务器成功",
+	//		})
+	//		return
+	//	}
+	//}
 
 	//房间存在，房间当前人数不应该满了或者房间开始了
 	if room.UserNumber >= room.MaxUserNumber {
@@ -145,7 +150,7 @@ func UserIntoRoom(ctx *gin.Context) {
 		return
 	}
 	//初始化websocket（两协程，分别用来读与写）
-	ws := model.InitWebSocket(conn)
+	ws := model.InitWebSocket(conn, userID)
 
 	if RoomData[uint32(roomID)].UsersConn[userID] == nil {
 		RoomData[uint32(roomID)].UsersConn[userID] = new(model.WSConn)
@@ -167,20 +172,23 @@ func UserIntoRoom(ctx *gin.Context) {
 		Users:         users,
 	})
 	if err != nil {
-		err := ws.OutChanWrite([]byte(err.Error()))
-		if err != nil {
-			RoomData[uint32(roomID)].UsersConn[userID].CloseConn()
-		}
+		utils.SendErrToUser(ws, "[UserIntoRoom]", err)
 	}
 	//因为房间更新，给所有订阅者发送房间信息
 	message := model.Message{
-		UserID:     userID,
-		Type:       model.GetRoomData,
-		DeleteData: model.DeleteData{},
-		UpdateData: model.UpdateData{},
-		RoomData:   model.RoomData{RoomID: uint32(roomID)},
-		ReadyState: model.ReadyState{},
-		BeginGame:  model.BeginGame{},
+		UserID:   userID,
+		Type:     model.GetRoomData,
+		RoomData: model.RoomData{RoomID: uint32(roomID)},
 	}
-	RoomData[uint32(roomID)].MsgChan <- message
+	marshal, _ := json.Marshal(message)
+	BroadcastToAllRoomUsers(RoomData[uint32(roomID)], marshal)
+}
+
+func BroadcastToAllRoomUsers(coon *model.RoomCoon, message []byte) {
+	for _, wsConn := range coon.UsersConn {
+		err := wsConn.OutChanWrite(message)
+		if err != nil {
+			wsConn.CloseConn()
+		}
+	}
 }

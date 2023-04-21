@@ -7,6 +7,7 @@ import (
 )
 
 type WSConn struct {
+	UserID    uint32      //标识是哪个用户的连接
 	inChan    chan []byte //读客户端发来数据
 	outChan   chan []byte //向客户端写入数据
 	closeChan chan []byte
@@ -16,8 +17,9 @@ type WSConn struct {
 }
 
 // 创建websocket实例
-func InitWebSocket(conn *websocket.Conn) (ws *WSConn) {
+func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 	ws = &WSConn{
+		UserID:    userID,
 		inChan:    make(chan []byte, 1024),
 		outChan:   make(chan []byte, 1024),
 		closeChan: make(chan []byte, 1024),
