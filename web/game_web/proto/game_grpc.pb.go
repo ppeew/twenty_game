@@ -29,6 +29,12 @@ type GameClient interface {
 	AddDiamond(ctx context.Context, in *AddDiamondInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 增加道具(道具类型应该区别)
 	AddItem(ctx context.Context, in *AddItemInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 使用金币
+	UseGold(ctx context.Context, in *UseGoldRequest, opts ...grpc.CallOption) (*IsOK, error)
+	// 使用钻石
+	UseDiamond(ctx context.Context, in *UseDiamondInfo, opts ...grpc.CallOption) (*IsOK, error)
+	// 使用道具(道具类型应该区别)
+	UseItem(ctx context.Context, in *UseItemInfo, opts ...grpc.CallOption) (*IsOK, error)
 	// 房间
 	SearchAllRoom(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllRoomInfo, error)
 	CreateRoom(ctx context.Context, in *RoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -84,6 +90,33 @@ func (c *gameClient) AddDiamond(ctx context.Context, in *AddDiamondInfo, opts ..
 func (c *gameClient) AddItem(ctx context.Context, in *AddItemInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/Game/AddItem", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) UseGold(ctx context.Context, in *UseGoldRequest, opts ...grpc.CallOption) (*IsOK, error) {
+	out := new(IsOK)
+	err := c.cc.Invoke(ctx, "/Game/UseGold", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) UseDiamond(ctx context.Context, in *UseDiamondInfo, opts ...grpc.CallOption) (*IsOK, error) {
+	out := new(IsOK)
+	err := c.cc.Invoke(ctx, "/Game/UseDiamond", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) UseItem(ctx context.Context, in *UseItemInfo, opts ...grpc.CallOption) (*IsOK, error) {
+	out := new(IsOK)
+	err := c.cc.Invoke(ctx, "/Game/UseItem", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -149,6 +182,12 @@ type GameServer interface {
 	AddDiamond(context.Context, *AddDiamondInfo) (*emptypb.Empty, error)
 	// 增加道具(道具类型应该区别)
 	AddItem(context.Context, *AddItemInfo) (*emptypb.Empty, error)
+	// 使用金币
+	UseGold(context.Context, *UseGoldRequest) (*IsOK, error)
+	// 使用钻石
+	UseDiamond(context.Context, *UseDiamondInfo) (*IsOK, error)
+	// 使用道具(道具类型应该区别)
+	UseItem(context.Context, *UseItemInfo) (*IsOK, error)
 	// 房间
 	SearchAllRoom(context.Context, *emptypb.Empty) (*AllRoomInfo, error)
 	CreateRoom(context.Context, *RoomInfo) (*emptypb.Empty, error)
@@ -176,6 +215,15 @@ func (UnimplementedGameServer) AddDiamond(context.Context, *AddDiamondInfo) (*em
 }
 func (UnimplementedGameServer) AddItem(context.Context, *AddItemInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddItem not implemented")
+}
+func (UnimplementedGameServer) UseGold(context.Context, *UseGoldRequest) (*IsOK, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UseGold not implemented")
+}
+func (UnimplementedGameServer) UseDiamond(context.Context, *UseDiamondInfo) (*IsOK, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UseDiamond not implemented")
+}
+func (UnimplementedGameServer) UseItem(context.Context, *UseItemInfo) (*IsOK, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UseItem not implemented")
 }
 func (UnimplementedGameServer) SearchAllRoom(context.Context, *emptypb.Empty) (*AllRoomInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchAllRoom not implemented")
@@ -291,6 +339,60 @@ func _Game_AddItem_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GameServer).AddItem(ctx, req.(*AddItemInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_UseGold_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UseGoldRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).UseGold(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Game/UseGold",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).UseGold(ctx, req.(*UseGoldRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_UseDiamond_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UseDiamondInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).UseDiamond(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Game/UseDiamond",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).UseDiamond(ctx, req.(*UseDiamondInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_UseItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UseItemInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).UseItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Game/UseItem",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).UseItem(ctx, req.(*UseItemInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -411,6 +513,18 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddItem",
 			Handler:    _Game_AddItem_Handler,
+		},
+		{
+			MethodName: "UseGold",
+			Handler:    _Game_UseGold_Handler,
+		},
+		{
+			MethodName: "UseDiamond",
+			Handler:    _Game_UseDiamond_Handler,
+		},
+		{
+			MethodName: "UseItem",
+			Handler:    _Game_UseItem_Handler,
 		},
 		{
 			MethodName: "SearchAllRoom",

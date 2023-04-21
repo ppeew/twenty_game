@@ -11,6 +11,13 @@ import (
 	"go.uber.org/zap"
 )
 
+type DealFunc func(roomID uint32, message model.Message)
+
+var dealFuncs = make(map[uint32]DealFunc)
+
+// 全局房间信息
+var RoomData map[uint32]*model.RoomCoon = make(map[uint32]*model.RoomCoon) //房间号->房间数据的映射(每个房间线程访问各自数据)
+
 func GrpcModelToResponse(room *proto.RoomInfo) response.RoomResponse {
 	resp := response.RoomResponse{
 		RoomID:        room.RoomID,
@@ -33,13 +40,13 @@ func GrpcModelToResponse(room *proto.RoomInfo) response.RoomResponse {
 // 房间协程函数(主逻辑)
 func startRoomThread(roomID uint32) {
 	//初始化房间信息
-	if global.RoomData[roomID] == nil {
-		global.RoomData[roomID] = &model.RoomCoon{
+	if RoomData[roomID] == nil {
+		RoomData[roomID] = &model.RoomCoon{
 			MsgChan:   make(chan model.Message, 50),
 			UsersConn: make(map[uint32]*model.WSConn),
 		}
 	}
-	roomInfo := global.RoomData[roomID]
+	roomInfo := RoomData[roomID]
 	//服务器是单线程处理游戏，那么每次都将客户端发来数据拿过来
 	go ReadRoomData(roomInfo)
 	//协程主要作用在于处理房间内用户websocket的消息
@@ -60,14 +67,14 @@ func startRoomThread(roomID uint32) {
 
 func ReadRoomData(roomInfo *model.RoomCoon) {
 	for true {
-		for userID, subscriber := range roomInfo.UsersConn {
-			if subscriber.IsClose() {
+		for userID, wsConn := range roomInfo.UsersConn {
+			if wsConn.IsClose() {
 				continue
 			}
-			data, err := subscriber.InChanRead()
+			data, err := wsConn.InChanRead()
 			if err != nil {
 				//如果读到客户端关闭信息,关闭与客户端的websocket连接
-				subscriber.CloseConn()
+				wsConn.CloseConn()
 				continue
 			}
 			message := model.Message{}
@@ -75,6 +82,7 @@ func ReadRoomData(roomInfo *model.RoomCoon) {
 			if err != nil {
 				//客户端发过来数据有误
 				zap.S().Info("客户端发送数据有误:", data)
+				continue
 			}
 			message.UserID = userID //添加标识，能够识别用户
 			select {
@@ -89,10 +97,6 @@ func ReadRoomData(roomInfo *model.RoomCoon) {
 	}
 }
 
-type DealFunc func(roomID uint32, message model.Message)
-
-var dealFuncs = make(map[uint32]DealFunc)
-
 func init() {
 	dealFuncs[model.DeleteRoom] = DropRoom
 	dealFuncs[model.GetRoomData] = RoomInfo
@@ -103,7 +107,7 @@ func init() {
 
 // 房间信息
 func RoomInfo(roomID uint32, message model.Message) {
-	users := global.RoomData[roomID].UsersConn
+	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
 		ret := err.Error()
@@ -124,7 +128,7 @@ func RoomInfo(roomID uint32, message model.Message) {
 // 删除房间（仅房主）
 func DropRoom(roomID uint32, message model.Message) {
 	//先查询房间是否存在
-	users := global.RoomData[roomID].UsersConn
+	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
 		ret := err.Error()
@@ -179,7 +183,7 @@ func DropRoom(roomID uint32, message model.Message) {
 // 更新房间的房主或者游戏配置(仅房主)
 func UpdateRoom(roomID uint32, message model.Message) {
 	//先查询房间是否存在
-	users := global.RoomData[roomID].UsersConn
+	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
 		ret := err.Error()
@@ -263,7 +267,7 @@ func UpdateRoom(roomID uint32, message model.Message) {
 // 玩家准备状态
 func UpdateUserReadyState(roomID uint32, message model.Message) {
 	//先查询房间是否存在
-	users := global.RoomData[roomID].UsersConn
+	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
 		ret := err.Error()
@@ -307,7 +311,7 @@ func UpdateUserReadyState(roomID uint32, message model.Message) {
 // 开始游戏按键接口(需要将用户连接（全局）传输到游戏线程，当前线程就不再运行，等待游戏完成信号再启动该线程，设置pausechan)
 func BeginGame(roomID uint32, message model.Message) {
 	//查看房间是否存在
-	users := global.RoomData[roomID].UsersConn
+	users := RoomData[roomID].UsersConn
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
 		ret := err.Error()
@@ -343,6 +347,6 @@ func BeginGame(roomID uint32, message model.Message) {
 		}
 	}
 	//游戏开始,告知房间线程先暂停
-	global.RoomData[roomID].PauseChan <- struct{}{}
+	RoomData[roomID].PauseChan <- struct{}{}
 	go RunGame(roomID)
 }

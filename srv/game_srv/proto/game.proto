@@ -13,6 +13,12 @@ service Game{
   rpc AddDiamond(AddDiamondInfo) returns(google.protobuf.Empty);
   //增加道具(道具类型应该区别)
   rpc AddItem(AddItemInfo) returns(google.protobuf.Empty);
+  //使用金币
+  rpc UseGold(UseGoldRequest) returns(IsOK);
+  //使用钻石
+  rpc UseDiamond(UseDiamondInfo) returns(IsOK);
+  //使用道具(道具类型应该区别)
+  rpc UseItem(UseItemInfo) returns(IsOK);
 
   //房间
   rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);
@@ -20,6 +26,25 @@ service Game{
   rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
   rpc UpdateRoom(RoomInfo)returns (google.protobuf.Empty);
   rpc DeleteRoom(RoomIDInfo)returns (google.protobuf.Empty);
+}
+
+message IsOK{
+  bool isOK=1;
+}
+
+message UseGoldRequest{
+  uint32 id=1;
+  uint32 count=2;
+}
+
+message UseDiamondInfo{
+  uint32 id=1;
+  uint32 count=2;
+}
+
+message UseItemInfo{
+  uint32 id=1;
+  repeated uint32 items=2;
 }
 
 message UserItemsInfo{

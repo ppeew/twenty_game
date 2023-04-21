@@ -67,7 +67,20 @@ func (s *GameServer) GetUserItemsInfo(ctx context.Context, req *proto.UserIDInfo
 
 // 增加金币
 func (s *GameServer) AddGold(ctx context.Context, req *proto.AddGoldRequest) (*emptypb.Empty, error) {
-	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("gold = ?", fmt.Sprintf("%d", req.Count))
+	query := &model.UserItem{
+		BaseModel: model.BaseModel{
+			ID: req.Id,
+		},
+	}
+	tx := global.MysqlDB.First(&query)
+	if tx.Error != nil {
+		return &emptypb.Empty{}, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "用户不存在")
+	}
+	query.Gold += req.Count
+	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("gold = ?", fmt.Sprintf("%d", query.Gold))
 	if res.RowsAffected == 0 {
 		return &emptypb.Empty{}, status.Error(codes.Internal, "更新用户失败")
 	}
@@ -76,7 +89,20 @@ func (s *GameServer) AddGold(ctx context.Context, req *proto.AddGoldRequest) (*e
 
 // 增加钻石
 func (s *GameServer) AddDiamond(ctx context.Context, req *proto.AddDiamondInfo) (*emptypb.Empty, error) {
-	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", req.Count))
+	query := &model.UserItem{
+		BaseModel: model.BaseModel{
+			ID: req.Id,
+		},
+	}
+	tx := global.MysqlDB.First(&query)
+	if tx.Error != nil {
+		return &emptypb.Empty{}, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "用户不存在")
+	}
+	query.Diamond += req.Count
+	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", query.Diamond))
 	if res.RowsAffected == 0 {
 		return &emptypb.Empty{}, status.Error(codes.Internal, "更新用户失败")
 	}
@@ -86,15 +112,109 @@ func (s *GameServer) AddDiamond(ctx context.Context, req *proto.AddDiamondInfo) 
 // 增加道具(道具类型应该区别)
 func (s *GameServer) AddItem(ctx context.Context, req *proto.AddItemInfo) (*emptypb.Empty, error) {
 	//要知道更新什么
+	query := &model.UserItem{
+		BaseModel: model.BaseModel{
+			ID: req.Id,
+		},
+	}
+	tx := global.MysqlDB.First(&query)
+	if tx.Error != nil {
+		return &emptypb.Empty{}, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "用户不存在")
+	}
 	item := model.UserItem{
-		Apple:  req.Items[proto.Type_Apple],
-		Banana: req.Items[proto.Type_Banana],
+		Apple:  req.Items[proto.Type_Apple] + query.Apple,
+		Banana: req.Items[proto.Type_Banana] + query.Banana,
 	}
 	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Updates(item)
 	if res.RowsAffected == 0 {
 		return &emptypb.Empty{}, status.Error(codes.Internal, "更新用户失败")
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (s *GameServer) UseGold(ctx context.Context, req *proto.UseGoldRequest) (*proto.IsOK, error) {
+	//要知道更新什么
+	query := &model.UserItem{
+		BaseModel: model.BaseModel{
+			ID: req.Id,
+		},
+	}
+	tx := global.MysqlDB.First(&query)
+	if tx.Error != nil {
+		return &proto.IsOK{IsOK: false}, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return &proto.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
+	}
+	if req.Count > query.Gold {
+		//不可以使用
+		return &proto.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
+	}
+	query.Gold -= req.Count
+	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", query.Gold))
+	if res.RowsAffected == 0 {
+		return &proto.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
+	}
+	return &proto.IsOK{IsOK: true}, nil
+
+}
+
+func (s *GameServer) UseDiamond(ctx context.Context, req *proto.UseDiamondInfo) (*proto.IsOK, error) {
+	//要知道更新什么
+	query := &model.UserItem{
+		BaseModel: model.BaseModel{
+			ID: req.Id,
+		},
+	}
+	tx := global.MysqlDB.First(&query)
+	if tx.Error != nil {
+		return &proto.IsOK{IsOK: false}, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return &proto.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
+	}
+	if req.Count > query.Diamond {
+		//不可以使用
+		return &proto.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
+	}
+	query.Diamond -= req.Count
+	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", query.Diamond))
+	if res.RowsAffected == 0 {
+		return &proto.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
+	}
+	return &proto.IsOK{IsOK: true}, nil
+}
+
+func (s *GameServer) UseItem(ctx context.Context, req *proto.UseItemInfo) (*proto.IsOK, error) {
+	//要知道更新什么
+	query := &model.UserItem{
+		BaseModel: model.BaseModel{
+			ID: req.Id,
+		},
+	}
+	tx := global.MysqlDB.First(&query)
+	if tx.Error != nil {
+		return &proto.IsOK{IsOK: false}, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return &proto.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
+	}
+	item := model.UserItem{
+		Apple:  query.Apple - req.Items[proto.Type_Apple],
+		Banana: query.Banana - req.Items[proto.Type_Banana],
+	}
+	if item.Apple < 0 || item.Banana < 0 {
+		//不可以使用
+		return &proto.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
+	}
+	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Updates(item)
+	if res.RowsAffected == 0 {
+		return &proto.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
+	}
+	return &proto.IsOK{IsOK: true}, nil
 }
 
 func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*proto.AllRoomInfo, error) {
