@@ -196,8 +196,12 @@ func UpdateRoom(roomID uint32, message model.Message) {
 	if message.UpdateData.Owner != 0 {
 		room.RoomOwner = message.UpdateData.Owner
 	}
-	//T人
+	//T人(房主不能t自己)
 	if message.UpdateData.Kicker != 0 {
+		if message.UpdateData.Kicker == room.RoomOwner {
+			utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", errors.New("房主不可t自己"))
+			return
+		}
 		for i, user := range room.Users {
 			if user.ID == message.UpdateData.Kicker {
 				room.Users = append(room.Users[:i], room.Users[i+1:]...)
