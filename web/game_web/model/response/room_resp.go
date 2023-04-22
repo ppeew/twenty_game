@@ -1,6 +1,6 @@
 package response
 
-// 给客户端返回的信息体
+// 给http客户端返回的信息体
 type RoomResponse struct {
 	RoomID        uint32         `json:"roomID"`
 	MaxUserNumber uint32         `json:"maxUserNumber"`
@@ -9,4 +9,9 @@ type RoomResponse struct {
 	RoomOwner     uint32         `json:"roomOwner"`
 	RoomWait      bool           `json:"roomWait"`
 	Users         []UserResponse `json:"users"`
+}
+
+type UserResponse struct {
+	ID    uint32
+	Ready bool
 }

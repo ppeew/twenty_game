@@ -1,36 +1,36 @@
 package model
 
-// 用户与websocket通讯的消息体
+// 用户发送websocket通讯的消息体,前端通过传Type字段，服务器知道消息是什么类型，做什么处理
 type Message struct {
 	//通用
-	Type    uint32  `json:"type"`
-	ChatMsg ChatMsg `json:"chatMsgInfo"`
+	Type        uint32      `json:"type"`
+	UserID      uint32      `json:"userID"`
+	ChatMsgData ChatMsgData `json:"chatMsgInfo"`
 	//房间
-	UserID     uint32     `json:"userID"`
-	DeleteData DeleteData `json:"deleteData"`
-	UpdateData UpdateData `json:"updateData"`
-	RoomData   RoomData   `json:"roomData"`
-	ReadyState ReadyState `json:"readyState"`
-	BeginGame  BeginGame  `json:"beginGame"`
+	QuitRoomData   QuitRoomData   `json:"deleteData"`
+	UpdateData     UpdateData     `json:"updateData"`
+	RoomData       RoomData       `json:"roomData"`
+	ReadyStateData ReadyStateData `json:"readyState"`
+	BeginGameData  BeginGameData  `json:"beginGame"`
 	//游戏
-	ItemMsg        ItemMsg        `json:"itemMsgInfo"`
+	ItemMsgData    ItemMsgData    `json:"itemMsgInfo"`
 	GetCardData    GetCardData    `json:"getCardData"`
 	UseSpecialData UseSpecialData `json:"useSpecialData"`
 }
 
 const (
 	// 通用的消息
-	ChatMsgData = 1 << iota
+	ChatMsg = 1 << iota
 	// 房间相关的消息
-	QuitRoom
-	UpdateRoom
-	GetRoomData
-	UserReadyState
-	RoomBeginGame
+	QuitRoomMsg
+	UpdateRoomMsg
+	GetRoomMsg
+	UserReadyStateMsg
+	RoomBeginGameMsg
 	// 游戏相关的消息
-	ItemMsgData
-	ListenHandleCard
-	UseSpecialCard
+	ItemMsg
+	ListenHandleCardMsg
+	UseSpecialCardMsg
 )
 
 type UseSpecialData struct {
@@ -76,8 +76,8 @@ type GetCardData struct {
 }
 
 // 删除房间结构体
-type DeleteData struct {
-	RoomID uint32 `json:"roomID"`
+type QuitRoomData struct {
+	//RoomID uint32 `json:"roomID"`
 }
 
 // 更新房间结构体
@@ -90,15 +90,15 @@ type UpdateData struct {
 
 // 查询房间数据结构体
 type RoomData struct {
-	RoomID uint32 `json:"roomID"`
+	//RoomID uint32 `json:"roomID"`
 }
 
 // 更新装备状态结构体
-type ReadyState struct {
+type ReadyStateData struct {
 	IsReady bool `json:"isReady"`
 }
 
 // 开始游戏结构体
-type BeginGame struct {
-	RoomID uint32 `json:"roomID"`
+type BeginGameData struct {
+	//RoomID uint32 `json:"roomID"`
 }

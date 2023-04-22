@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"game_web/global"
-	"game_web/global/response"
 	"game_web/model"
+	"game_web/model/response"
 	"game_web/proto"
 	"game_web/utils"
 	"go.uber.org/zap"
@@ -14,11 +14,11 @@ import (
 )
 
 func init() {
-	dealFuncs[model.QuitRoom] = QuitRoom
-	dealFuncs[model.GetRoomData] = RoomInfo
-	dealFuncs[model.RoomBeginGame] = BeginGame
-	dealFuncs[model.UserReadyState] = UpdateUserReadyState
-	dealFuncs[model.UpdateRoom] = UpdateRoom
+	dealFuncs[model.QuitRoomMsg] = QuitRoom
+	dealFuncs[model.GetRoomMsg] = RoomInfo
+	dealFuncs[model.RoomBeginGameMsg] = BeginGame
+	dealFuncs[model.UserReadyStateMsg] = UpdateUserReadyState
+	dealFuncs[model.UpdateRoomMsg] = UpdateRoom
 }
 
 type DealFunc func(roomID uint32, message model.Message)
@@ -43,7 +43,6 @@ func GrpcModelToResponse(room *proto.RoomInfo) response.RoomResponse {
 			Ready: user.Ready,
 		})
 	}
-
 	return resp
 }
 
@@ -57,7 +56,7 @@ func startRoomThread(roomID uint32) {
 		}
 	}
 	roomInfo := RoomData[roomID]
-	//房间对要求实时性不高，采用一个消费者去拿webscoket到的数据
+	//房间对要求实时性不高，采用一个消费者去拿websocket到的数据
 	ctx, cancel := context.WithCancel(context.Background())
 	go ReadRoomData(ctx, roomInfo)
 	//协程主要作用在于处理房间内用户websocket的消息
@@ -90,6 +89,7 @@ func ReadRoomData(ctx context.Context, roomInfo *model.RoomCoon) {
 			err = json.Unmarshal(data, &message)
 			if err != nil {
 				zap.S().Info("客户端发送数据有误:", data)
+				utils.SendErrToUser(roomInfo.UsersConn[userID], "[ReadRoomData]", err)
 				continue
 			}
 			message.UserID = userID //添加标识，能够识别用户
@@ -152,7 +152,7 @@ func QuitRoom(roomID uint32, message model.Message) {
 			utils.SendErrToUser(users[message.UserID], "[DropRoom]", err)
 			return
 		}
-		utils.SendMsgToUser(users[message.UserID], []byte("删除房间成功"))
+		utils.SendMsgToUser(users[message.UserID], "删除房间成功")
 		//房间变化，广播
 		searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 		if err != nil {
@@ -214,7 +214,7 @@ func UpdateRoom(roomID uint32, message model.Message) {
 		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", err)
 		return
 	}
-	utils.SendMsgToUser(users[message.UserID], []byte("更新房间成功"))
+	utils.SendMsgToUser(users[message.UserID], "更新房间成功")
 	//更新房间，发送广播
 	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
@@ -238,7 +238,7 @@ func UpdateUserReadyState(roomID uint32, message model.Message) {
 	isFind := false
 	for _, user := range room.Users {
 		if user.ID == message.UserID {
-			user.Ready = message.ReadyState.IsReady
+			user.Ready = message.ReadyStateData.IsReady
 			isFind = true
 		}
 	}
@@ -254,7 +254,7 @@ func UpdateUserReadyState(roomID uint32, message model.Message) {
 			utils.SendErrToUser(users[message.UserID], "[UpdateUserReadyState]", err)
 			return
 		}
-		utils.SendMsgToUser(users[message.UserID], []byte("玩家准备状态更新成功"))
+		utils.SendMsgToUser(users[message.UserID], "玩家准备状态更新成功")
 		resp := GrpcModelToResponse(searchRoom)
 		marshal, _ := json.Marshal(resp)
 		BroadcastToAllRoomUsers(RoomData[roomID], marshal)
@@ -274,12 +274,12 @@ func BeginGame(roomID uint32, message model.Message) {
 	}
 	//检查是否是房主
 	if room.RoomOwner != message.UserID {
-		utils.SendMsgToUser(users[message.UserID], []byte("非房主不可更新房间"))
+		utils.SendMsgToUser(users[message.UserID], "非房主不可更新房间")
 		return
 	}
 	//检查是否够人了
 	if room.UserNumber != room.MaxUserNumber {
-		utils.SendMsgToUser(users[message.UserID], []byte("人数不足，无法开始"))
+		utils.SendMsgToUser(users[message.UserID], "人数不足，无法开始")
 		return
 	}
 	//都准备好了，可以进入游戏模块,向所有用户发送游戏开始
@@ -293,4 +293,17 @@ func BeginGame(roomID uint32, message model.Message) {
 	}
 	go RunGame(roomID)
 	RoomData[roomID].ExitChan <- struct{}{}
+}
+
+func BroadcastToAllRoomUsers(coon *model.RoomCoon, message interface{}) {
+	c := map[string]interface{}{
+		"data": message,
+	}
+	marshal, _ := json.Marshal(c)
+	for userID, wsConn := range coon.UsersConn {
+		err := wsConn.OutChanWrite(marshal)
+		if err != nil {
+			zap.S().Infof("ID为%d的用户掉线了", userID)
+		}
+	}
 }

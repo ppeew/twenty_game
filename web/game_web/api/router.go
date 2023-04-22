@@ -3,14 +3,14 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"game_web/global"
-	"game_web/global/response"
 	"game_web/model"
+	"game_web/model/response"
 	"game_web/proto"
 	"game_web/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"net/http"
 	"strconv"
@@ -28,7 +28,9 @@ var upgrader = websocket.Upgrader{
 func GetRoomList(ctx *gin.Context) {
 	allRoom, err := global.GameSrvClient.SearchAllRoom(context.Background(), &emptypb.Empty{})
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Error())
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"err": err.Error(),
+		})
 		return
 	}
 	var resp []response.RoomResponse
@@ -76,12 +78,28 @@ func CreateRoom(ctx *gin.Context) {
 	go startRoomThread(uint32(roomID))
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"msg": "创建成功",
+		"data": "创建成功",
 	})
 	return
 }
 
-// 玩家进入(断线重连)
+// 房间信息
+func GetRoomInfo(ctx *gin.Context) {
+	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: uint32(roomID)})
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"err": err,
+		})
+		return
+	}
+	resp := GrpcModelToResponse(room)
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": resp,
+	})
+}
+  
+// 玩家进入房间(断线重连)
 func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	claims, _ := ctx.Get("claims")
@@ -97,21 +115,27 @@ func UserIntoRoom(ctx *gin.Context) {
 	if RoomData[uint32(roomID)] == nil {
 		//没有创房间
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": "还没创房就进入",
+			"err": "还没创房就进入",
 		})
 		return
 	}
 	//断线重连（因为之前已经在房间，查询是否之前有连接过，重连只需要把订阅者内的连接改一下即可）
-	ReConn(RoomData[uint32(roomID)].UsersConn, ctx, userID)
+	err = ReConnRoom(RoomData[uint32(roomID)].UsersConn, ctx, userID)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
 	//房间存在，房间当前人数不应该满了或者房间开始了
 	if room.UserNumber >= room.MaxUserNumber {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": "房间满了",
+			"err": "房间满了",
 		})
 		return
 	} else if !room.RoomWait {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": "房间已开始游戏",
+			"err": "房间已开始游戏",
 		})
 		return
 	}
@@ -119,7 +143,7 @@ func UserIntoRoom(ctx *gin.Context) {
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": "无法连接房间服务器",
+			"err": "无法连接房间服务器",
 		})
 		return
 	}
@@ -139,26 +163,22 @@ func UserIntoRoom(ctx *gin.Context) {
 		utils.SendErrToUser(ws, "[UserIntoRoom]", err)
 	}
 	//因为房间更新，给所有订阅者发送房间信息
-	message := model.Message{
-		UserID:   userID,
-		Type:     model.GetRoomData,
-		RoomData: model.RoomData{RoomID: uint32(roomID)},
+	room, err = global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: uint32(roomID)})
+	if err != nil {
+		utils.SendErrToUser(ws, "[UserIntoRoom]", err)
 	}
-	marshal, _ := json.Marshal(message)
+	marshal, _ := json.Marshal(room)
 	BroadcastToAllRoomUsers(RoomData[uint32(roomID)], marshal)
 }
 
-func ReConn(usersConn map[uint32]*model.WSConn, ctx *gin.Context, userID uint32) {
+func ReConnRoom(usersConn map[uint32]*model.WSConn, ctx *gin.Context, userID uint32) error {
 	//断线重连机制
 	for u, _ := range usersConn {
 		if u == userID {
 			//存在用户
 			conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 			if err != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"msg": "无法连接房间服务器",
-				})
-				return
+				return errors.New("无法连接房间服务器")
 			}
 			//初始化websocket（两协程，分别用来读与写）
 			ws := model.InitWebSocket(conn, userID)
@@ -166,19 +186,48 @@ func ReConn(usersConn map[uint32]*model.WSConn, ctx *gin.Context, userID uint32)
 				usersConn[userID] = new(model.WSConn)
 			}
 			usersConn[userID] = ws
-			ctx.JSON(http.StatusOK, gin.H{
-				"msg": "重连房间服务器成功",
-			})
-			return
+			utils.SendMsgToUser(ws, "重连房间服务器成功")
+			return nil
 		}
 	}
+	return errors.New("该游戏玩家不在房间中")
 }
 
-func BroadcastToAllRoomUsers(coon *model.RoomCoon, message []byte) {
-	for userID, wsConn := range coon.UsersConn {
-		err := wsConn.OutChanWrite(message)
-		if err != nil {
-			zap.S().Infof("ID为%d的用户掉线了", userID)
+// 玩家进入游戏(断线重连)
+func UserIntoGame(ctx *gin.Context) {
+	claims, _ := ctx.Get("claims")
+	userID := claims.(*model.CustomClaims).ID
+	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
+	if GameData[uint32(roomID)] == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"err": "不存在该游戏房间，稍后再试",
+		})
+		return
+	}
+	//等待服务器初始化完成，因为有些资源还没分配好
+	isFindUser := false
+	<-GameData[uint32(roomID)].InitChan
+	for u, _ := range GameData[uint32(roomID)].Users {
+		if u == userID {
+			//找到用户，可以重连
+			isFindUser = true
+			break
 		}
 	}
+	if !isFindUser {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "该玩家不在该游戏房间",
+		})
+		return
+	}
+	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "无法连接游戏服务器",
+		})
+		return
+	}
+	ws := model.InitWebSocket(conn, userID)
+	GameData[uint32(roomID)].Users[userID].WS = ws
+	utils.SendMsgToUser(ws, "连接游戏服务器成功")
 }

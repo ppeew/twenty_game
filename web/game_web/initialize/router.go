@@ -16,6 +16,7 @@ func InitRouters() *gin.Engine {
 	versionGroup.Use(middlewares.JWTAuth())
 	router.InitRoomRouter(versionGroup)
 	engine.GET("userIntoRoom", middlewares.JWTAuthInParam(), api.UserIntoRoom)
+	engine.GET("UserIntoGame", middlewares.JWTAuthInParam(), api.UserIntoGame)
 
 	return engine
 }

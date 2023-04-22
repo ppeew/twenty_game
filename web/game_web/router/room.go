@@ -9,4 +9,5 @@ func InitRoomRouter(group *gin.RouterGroup) {
 	//房间相关接口
 	group.GET("getRoomList", api.GetRoomList)
 	group.GET("createRoom", api.CreateRoom)
+	group.GET("GetRoomInfo", api.GetRoomInfo)
 }
