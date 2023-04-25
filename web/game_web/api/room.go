@@ -9,8 +9,9 @@ import (
 	"game_web/model/response"
 	"game_web/proto"
 	"game_web/utils"
-	"go.uber.org/zap"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 func init() {
@@ -70,7 +71,6 @@ func startRoomThread(roomID uint32) {
 			cancel()
 			select {
 			case <-roomInfo.ReadExit:
-				//读的子线程已经退出。因为游戏线程还需要房间线程的ws连接，所以不关闭资源
 				return
 			}
 		}
@@ -278,7 +278,7 @@ func BeginGame(roomID uint32, message model.Message) {
 	}
 	//检查是否是房主
 	if room.RoomOwner != message.UserID {
-		utils.SendMsgToUser(users[message.UserID], "非房主不可更新房间")
+		utils.SendMsgToUser(users[message.UserID], "非房主不可开始游戏")
 		return
 	}
 	//检查是否够人了

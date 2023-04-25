@@ -2,18 +2,18 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"game_web/global"
 	"game_web/model"
 	"game_web/model/response"
 	"game_web/proto"
 	"game_web/utils"
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"net/http"
-	"strconv"
 )
 
 var upgrader = websocket.Upgrader{
@@ -98,7 +98,23 @@ func GetRoomInfo(ctx *gin.Context) {
 		"data": resp,
 	})
 }
-  
+
+// 查询个人的物品信息
+func SelectItems(ctx *gin.Context) {
+	claims, _ := ctx.Get("claims")
+	userID := claims.(*model.CustomClaims).ID
+	info, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{Id: userID})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": info,
+	})
+}
+
 // 玩家进入房间(断线重连)
 func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
@@ -119,12 +135,9 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	//断线重连（因为之前已经在房间，查询是否之前有连接过，重连只需要把订阅者内的连接改一下即可）
+	//断线重连（因为之前已经在房间，查询是否之前有连接过）
 	err = ReConnRoom(RoomData[uint32(roomID)].UsersConn, ctx, userID)
-	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"err": err.Error(),
-		})
+	if err == nil {
 		return
 	}
 	//房间存在，房间当前人数不应该满了或者房间开始了
@@ -167,15 +180,15 @@ func UserIntoRoom(ctx *gin.Context) {
 	if err != nil {
 		utils.SendErrToUser(ws, "[UserIntoRoom]", err)
 	}
-	marshal, _ := json.Marshal(room)
-	BroadcastToAllRoomUsers(RoomData[uint32(roomID)], marshal)
+	BroadcastToAllRoomUsers(RoomData[uint32(roomID)], room)
 }
 
 func ReConnRoom(usersConn map[uint32]*model.WSConn, ctx *gin.Context, userID uint32) error {
 	//断线重连机制
 	for u, _ := range usersConn {
 		if u == userID {
-			//存在用户
+			//存在用户,先把之前开的协程关闭
+			usersConn[u].CloseConn()
 			conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 			if err != nil {
 				return errors.New("无法连接房间服务器")
@@ -209,7 +222,7 @@ func UserIntoGame(ctx *gin.Context) {
 	<-GameData[uint32(roomID)].InitChan
 	for u, _ := range GameData[uint32(roomID)].Users {
 		if u == userID {
-			//找到用户，可以重连
+			//找到用户，建立连接
 			isFindUser = true
 			break
 		}

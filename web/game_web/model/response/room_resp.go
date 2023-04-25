@@ -12,6 +12,6 @@ type RoomResponse struct {
 }
 
 type UserResponse struct {
-	ID    uint32
-	Ready bool
+	ID    uint32 `json:"ID"`
+	Ready bool   `json:"Ready"`
 }

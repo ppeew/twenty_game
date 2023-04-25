@@ -2,8 +2,9 @@ package model
 
 import (
 	"errors"
-	"github.com/gorilla/websocket"
 	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
 type WSConn struct {
