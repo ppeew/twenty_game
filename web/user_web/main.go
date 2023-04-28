@@ -26,7 +26,7 @@ func main() {
 	fmt.Println("okok!!!!!")
 
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	<-quit
 	//if err = register_client.DeRegister(serviceId); err != nil {
 	//	zap.S().Info("注销失败:", err.Error())

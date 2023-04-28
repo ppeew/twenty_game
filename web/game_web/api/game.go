@@ -9,9 +9,10 @@ import (
 	"game_web/model/response"
 	"game_web/proto"
 	"game_web/utils"
-	"go.uber.org/zap"
 	"math/rand"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 var GameData map[uint32]*model.Game = make(map[uint32]*model.Game)
@@ -47,7 +48,6 @@ func RunGame(roomID uint32) {
 	}
 	//游戏结束计算排名发奖励阶段
 	DoEndGame(game)
-
 	//更改用户为非准备状态，并且房间为等待状态
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
@@ -127,34 +127,35 @@ func DoScoreCount(game *model.Game) {
 
 func DoHandleSpecialCard(game *model.Game) {
 	//监听用户特殊卡环节,这块要设置超时时间，非一直读取
-	select {
-	case msg := <-game.CommonChan:
-		//正常处理
-		switch msg.Type {
-		case model.UseSpecialCardMsg:
-			//只有这类型的消息才处理
-			findCard := false
-			for i, card := range game.Users[msg.UserID].SpecialCards {
-				if msg.UseSpecialData.SpecialCardID == card.CardID {
-					//找到卡，执行
-					findCard = true
-					game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards[:i], game.Users[msg.UserID].SpecialCards[i+1:]...)
-					HandleCard[card.Type](game, msg)
+	for true {
+		select {
+		case msg := <-game.CommonChan:
+			//正常处理
+			switch msg.Type {
+			case model.UseSpecialCardMsg:
+				//只有这类型的消息才处理
+				findCard := false
+				for i, card := range game.Users[msg.UserID].SpecialCards {
+					if msg.UseSpecialData.SpecialCardID == card.CardID {
+						//找到卡，执行
+						findCard = true
+						game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards[:i], game.Users[msg.UserID].SpecialCards[i+1:]...)
+						HandleCard[card.Type](game, msg)
+					}
 				}
+				if findCard == false {
+					//找不到卡
+					utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
+				}
+			default:
+				//其他消息不处理,给用户返回超时
+				utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoListenDistributeCard]", errors.New("超时信息不处理"))
 			}
-			if findCard == false {
-				//找不到卡
-				utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
-			}
-		default:
-			//其他消息不处理,给用户返回超时
-			utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoListenDistributeCard]", errors.New("超时信息不处理"))
+		case <-time.After(time.Second * 10):
+			//超时处理,超时就直接返回了
+			return
 		}
-	case <-time.After(time.Second * 10):
-		//超时处理,超时就直接返回了
-		return
 	}
-
 }
 
 func HandleChangeCard(game *model.Game, msg model.Message) {
@@ -277,49 +278,51 @@ func HandleAddCard(game *model.Game, msg model.Message) {
 
 func DoListenDistributeCard(game *model.Game) {
 	//监听用户抢牌环节,这块要设置超时时间，非一直读取
-	select {
-	case msg := <-game.CommonChan:
-		//正常处理
-		switch msg.Type {
-		//只有这类型的消息才处理
-		case model.ListenHandleCardMsg:
-			//每一局用户最多只能抢一张卡，检查
-			if game.Users[msg.UserID].IsGetCard {
-				utils.SendMsgToUser(game.Users[msg.UserID].WS, "一回合只能抢一次噢！")
-			} else {
-				data := msg.GetCardData
-				isOK := false
-				for _, card := range game.RandCard {
-					if data.GetCardID == card.CardID && !card.HasOwner {
-						//按理来说不会空
-						//if game.Users[msg.UserID] == nil {
-						//	game.Users[msg.UserID] = new(model.UserGameInfo)
-						//}
-						if card.Type == model.BaseType {
-							game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, card.BaseCardCardInfo)
-						} else if card.Type == model.SpecialType {
-							game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards, card.SpecialCardInfo)
+	for true {
+		select {
+		case msg := <-game.CommonChan:
+			//正常处理
+			switch msg.Type {
+			//只有这类型的消息才处理
+			case model.ListenHandleCardMsg:
+				//每一局用户最多只能抢一张卡，检查
+				if game.Users[msg.UserID].IsGetCard {
+					utils.SendMsgToUser(game.Users[msg.UserID].WS, "一回合只能抢一次噢！")
+				} else {
+					data := msg.GetCardData
+					isOK := false
+					for _, card := range game.RandCard {
+						if data.GetCardID == card.CardID && !card.HasOwner {
+							//按理来说不会空
+							//if game.Users[msg.UserID] == nil {
+							//	game.Users[msg.UserID] = new(model.UserGameInfo)
+							//}
+							if card.Type == model.BaseType {
+								game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, card.BaseCardCardInfo)
+							} else if card.Type == model.SpecialType {
+								game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards, card.SpecialCardInfo)
+							}
+							isOK = true
+							break
 						}
-						isOK = true
-						break
+					}
+					//发送给用户信息
+					if isOK {
+						utils.SendMsgToUser(game.Users[msg.UserID].WS, "抢到卡了！")
+						resp := CardModelToResponse(game)
+						BroadcastToAllGameUsers(game, resp)
+					} else {
+						utils.SendMsgToUser(game.Users[msg.UserID].WS, "没抢到卡~~~")
 					}
 				}
-				//发送给用户信息
-				if isOK {
-					utils.SendMsgToUser(game.Users[msg.UserID].WS, "抢到卡了！")
-					resp := CardModelToResponse(game)
-					BroadcastToAllGameUsers(game, resp)
-				} else {
-					utils.SendMsgToUser(game.Users[msg.UserID].WS, "没抢到卡~~~")
-				}
+			default:
+				//其他消息不处理,给用户返回超时
+				utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoListenDistributeCard]", errors.New("超时信息不处理"))
 			}
-		default:
-			//其他消息不处理,给用户返回超时
-			utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoListenDistributeCard]", errors.New("超时信息不处理"))
+		case <-time.After(time.Second * 10):
+			//超时处理,超时就直接返回了
+			return
 		}
-	case <-time.After(time.Second * 10):
-		//超时处理,超时就直接返回了
-		return
 	}
 }
 
@@ -471,6 +474,7 @@ func ProcessChatMsg(todo context.Context, game *model.Game) {
 		case chat := <-game.ChatChan:
 			//处理用户的聊天消息,广播所有用户
 			rsp := response.ChatResponse{
+				UserID:  chat.UserID,
 				MsgType: response.ChatResponseType,
 				ChatMsgData: model.ChatMsgData{
 					UserID: chat.UserID,
@@ -498,15 +502,18 @@ func ReadGameUserMsg(game *model.Game, userID uint32) {
 			zap.S().Info("客户端发送数据有误:", data)
 			continue
 		}
-		message.ChatMsgData.UserID = userID
 		switch message.Type {
 		case model.ChatMsg:
 			//聊天信息发到聊天管道
+			message.ChatMsgData.UserID = userID
 			game.ChatChan <- message.ChatMsgData
 		case model.ItemMsg:
+			//物品信息发到物品管道
+			message.ItemMsgData.UserID = userID
 			game.ItemChan <- message.ItemMsgData
 		default:
 			//其他信息是通用信息
+			message.UserID = userID
 			game.CommonChan <- message
 		}
 	}

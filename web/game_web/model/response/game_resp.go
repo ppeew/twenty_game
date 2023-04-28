@@ -2,14 +2,6 @@ package response
 
 import "game_web/model"
 
-// websocket返回结构体类型,前端通过MsgType字段知道消息是什么类型，做什么处理
-const (
-	GameStateResponseType = 1 << iota
-	UseSpecialCardInfoType
-	UseItemResponseType
-	ChatResponseType
-)
-
 // 游戏状态信息(玩家卡牌堆，分数信息)
 type GameStateResponse struct {
 	MsgType   uint32                 `json:"msgType"`
@@ -47,10 +39,4 @@ const (
 type UseItemResponse struct {
 	MsgType     uint32            `json:"msgType"`
 	ItemMsgData model.ItemMsgData `json:"itemMsgData"`
-}
-
-// 游戏玩家聊天信心
-type ChatResponse struct {
-	MsgType     uint32            `json:"msgType"`
-	ChatMsgData model.ChatMsgData `json:"chatMsgData"`
 }

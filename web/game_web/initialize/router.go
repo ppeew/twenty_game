@@ -3,6 +3,7 @@ package initialize
 import (
 	"game_web/middlewares"
 	"game_web/router"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,6 +13,7 @@ func InitRouters() *gin.Engine {
 	engine.Use(middlewares.Cors())
 	versionGroup := engine.Group("/v1")
 	//使用中间件,要求只有登录的用户才能使用游戏接口
+	router.InitCommonRouter(versionGroup)
 	router.InitRoomRouter(versionGroup)
 	router.InitGameRouter(versionGroup)
 	return engine

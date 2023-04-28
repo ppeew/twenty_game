@@ -26,7 +26,7 @@ func main() {
 		zap.S().Info("启动成功")
 	}()
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	<-quit
 	// 资源释放
 	go func() {

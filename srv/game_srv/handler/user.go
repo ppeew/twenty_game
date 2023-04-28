@@ -8,6 +8,7 @@ import (
 	"game_srv/global"
 	"game_srv/model"
 	"game_srv/proto"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -253,7 +254,7 @@ func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*pro
 }
 
 func (s *GameServer) CreateRoom(ctx context.Context, in *proto.RoomInfo) (*emptypb.Empty, error) {
-	var users []model.User
+	var users []*model.User
 	room := model.Room{
 		RoomID:        in.RoomID,
 		MaxUserNumber: in.MaxUserNumber,
@@ -286,6 +287,7 @@ func (s *GameServer) SearchRoom(ctx context.Context, in *proto.RoomIDInfo) (*pro
 		UserNumber:    room.UserNumber,
 		RoomOwner:     room.RoomOwner,
 		RoomWait:      room.RoomWait,
+		//Users:         make([]*proto.RoomUser, 0),  不用初始化也可以append
 	}
 	for _, user := range room.Users {
 		ret.Users = append(ret.Users, &proto.RoomUser{
@@ -293,6 +295,11 @@ func (s *GameServer) SearchRoom(ctx context.Context, in *proto.RoomIDInfo) (*pro
 			Ready: user.Ready,
 		})
 	}
+	//for i, user := range ret.Users {
+	//	println(i)
+	//	println(user.Ready)
+	//	println(user.ID)
+	//}
 	return ret, nil
 }
 
@@ -306,7 +313,7 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *proto.RoomInfo) (*empty
 		RoomWait:      in.RoomWait,
 	}
 	for _, user := range in.Users {
-		room.Users = append(room.Users, model.User{
+		room.Users = append(room.Users, &model.User{
 			ID:    user.ID,
 			Ready: user.Ready,
 		})

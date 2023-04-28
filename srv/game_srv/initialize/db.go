@@ -22,7 +22,6 @@ func InitDB() {
 		zap.S().Fatalf("[InitDB]打开mysql错误:%s", err.Error())
 	}
 	//初始化redis
-	//初始化redis
 	redisInfo := global.ServerConfig.RedisInfo
 	global.RedisDB = redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d", redisInfo.Host, redisInfo.Port),
