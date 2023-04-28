@@ -20,7 +20,8 @@ type Message struct {
 
 const (
 	// 通用的消息
-	ChatMsg = 1 << iota
+	CheckHealthMsg = 1 << iota
+	ChatMsg
 	// 房间相关的消息
 	QuitRoomMsg
 	UpdateRoomMsg

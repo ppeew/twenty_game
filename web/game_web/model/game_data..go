@@ -10,6 +10,7 @@ type Game struct {
 	CommonChan chan Message     //游戏逻辑管道
 	ChatChan   chan ChatMsgData //聊天管道
 	ItemChan   chan ItemMsgData //使用物品管道
+	HealthChan chan Message     //心脏包管道
 
 	MakeCardID uint32 //依次生成卡的id
 	RandCard   []Card //卡id->卡信息(包含特殊和普通卡)

@@ -33,6 +33,7 @@ const (
 )
 
 func init() {
+	dealFuncs[model.CheckHealthMsg] = CheckHealth
 	dealFuncs[model.QuitRoomMsg] = QuitRoom
 	dealFuncs[model.GetRoomMsg] = RoomInfo
 	dealFuncs[model.RoomBeginGameMsg] = BeginGame
@@ -341,6 +342,13 @@ func ChatProcess(roomID uint32, message model.Message) {
 	BroadcastToAllRoomUsers(RoomData[roomID], response.RoomMsgResponse{
 		MsgType: response.RoomMsgResponseType,
 		MsgData: fmt.Sprintf("用户%d说：%s", message.UserID, string(message.ChatMsgData.Data)),
+	})
+}
+
+func CheckHealth(roomID uint32, message model.Message) {
+	utils.SendMsgToUser(RoomData[roomID].UsersConn[message.UserID], response.CheckHealthResponse{
+		MsgType: response.CheckHealthResponseType,
+		Ok:      true,
 	})
 }
 

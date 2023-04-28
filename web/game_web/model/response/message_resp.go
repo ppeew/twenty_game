@@ -5,7 +5,8 @@ import "game_web/model"
 // websocket返回结构体类型,前端通过MsgType字段知道消息是什么类型，做什么处理
 const (
 	//通用
-	ChatResponseType = 1 << iota //用户聊天信息
+	CheckHealthResponseType = 1 << iota
+	ChatResponseType        //用户聊天信息
 	//房间
 	RoomInfoResponseType
 	KickerResponseType //被t的人信息
@@ -21,4 +22,9 @@ type ChatResponse struct {
 	MsgType     uint32            `json:"msgType"`
 	UserID      uint32            `json:"userID"`
 	ChatMsgData model.ChatMsgData `json:"chatMsgData"`
+}
+
+type CheckHealthResponse struct {
+	MsgType uint32 `json:"msgType"`
+	Ok      bool   `json:"ok"`
 }

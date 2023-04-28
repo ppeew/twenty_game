@@ -242,7 +242,10 @@ func SelectUserState(ctx *gin.Context) {
 	userID := claims.(*model.CustomClaims).ID
 	state := UsersState[userID]
 	if state == nil {
-		state = new(UserState)
+		state = &UserState{
+			State:   NotIn,
+			RWMutex: sync.RWMutex{},
+		}
 	}
 	state.RWMutex.RLock()
 	ctx.JSON(http.StatusOK, gin.H{

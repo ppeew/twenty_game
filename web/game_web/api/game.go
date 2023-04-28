@@ -57,6 +57,11 @@ func RunGame(roomID uint32) {
 	for _, user := range room.Users {
 		user.Ready = false
 	}
+	for u, _ := range game.Users {
+		UsersState[u].RWMutex.Lock()
+		UsersState[u].State = RoomIn
+		UsersState[u].RWMutex.Unlock()
+	}
 	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
 	if err != nil {
 		zap.S().Info("[RunGame]更新房间失败")
@@ -388,10 +393,11 @@ func InitGame(roomID uint32) *model.Game {
 		GameData[roomID] = &model.Game{
 			RoomID:     roomID,
 			Users:      make(map[uint32]*model.UserGameInfo),
-			CommonChan: make(chan model.Message, 50),
+			CommonChan: make(chan model.Message, 1024),
 			InitChan:   make(chan struct{}),
 			ChatChan:   make(chan model.ChatMsgData, 1024),
 			ItemChan:   make(chan model.ItemMsgData, 1024),
+			HealthChan: make(chan model.Message, 1024),
 		}
 	}
 	game := GameData[roomID]
@@ -401,9 +407,10 @@ func InitGame(roomID uint32) *model.Game {
 	}
 	game.GameCount = room.GameCount
 	game.UserNumber = room.UserNumber
-	//创建两个协程，用来处理用户聊天消息和用户使用道具，这样才能异步执行
+	//创建三个协程，用来处理用户聊天消息和用户使用道具和心脏包回复，异步执行
 	go ProcessChatMsg(context.TODO(), game)
 	go ProcessItemMsg(context.TODO(), game)
+	go ProcessHealthMsg(context.TODO(), game)
 	for _, info := range room.Users {
 		itemsInfo, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{Id: info.ID})
 		if err != nil {
@@ -428,6 +435,20 @@ func InitGame(roomID uint32) *model.Game {
 	//等待用户的连接,完成，超时都不完成的直接开始游戏(用户可以后续再连接进来，这里不需要设置chan监听用户是否进入了)
 	time.Sleep(6 * time.Second)
 	return game
+}
+
+func ProcessHealthMsg(todo context.Context, game *model.Game) {
+	for true {
+		select {
+		case <-todo.Done():
+			return
+		case msg := <-game.HealthChan:
+			utils.SendMsgToUser(game.Users[msg.UserID].WS, response.CheckHealthResponse{
+				MsgType: response.CheckHealthResponseType,
+				Ok:      true,
+			})
+		}
+	}
 }
 
 func ProcessItemMsg(todo context.Context, game *model.Game) {
@@ -511,6 +532,10 @@ func ReadGameUserMsg(game *model.Game, userID uint32) {
 			//物品信息发到物品管道
 			message.ItemMsgData.UserID = userID
 			game.ItemChan <- message.ItemMsgData
+		case model.CheckHealthMsg:
+			//心脏包
+			message.UserID = userID
+			game.HealthChan <- message
 		default:
 			//其他信息是通用信息
 			message.UserID = userID
