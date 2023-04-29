@@ -28,6 +28,20 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+// 用户ID -> 用户状态
+var UsersState map[uint32]*UserState = make(map[uint32]*UserState)
+
+type UserState struct {
+	State   uint32
+	RWMutex sync.RWMutex
+}
+
+const (
+	NotIn = 1 << iota
+	RoomIn
+	GameIn
+)
+
 // 获取所有的房间
 func GetRoomList(ctx *gin.Context) {
 	allRoom, err := global.GameSrvClient.SearchAllRoom(context.Background(), &emptypb.Empty{})

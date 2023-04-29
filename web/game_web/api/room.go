@@ -10,71 +10,18 @@ import (
 	"game_web/model/response"
 	"game_web/proto"
 	"game_web/utils"
-	"sync"
 	"time"
 
 	"go.uber.org/zap"
 )
 
-// 全局房间信息
-var RoomData map[uint32]*model.RoomCoon = make(map[uint32]*model.RoomCoon) //房间号->房间数据的映射(每个房间线程访问各自数据)
-
-var UsersState map[uint32]*UserState = make(map[uint32]*UserState) //用户ID对该用户状态
-
-type UserState struct {
-	State   uint32
-	RWMutex sync.RWMutex
-}
-
-const (
-	NotIn = 1 << iota
-	RoomIn
-	GameIn
-)
-
-func init() {
-	dealFuncs[model.CheckHealthMsg] = CheckHealth
-	dealFuncs[model.QuitRoomMsg] = QuitRoom
-	dealFuncs[model.GetRoomMsg] = RoomInfo
-	dealFuncs[model.RoomBeginGameMsg] = BeginGame
-	dealFuncs[model.UserReadyStateMsg] = UpdateUserReadyState
-	dealFuncs[model.UpdateRoomMsg] = UpdateRoom
-	dealFuncs[model.ChatMsg] = ChatProcess
-}
-
-type DealFunc func(roomID uint32, message model.Message)
-
-var dealFuncs = make(map[uint32]DealFunc)
-
-func GrpcModelToResponse(room *proto.RoomInfo) response.RoomResponse {
-	resp := response.RoomResponse{
-		MsgType:       response.RoomInfoResponseType,
-		RoomID:        room.RoomID,
-		MaxUserNumber: room.MaxUserNumber,
-		GameCount:     room.GameCount,
-		UserNumber:    room.UserNumber,
-		RoomOwner:     room.RoomOwner,
-		RoomWait:      room.RoomWait,
-	}
-	for _, user := range room.Users {
-		resp.Users = append(resp.Users, response.UserResponse{
-			ID:    user.ID,
-			Ready: user.Ready,
-		})
-	}
-	return resp
-}
+// 房间号 -> 房间数据的映射(每个房间线程访问各自数据)
+var RoomData map[uint32]*model.Room = make(map[uint32]*model.Room)
 
 // 房间主函数(主逻辑)
 func startRoomThread(roomID uint32) {
 	//初始化房间信息
-	if RoomData[roomID] == nil {
-		RoomData[roomID] = &model.RoomCoon{
-			MsgChan:   make(chan model.Message, 1024),
-			UsersConn: make(map[uint32]*model.WSConn),
-		}
-	}
-	roomInfo := RoomData[roomID]
+	roomInfo := NewRoom(roomID)
 	//房间对要求实时性不高，采用一个消费者去拿websocket到的数据
 	ctx, cancel := context.WithCancel(context.Background())
 	go ReadRoomData(ctx, roomInfo)
@@ -95,7 +42,19 @@ func startRoomThread(roomID uint32) {
 	}
 }
 
-func ReadRoomData(ctx context.Context, roomInfo *model.RoomCoon) {
+func NewRoom(roomID uint32) *model.Room {
+	if RoomData[roomID] == nil {
+		RoomData[roomID] = &model.Room{
+			RoomID:    roomID,
+			MsgChan:   make(chan model.Message, 1024),
+			UsersConn: make(map[uint32]*model.WSConn),
+		}
+	}
+	return RoomData[roomID]
+}
+
+// 读取发送到房间的信息入管道
+func ReadRoomData(ctx context.Context, roomInfo *model.Room) {
 	for true {
 		for userID, wsConn := range roomInfo.UsersConn {
 			data, err := wsConn.InChanRead()
@@ -123,6 +82,20 @@ func ReadRoomData(ctx context.Context, roomInfo *model.RoomCoon) {
 		}
 	}
 }
+
+func init() {
+	dealFuncs[model.CheckHealthMsg] = CheckHealth
+	dealFuncs[model.QuitRoomMsg] = QuitRoom
+	dealFuncs[model.GetRoomMsg] = RoomInfo
+	dealFuncs[model.RoomBeginGameMsg] = BeginGame
+	dealFuncs[model.UserReadyStateMsg] = UpdateUserReadyState
+	dealFuncs[model.UpdateRoomMsg] = UpdateRoom
+	dealFuncs[model.ChatMsg] = ChatProcess
+}
+
+type DealFunc func(roomID uint32, message model.Message)
+
+var dealFuncs = make(map[uint32]DealFunc)
 
 // 房间信息
 func RoomInfo(roomID uint32, message model.Message) {
@@ -352,7 +325,26 @@ func CheckHealth(roomID uint32, message model.Message) {
 	})
 }
 
-func BroadcastToAllRoomUsers(coon *model.RoomCoon, message interface{}) {
+func GrpcModelToResponse(room *proto.RoomInfo) response.RoomResponse {
+	resp := response.RoomResponse{
+		MsgType:       response.RoomInfoResponseType,
+		RoomID:        room.RoomID,
+		MaxUserNumber: room.MaxUserNumber,
+		GameCount:     room.GameCount,
+		UserNumber:    room.UserNumber,
+		RoomOwner:     room.RoomOwner,
+		RoomWait:      room.RoomWait,
+	}
+	for _, user := range room.Users {
+		resp.Users = append(resp.Users, response.UserResponse{
+			ID:    user.ID,
+			Ready: user.Ready,
+		})
+	}
+	return resp
+}
+
+func BroadcastToAllRoomUsers(coon *model.Room, message interface{}) {
 	c := map[string]interface{}{
 		"data": message,
 	}

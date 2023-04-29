@@ -15,39 +15,45 @@ import (
 	"go.uber.org/zap"
 )
 
-var GameData map[uint32]*model.Game = make(map[uint32]*model.Game)
+type Game struct {
+	RoomID     uint32
+	Users      map[uint32]*model.UserGameInfo
+	GameCount  uint32
+	UserNumber uint32
 
-func init() {
-	HandleCard[model.AddCard] = HandleAddCard
-	HandleCard[model.DeleteCard] = HandleDeleteCard
-	HandleCard[model.UpdateCard] = HandleUpdateCard
-	HandleCard[model.ChangeCard] = HandleChangeCard
+	InitChan   chan struct{}          //通知游戏初始化已经完成
+	CommonChan chan model.Message     //游戏逻辑管道
+	ChatChan   chan model.ChatMsgData //聊天管道
+	ItemChan   chan model.ItemMsgData //使用物品管道
+	HealthChan chan model.Message     //心脏包管道
+
+	MakeCardID uint32       //依次生成卡的id
+	RandCard   []model.Card //卡id->卡信息(包含特殊和普通卡)
 }
 
-type HandlerCard func(*model.Game, model.Message)
-
-var HandleCard map[uint32]HandlerCard = make(map[uint32]HandlerCard)
+// 游戏号 -> 游戏数据的映射
+var GameData map[uint32]*Game = make(map[uint32]*Game)
 
 // 游戏主函数
 func RunGame(roomID uint32) {
 	//游戏初始化阶段
-	game := InitGame(roomID)
+	game := NewGame(roomID)
 	//初始化完成，进入游戏主要逻辑
 	for i := uint32(0); i < game.GameCount; i++ {
 		//循环初始化
-		DoFlush(game)
+		game.DoFlush()
 		time.Sleep(1 * time.Second)
 		//发牌阶段
-		DoDistributeCard(game)
+		game.DoDistributeCard()
 		//抢卡阶段
-		DoListenDistributeCard(game)
+		game.DoListenDistributeCard()
 		//特殊卡处理阶段
-		DoHandleSpecialCard(game)
+		game.DoHandleSpecialCard()
 		//分数计算阶段
-		DoScoreCount(game)
+		game.DoScoreCount()
 	}
 	//游戏结束计算排名发奖励阶段
-	DoEndGame(game)
+	game.DoEndGame()
 	//更改用户为非准备状态，并且房间为等待状态
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
@@ -70,7 +76,56 @@ func RunGame(roomID uint32) {
 	go startRoomThread(roomID)
 }
 
-func DoFlush(game *model.Game) {
+func NewGame(roomID uint32) *Game {
+	if GameData[roomID] == nil {
+		GameData[roomID] = &Game{
+			RoomID:     roomID,
+			Users:      make(map[uint32]*model.UserGameInfo),
+			CommonChan: make(chan model.Message, 1024),
+			InitChan:   make(chan struct{}),
+			ChatChan:   make(chan model.ChatMsgData, 1024),
+			ItemChan:   make(chan model.ItemMsgData, 1024),
+			HealthChan: make(chan model.Message, 1024),
+		}
+	}
+	game := GameData[roomID]
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: game.RoomID})
+	if err != nil {
+		zap.S().Panic("[RunGame]无法查找到房间信息")
+	}
+	game.GameCount = room.GameCount
+	game.UserNumber = room.UserNumber
+	//创建三个协程，用来处理用户聊天消息和用户使用道具和心脏包回复，异步执行
+	go game.ProcessChatMsg(context.TODO())
+	go game.ProcessItemMsg(context.TODO())
+	go game.ProcessHealthMsg(context.TODO())
+	for _, info := range room.Users {
+		itemsInfo, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{Id: info.ID})
+		if err != nil {
+			zap.S().Panic("[RunGame]无法查找到物品信息")
+		}
+		game.Users[info.ID] = &model.UserGameInfo{
+			BaseCards:    make([]model.BaseCard, 0),
+			SpecialCards: make([]model.SpecialCard, 0),
+			Items: []uint32{
+				itemsInfo.Items[proto.Type_Apple],
+				itemsInfo.Items[proto.Type_Banana],
+			},
+			IsGetCard: false,
+			Score:     0,
+			WS:        nil,
+		}
+		//对于每个用户开启一个协程，用于读取他的消息到游戏管道（分发消息功能）
+		go game.ReadGameUserMsg(info.ID)
+	}
+	//采用关闭的方式通知用户可以连接了，因为是多消费者对一生产者,关闭之后能读
+	close(game.InitChan)
+	//等待用户的连接,完成，超时都不完成的直接开始游戏(用户可以后续再连接进来，这里不需要设置chan监听用户是否进入了)
+	time.Sleep(6 * time.Second)
+	return game
+}
+
+func (game *Game) DoFlush() {
 	game.RandCard = []model.Card{}
 	for _, info := range game.Users {
 		info.IsGetCard = false
@@ -79,7 +134,7 @@ func DoFlush(game *model.Game) {
 	BroadcastToAllGameUsers(game, resp)
 }
 
-func DoEndGame(game *model.Game) {
+func (game *Game) DoEndGame() {
 	type Info struct {
 		UserID uint32
 		Score  uint32
@@ -110,7 +165,7 @@ func DoEndGame(game *model.Game) {
 	BroadcastToAllGameUsers(game, ranks)
 }
 
-func DoScoreCount(game *model.Game) {
+func (game *Game) DoScoreCount() {
 	for _, info := range game.Users {
 		sum := uint32(0)
 		for i, card := range info.BaseCards {
@@ -130,7 +185,7 @@ func DoScoreCount(game *model.Game) {
 	}
 }
 
-func DoHandleSpecialCard(game *model.Game) {
+func (game *Game) DoHandleSpecialCard() {
 	//监听用户特殊卡环节,这块要设置超时时间，非一直读取
 	for true {
 		select {
@@ -163,125 +218,7 @@ func DoHandleSpecialCard(game *model.Game) {
 	}
 }
 
-func HandleChangeCard(game *model.Game, msg model.Message) {
-	data := msg.UseSpecialData.ChangeCardData
-	//先找到两卡
-	findUserCard := false
-	var userInfo *model.BaseCard
-	findTargetUserCard := false
-	var targetUserInfo *model.BaseCard
-	for _, info := range game.Users[msg.UserID].BaseCards {
-		if info.CardID == data.CardID {
-			findUserCard = true
-			userInfo = &info
-			return
-		}
-	}
-	if findUserCard == false {
-		utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到要交换的的卡"))
-		return
-	}
-	for _, info := range game.Users[data.TargetUserID].BaseCards {
-		if info.CardID == data.TargetCard {
-			findTargetUserCard = true
-			targetUserInfo = &info
-			return
-		}
-	}
-	if findTargetUserCard == false {
-		utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到对方交换的卡"))
-		return
-	}
-	//都找到了
-	temp := userInfo
-	userInfo = targetUserInfo
-	targetUserInfo = temp
-	rsp := response.UseSpecialCardResponse{
-		MsgType:         response.UseSpecialCardInfoType,
-		SpecialCardType: response.ChangeCard,
-		UserID:          msg.UserID,
-		ChangeCardData: model.ChangeCardData{
-			CardID:       msg.UseSpecialData.ChangeCardData.CardID,
-			TargetUserID: msg.UseSpecialData.ChangeCardData.TargetUserID,
-			TargetCard:   msg.UseSpecialData.ChangeCardData.TargetCard,
-		},
-	}
-	BroadcastToAllGameUsers(game, rsp)
-}
-
-func HandleUpdateCard(game *model.Game, msg model.Message) {
-	data := msg.UseSpecialData.UpdateCardData
-	findUpdateCard := false
-	for _, card := range game.Users[data.TargetUserID].BaseCards {
-		if card.CardID == data.CardID {
-			//更新
-			findUpdateCard = true
-			card.Number = data.UpdateNumber
-		}
-	}
-	if findUpdateCard == false {
-		utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到要更新的卡"))
-		return
-	}
-	rsp := response.UseSpecialCardResponse{
-		MsgType:         response.UseSpecialCardInfoType,
-		SpecialCardType: response.UpdateCard,
-		UserID:          msg.UserID,
-		UpdateCardData: model.UpdateCardData{
-			TargetUserID: msg.UseSpecialData.UpdateCardData.TargetUserID,
-			CardID:       msg.UseSpecialData.UpdateCardData.CardID,
-			UpdateNumber: msg.UseSpecialData.UpdateCardData.UpdateNumber,
-		},
-	}
-	BroadcastToAllGameUsers(game, rsp)
-}
-
-func HandleDeleteCard(game *model.Game, msg model.Message) {
-	data := msg.UseSpecialData.DeleteCardData
-	findDelCard := false
-	for i, card := range game.Users[data.TargetUserID].BaseCards {
-		if card.CardID == data.CardID {
-			//删除
-			findDelCard = true
-			game.Users[data.TargetUserID].BaseCards = append(game.Users[data.TargetUserID].BaseCards[:i], game.Users[data.TargetUserID].BaseCards[i+1:]...)
-			break
-		}
-	}
-	if findDelCard == false {
-		utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到要删除的卡"))
-		return
-	}
-	rsp := response.UseSpecialCardResponse{
-		MsgType:         response.UseSpecialCardInfoType,
-		SpecialCardType: response.DeleteCard,
-		UserID:          msg.UserID,
-		DeleteCardData: model.DeleteCardData{
-			TargetUserID: msg.UseSpecialData.DeleteCardData.TargetUserID,
-			CardID:       msg.UseSpecialData.DeleteCardData.CardID,
-		},
-	}
-	BroadcastToAllGameUsers(game, rsp)
-}
-
-func HandleAddCard(game *model.Game, msg model.Message) {
-	data := msg.UseSpecialData.AddCardData
-	game.MakeCardID++
-	game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, model.BaseCard{
-		CardID: game.MakeCardID,
-		Number: data.NeedNumber,
-	})
-	rsp := response.UseSpecialCardResponse{
-		MsgType:         response.UseSpecialCardInfoType,
-		SpecialCardType: response.AddCard,
-		UserID:          msg.UserID,
-		AddCardData: model.AddCardData{
-			NeedNumber: msg.UseSpecialData.AddCardData.NeedNumber,
-		},
-	}
-	BroadcastToAllGameUsers(game, rsp)
-}
-
-func DoListenDistributeCard(game *model.Game) {
+func (game *Game) DoListenDistributeCard() {
 	//监听用户抢牌环节,这块要设置超时时间，非一直读取
 	for true {
 		select {
@@ -331,7 +268,7 @@ func DoListenDistributeCard(game *model.Game) {
 	}
 }
 
-func DoDistributeCard(game *model.Game) {
+func (game *Game) DoDistributeCard() {
 	//要生成userNumber*2的卡牌，其中包含普通卡和特殊卡,特殊卡数量应该在玩家数量（1/4-1/3）
 	needCount := int(game.UserNumber * 2)
 	//先生成特殊卡
@@ -368,76 +305,7 @@ func DoDistributeCard(game *model.Game) {
 	}
 }
 
-func CardModelToResponse(game *model.Game) response.GameStateResponse {
-	var users []response.UserGameInfoResponse
-	for _, info := range game.Users {
-		user := response.UserGameInfoResponse{
-			BaseCards:    info.BaseCards,
-			SpecialCards: info.SpecialCards,
-			IsGetCard:    info.IsGetCard,
-			Score:        info.Score,
-		}
-		users = append(users, user)
-	}
-	resp := response.GameStateResponse{
-		MsgType:   response.GameStateResponseType,
-		GameCount: game.GameCount,
-		Users:     users,
-		RandCard:  game.RandCard,
-	}
-	return resp
-}
-
-func InitGame(roomID uint32) *model.Game {
-	if GameData[roomID] == nil {
-		GameData[roomID] = &model.Game{
-			RoomID:     roomID,
-			Users:      make(map[uint32]*model.UserGameInfo),
-			CommonChan: make(chan model.Message, 1024),
-			InitChan:   make(chan struct{}),
-			ChatChan:   make(chan model.ChatMsgData, 1024),
-			ItemChan:   make(chan model.ItemMsgData, 1024),
-			HealthChan: make(chan model.Message, 1024),
-		}
-	}
-	game := GameData[roomID]
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: game.RoomID})
-	if err != nil {
-		zap.S().Panic("[RunGame]无法查找到房间信息")
-	}
-	game.GameCount = room.GameCount
-	game.UserNumber = room.UserNumber
-	//创建三个协程，用来处理用户聊天消息和用户使用道具和心脏包回复，异步执行
-	go ProcessChatMsg(context.TODO(), game)
-	go ProcessItemMsg(context.TODO(), game)
-	go ProcessHealthMsg(context.TODO(), game)
-	for _, info := range room.Users {
-		itemsInfo, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{Id: info.ID})
-		if err != nil {
-			zap.S().Panic("[RunGame]无法查找到物品信息")
-		}
-		game.Users[info.ID] = &model.UserGameInfo{
-			BaseCards:    make([]model.BaseCard, 0),
-			SpecialCards: make([]model.SpecialCard, 0),
-			Items: []uint32{
-				itemsInfo.Items[proto.Type_Apple],
-				itemsInfo.Items[proto.Type_Banana],
-			},
-			IsGetCard: false,
-			Score:     0,
-			WS:        nil,
-		}
-		//对于每个用户开启一个协程，用于读取他的消息到游戏管道（分发消息功能）
-		go ReadGameUserMsg(game, info.ID)
-	}
-	//采用关闭的方式通知用户可以连接了，因为是多消费者对一生产者,关闭之后能读
-	close(game.InitChan)
-	//等待用户的连接,完成，超时都不完成的直接开始游戏(用户可以后续再连接进来，这里不需要设置chan监听用户是否进入了)
-	time.Sleep(6 * time.Second)
-	return game
-}
-
-func ProcessHealthMsg(todo context.Context, game *model.Game) {
+func (game *Game) ProcessHealthMsg(todo context.Context) {
 	for true {
 		select {
 		case <-todo.Done():
@@ -451,7 +319,7 @@ func ProcessHealthMsg(todo context.Context, game *model.Game) {
 	}
 }
 
-func ProcessItemMsg(todo context.Context, game *model.Game) {
+func (game *Game) ProcessItemMsg(todo context.Context) {
 	for true {
 		select {
 		case <-todo.Done():
@@ -486,7 +354,7 @@ func ProcessItemMsg(todo context.Context, game *model.Game) {
 	}
 }
 
-func ProcessChatMsg(todo context.Context, game *model.Game) {
+func (game *Game) ProcessChatMsg(todo context.Context) {
 	for true {
 		select {
 		case <-todo.Done():
@@ -507,7 +375,7 @@ func ProcessChatMsg(todo context.Context, game *model.Game) {
 	}
 }
 
-func ReadGameUserMsg(game *model.Game, userID uint32) {
+func (game *Game) ReadGameUserMsg(userID uint32) {
 	for true {
 		wsConn := game.Users[userID].WS
 		data, err := wsConn.InChanRead()
@@ -544,7 +412,138 @@ func ReadGameUserMsg(game *model.Game, userID uint32) {
 	}
 }
 
-func BroadcastToAllGameUsers(game *model.Game, msg interface{}) {
+func init() {
+	HandleCard[model.AddCard] = HandleAddCard
+	HandleCard[model.DeleteCard] = HandleDeleteCard
+	HandleCard[model.UpdateCard] = HandleUpdateCard
+	HandleCard[model.ChangeCard] = HandleChangeCard
+}
+
+type HandlerCard func(*Game, model.Message)
+
+var HandleCard map[uint32]HandlerCard = make(map[uint32]HandlerCard)
+
+func HandleChangeCard(game *Game, msg model.Message) {
+	data := msg.UseSpecialData.ChangeCardData
+	//先找到两卡
+	findUserCard := false
+	var userInfo *model.BaseCard
+	findTargetUserCard := false
+	var targetUserInfo *model.BaseCard
+	for _, info := range game.Users[msg.UserID].BaseCards {
+		if info.CardID == data.CardID {
+			findUserCard = true
+			userInfo = &info
+			return
+		}
+	}
+	if findUserCard == false {
+		utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到要交换的的卡"))
+		return
+	}
+	for _, info := range game.Users[data.TargetUserID].BaseCards {
+		if info.CardID == data.TargetCard {
+			findTargetUserCard = true
+			targetUserInfo = &info
+			return
+		}
+	}
+	if findTargetUserCard == false {
+		utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到对方交换的卡"))
+		return
+	}
+	//都找到了
+	temp := userInfo
+	userInfo = targetUserInfo
+	targetUserInfo = temp
+	rsp := response.UseSpecialCardResponse{
+		MsgType:         response.UseSpecialCardInfoType,
+		SpecialCardType: response.ChangeCard,
+		UserID:          msg.UserID,
+		ChangeCardData: model.ChangeCardData{
+			CardID:       msg.UseSpecialData.ChangeCardData.CardID,
+			TargetUserID: msg.UseSpecialData.ChangeCardData.TargetUserID,
+			TargetCard:   msg.UseSpecialData.ChangeCardData.TargetCard,
+		},
+	}
+	BroadcastToAllGameUsers(game, rsp)
+
+}
+
+func HandleUpdateCard(game *Game, msg model.Message) {
+	data := msg.UseSpecialData.UpdateCardData
+	findUpdateCard := false
+	for _, card := range game.Users[data.TargetUserID].BaseCards {
+		if card.CardID == data.CardID {
+			//更新
+			findUpdateCard = true
+			card.Number = data.UpdateNumber
+		}
+	}
+	if findUpdateCard == false {
+		utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到要更新的卡"))
+		return
+	}
+	rsp := response.UseSpecialCardResponse{
+		MsgType:         response.UseSpecialCardInfoType,
+		SpecialCardType: response.UpdateCard,
+		UserID:          msg.UserID,
+		UpdateCardData: model.UpdateCardData{
+			TargetUserID: msg.UseSpecialData.UpdateCardData.TargetUserID,
+			CardID:       msg.UseSpecialData.UpdateCardData.CardID,
+			UpdateNumber: msg.UseSpecialData.UpdateCardData.UpdateNumber,
+		},
+	}
+	BroadcastToAllGameUsers(game, rsp)
+
+}
+
+func HandleDeleteCard(game *Game, msg model.Message) {
+	data := msg.UseSpecialData.DeleteCardData
+	findDelCard := false
+	for i, card := range game.Users[data.TargetUserID].BaseCards {
+		if card.CardID == data.CardID {
+			//删除
+			findDelCard = true
+			game.Users[data.TargetUserID].BaseCards = append(game.Users[data.TargetUserID].BaseCards[:i], game.Users[data.TargetUserID].BaseCards[i+1:]...)
+			break
+		}
+	}
+	if findDelCard == false {
+		utils.SendErrToUser(game.Users[msg.UserID].WS, "[DoHandleSpecialCard]", errors.New("找不到要删除的卡"))
+		return
+	}
+	rsp := response.UseSpecialCardResponse{
+		MsgType:         response.UseSpecialCardInfoType,
+		SpecialCardType: response.DeleteCard,
+		UserID:          msg.UserID,
+		DeleteCardData: model.DeleteCardData{
+			TargetUserID: msg.UseSpecialData.DeleteCardData.TargetUserID,
+			CardID:       msg.UseSpecialData.DeleteCardData.CardID,
+		},
+	}
+	BroadcastToAllGameUsers(game, rsp)
+}
+
+func HandleAddCard(game *Game, msg model.Message) {
+	data := msg.UseSpecialData.AddCardData
+	game.MakeCardID++
+	game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, model.BaseCard{
+		CardID: game.MakeCardID,
+		Number: data.NeedNumber,
+	})
+	rsp := response.UseSpecialCardResponse{
+		MsgType:         response.UseSpecialCardInfoType,
+		SpecialCardType: response.AddCard,
+		UserID:          msg.UserID,
+		AddCardData: model.AddCardData{
+			NeedNumber: msg.UseSpecialData.AddCardData.NeedNumber,
+		},
+	}
+	BroadcastToAllGameUsers(game, rsp)
+}
+
+func BroadcastToAllGameUsers(game *Game, msg interface{}) {
 	c := map[string]interface{}{
 		"data": msg,
 	}
@@ -555,4 +554,24 @@ func BroadcastToAllGameUsers(game *model.Game, msg interface{}) {
 			info.WS.CloseConn()
 		}
 	}
+}
+
+func CardModelToResponse(game *Game) response.GameStateResponse {
+	var users []response.UserGameInfoResponse
+	for _, info := range game.Users {
+		user := response.UserGameInfoResponse{
+			BaseCards:    info.BaseCards,
+			SpecialCards: info.SpecialCards,
+			IsGetCard:    info.IsGetCard,
+			Score:        info.Score,
+		}
+		users = append(users, user)
+	}
+	resp := response.GameStateResponse{
+		MsgType:   response.GameStateResponseType,
+		GameCount: game.GameCount,
+		Users:     users,
+		RandCard:  game.RandCard,
+	}
+	return resp
 }
