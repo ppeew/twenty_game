@@ -48,7 +48,7 @@ func main() {
 
 	//优雅退出
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	<-quit
 	if err := consulClient.Agent().ServiceDeregister(serverID); err != nil {
 		zap.S().Info("注销服务失败")

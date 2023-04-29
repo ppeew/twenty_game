@@ -6,12 +6,13 @@ import (
 	"game_srv/initialize"
 	"game_srv/proto"
 	"game_srv/utils"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -41,10 +42,9 @@ func main() {
 		}
 	}()
 	zap.S().Info("启动服务成功")
-
 	//优雅退出
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	<-quit
 	if err := consulClient.Agent().ServiceDeregister(serverID); err != nil {
 		zap.S().Info("注销服务失败")

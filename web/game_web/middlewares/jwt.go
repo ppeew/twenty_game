@@ -45,6 +45,38 @@ func JWTAuth() gin.HandlerFunc {
 	}
 }
 
+func JWTAuthInParam() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.DefaultQuery("token", "")
+		if token == "" {
+			c.JSON(http.StatusUnauthorized, map[string]string{
+				"msg": "请登录",
+			})
+			c.Abort()
+			return
+		}
+		j := NewJWT()
+		claims, err := j.ParseToken(token)
+		if err != nil {
+			if err == TokenExpired {
+				if err == TokenExpired {
+					c.JSON(http.StatusUnauthorized, map[string]string{
+						"msg": "授权已过期",
+					})
+					c.Abort()
+					return
+				}
+			}
+
+			c.JSON(http.StatusUnauthorized, "未登陆")
+			c.Abort()
+			return
+		}
+		c.Set("claims", claims)
+		c.Next()
+	}
+}
+
 type JWT struct {
 	SigningKey []byte
 }

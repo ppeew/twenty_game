@@ -2,30 +2,29 @@ package model
 
 import (
 	"errors"
-	"github.com/gorilla/websocket"
 	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
 type WSConn struct {
-	inChan    chan []byte //读客户端发来数据
-	outChan   chan []byte //向客户端写入数据
-	closeChan chan []byte
-	isClose   bool       // 通道closeChan是否已经关闭
-	mutex     sync.Mutex //并发问题
+	UserID    uint32        //标识是哪个用户的连接
+	inChan    chan []byte   //读客户端发来数据
+	outChan   chan []byte   //向客户端写入数据
+	closeChan chan struct{} //标记ws是否关闭，关闭chan后，消费者依然可以读,通过这个标志说明是否关闭
+	isClose   bool          // 通道closeChan是否已经关闭,chan不能多次关闭，所有需要保证只能关闭一次
+	mutex     sync.Mutex    //保证closeChan不会多次关闭
 	conn      *websocket.Conn
-
-	//订阅
-	Subscriber *Subscriber
 }
 
 // 创建websocket实例
-func InitWebSocket(conn *websocket.Conn) (ws *WSConn) {
+func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 	ws = &WSConn{
-		inChan:     make(chan []byte, 1024),
-		outChan:    make(chan []byte, 1024),
-		closeChan:  make(chan []byte, 1024),
-		conn:       conn,
-		Subscriber: NewSubscriber(3),
+		UserID:    userID,
+		inChan:    make(chan []byte, 1024),
+		outChan:   make(chan []byte, 1024),
+		closeChan: make(chan struct{}),
+		conn:      conn,
 	}
 	// 完善必要协程：读取客户端数据协程/发送数据协程
 	go ws.readMsgLoop()
@@ -36,7 +35,12 @@ func InitWebSocket(conn *websocket.Conn) (ws *WSConn) {
 // 协程接受客户端msg
 func (ws *WSConn) readMsgLoop() {
 	for true {
-		_, data, _ := ws.conn.ReadMessage()
+		_, data, err := ws.conn.ReadMessage()
+		if err != nil {
+			//发生错误,关闭连接，停止协程
+			ws.CloseConn()
+			break
+		}
 		ws.inChan <- data
 	}
 }
@@ -45,7 +49,12 @@ func (ws *WSConn) readMsgLoop() {
 func (ws *WSConn) writeMsgLoop() {
 	for true {
 		data := <-ws.outChan
-		_ = ws.conn.WriteMessage(websocket.TextMessage, data)
+		err := ws.conn.WriteMessage(websocket.TextMessage, data)
+		if err != nil {
+			//发生错误,关闭连接，停止协程
+			ws.CloseConn()
+			break
+		}
 	}
 }
 
@@ -77,5 +86,5 @@ func (ws *WSConn) CloseConn() {
 		ws.isClose = true
 	}
 	ws.mutex.Unlock()
-	ws.conn.Close()
+	_ = ws.conn.Close()
 }

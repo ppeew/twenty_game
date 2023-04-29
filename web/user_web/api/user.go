@@ -85,7 +85,7 @@ func UserRegister(ctx *gin.Context) {
 	register := forms.RegisterForm{}
 	if err := ctx.ShouldBind(&register); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
+			"err": err.Error(),
 		})
 	}
 
@@ -109,7 +109,7 @@ func UserRegister(ctx *gin.Context) {
 			//服务错误
 			//GrpcErrorToHttp(err, ctx)
 			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"msg": err.Error(),
+				"err": err.Error(),
 			})
 			return
 		}
@@ -121,15 +121,15 @@ func UserRegister(ctx *gin.Context) {
 	claims := models.CustomClaims{
 		ID: info.Id,
 		StandardClaims: jwt.StandardClaims{
-			NotBefore: time.Now().Unix(),            //签名生效时间
-			ExpiresAt: time.Now().Unix() + 60*60*24, //过期时间.一天
+			NotBefore: time.Now().Unix(),              //签名生效时间
+			ExpiresAt: time.Now().Unix() + 60*60*24*5, //过期时间.五天
 			Issuer:    "ppeew",
 		},
 	}
 	token, err := j.CreateToken(claims)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": "生成token失败",
+			"err": "生成token失败",
 		})
 		return
 	}
@@ -151,16 +151,14 @@ func UserLogin(ctx *gin.Context) {
 	login := forms.LoginForm{}
 	if err := ctx.ShouldBind(&login); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-			"err": 0,
+			"err": err.Error(),
 		})
 		return
 	}
 	info, err := global.UserSrvClient.GetUserByUsername(context.Background(), &proto.UserNameInfo{UserName: login.Username})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": "用户不存在",
-			"err": 1,
+			"err": "用户没注册",
 		})
 		return
 	}
@@ -173,8 +171,7 @@ func UserLogin(ctx *gin.Context) {
 	}
 	if !verify.Success {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": "密码错误",
-			"err": 2,
+			"err": "密码错误",
 		})
 		return
 	}
@@ -182,15 +179,15 @@ func UserLogin(ctx *gin.Context) {
 	claims := models.CustomClaims{
 		ID: info.Id,
 		StandardClaims: jwt.StandardClaims{
-			NotBefore: time.Now().Unix(),            //签名生效时间
-			ExpiresAt: time.Now().Unix() + 60*60*24, //过期时间.一天
+			NotBefore: time.Now().Unix(),              //签名生效时间
+			ExpiresAt: time.Now().Unix() + 60*60*24*5, //过期时间.五天
 			Issuer:    "ppeew",
 		},
 	}
 	token, err := j.CreateToken(claims)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": "生成token失败",
+			"err": "生成token失败",
 		})
 		return
 	}
@@ -217,7 +214,7 @@ func UserUpdate(ctx *gin.Context) {
 	form := forms.ModifyForm{}
 	if err := ctx.ShouldBind(&form); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
+			"err": err.Error(),
 		})
 		return
 	}
@@ -225,8 +222,8 @@ func UserUpdate(ctx *gin.Context) {
 	//必须先查询是否有username=form.Username
 	_, err := global.UserSrvClient.GetUserByUsername(context.Background(), &proto.UserNameInfo{UserName: form.Username})
 	if err == nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": "用户名已经被使用",
+		ctx.JSON(http.StatusOK, gin.H{
+			"err": "用户名已经被使用",
 		})
 		return
 	}
@@ -243,6 +240,6 @@ func UserUpdate(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"msg": "更改信息成功",
+		"data": "更改信息成功",
 	})
 }

@@ -17,6 +17,6 @@ type User struct {
 	BaseModel
 	Nickname string
 	Gender   bool
-	UserName string `gorm:"index;unique"`
+	UserName string `gorm:"index;unique;not null"`
 	Password string
 }

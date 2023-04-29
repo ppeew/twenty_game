@@ -20,8 +20,6 @@ func InitSrvConn() {
 	if err != nil {
 		zap.S().Fatal("[InitSrvConn] 连接 【用户服务失败】")
 	}
-
-	userSrvClient := proto.NewGameClient(userConn)
-	global.UserSrvClient = userSrvClient
-
+	gameSrvClient := proto.NewGameClient(userConn)
+	global.GameSrvClient = gameSrvClient
 }
