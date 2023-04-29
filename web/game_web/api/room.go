@@ -15,8 +15,16 @@ import (
 	"go.uber.org/zap"
 )
 
+type Room struct {
+	RoomID    uint32
+	MsgChan   chan model.Message       //接受信息管道
+	ExitChan  chan struct{}            //用于结束房间协程
+	ReadExit  chan struct{}            //告知读用户消息线程是否已经完成退出
+	UsersConn map[uint32]*model.WSConn //用户id到订阅者的映射
+}
+
 // 房间号 -> 房间数据的映射(每个房间线程访问各自数据)
-var RoomData map[uint32]*model.Room = make(map[uint32]*model.Room)
+var RoomData map[uint32]*Room = make(map[uint32]*Room)
 
 // 房间主函数(主逻辑)
 func startRoomThread(roomID uint32) {
@@ -24,7 +32,7 @@ func startRoomThread(roomID uint32) {
 	roomInfo := NewRoom(roomID)
 	//房间对要求实时性不高，采用一个消费者去拿websocket到的数据
 	ctx, cancel := context.WithCancel(context.Background())
-	go ReadRoomData(ctx, roomInfo)
+	go roomInfo.ReadRoomData(ctx)
 	//协程主要作用在于处理房间内用户websocket的消息
 	for {
 		select {
@@ -42,9 +50,9 @@ func startRoomThread(roomID uint32) {
 	}
 }
 
-func NewRoom(roomID uint32) *model.Room {
+func NewRoom(roomID uint32) *Room {
 	if RoomData[roomID] == nil {
-		RoomData[roomID] = &model.Room{
+		RoomData[roomID] = &Room{
 			RoomID:    roomID,
 			MsgChan:   make(chan model.Message, 1024),
 			UsersConn: make(map[uint32]*model.WSConn),
@@ -54,7 +62,7 @@ func NewRoom(roomID uint32) *model.Room {
 }
 
 // 读取发送到房间的信息入管道
-func ReadRoomData(ctx context.Context, roomInfo *model.Room) {
+func (roomInfo *Room) ReadRoomData(ctx context.Context) {
 	for true {
 		for userID, wsConn := range roomInfo.UsersConn {
 			data, err := wsConn.InChanRead()
@@ -93,9 +101,9 @@ func init() {
 	dealFuncs[model.ChatMsg] = ChatProcess
 }
 
-type DealFunc func(roomID uint32, message model.Message)
+type dealFunc func(roomID uint32, message model.Message)
 
-var dealFuncs = make(map[uint32]DealFunc)
+var dealFuncs = make(map[uint32]dealFunc)
 
 // 房间信息
 func RoomInfo(roomID uint32, message model.Message) {
@@ -344,7 +352,7 @@ func GrpcModelToResponse(room *proto.RoomInfo) response.RoomResponse {
 	return resp
 }
 
-func BroadcastToAllRoomUsers(coon *model.Room, message interface{}) {
+func BroadcastToAllRoomUsers(coon *Room, message interface{}) {
 	c := map[string]interface{}{
 		"data": message,
 	}
