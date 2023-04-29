@@ -11,7 +11,6 @@ import (
 	"game_web/utils"
 	"net/http"
 	"strconv"
-	"sync"
 
 	"go.uber.org/zap"
 
@@ -30,15 +29,10 @@ var upgrader = websocket.Upgrader{
 }
 
 // 用户ID -> 用户状态
-var UsersState map[uint32]*UserState = make(map[uint32]*UserState)
-
-type UserState struct {
-	State   uint32
-	RWMutex sync.RWMutex
-}
+var UsersState map[uint32]uint32 = make(map[uint32]uint32)
 
 const (
-	NotIn = 1 << iota
+	NotIn = iota
 	RoomIn
 	GameIn
 )
@@ -47,11 +41,9 @@ const (
 func CreateRoom(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-
 	roomID, _ := strconv.Atoi(ctx.DefaultQuery("room_id", "0"))
 	maxUserNumber, _ := strconv.Atoi(ctx.DefaultQuery("max_user_number", "0"))
 	gameCount, _ := strconv.Atoi(ctx.DefaultQuery("game_count", "0"))
-
 	//查询房间
 	_, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: uint32(roomID)})
 	if err == nil {
@@ -60,6 +52,13 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
+	//if UsersState[userID] != NotIn {
+	//	// 用户在其他房间不能创房
+	//	ctx.JSON(http.StatusOK, gin.H{
+	//		"err": errors.New("请先退出其他房间再创房"),
+	//	})
+	//	return
+	//}
 	_, err = global.GameSrvClient.CreateRoom(context.Background(), &proto.RoomInfo{
 		RoomID:        uint32(roomID),
 		MaxUserNumber: uint32(maxUserNumber),
@@ -104,33 +103,22 @@ func UserIntoRoom(ctx *gin.Context) {
 		return
 	}
 	//一个用户同时间只能够在一间房（房间或者游戏）存在
-	if UsersState[userID] == nil {
-		UsersState[userID] = &UserState{
-			State:   NotIn,
-			RWMutex: sync.RWMutex{},
-		}
-	}
 	state := UsersState[userID]
-	zap.S().Info("用户进入房间，此时状态为：", state.State)
-	state.RWMutex.RLock()
-	if state.State == RoomIn {
+	zap.S().Info("用户进入房间，此时状态为：", state)
+	switch state {
+	case RoomIn:
 		//用户进入相同房间会重连,否则要求先退出该房间
 		err = ReConnRoom(RoomData[uint32(roomID)].UsersConn, ctx, userID)
-		state.RWMutex.RUnlock()
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"err": "请先退出之前的房间,再进入房间",
 			})
 		}
-		return
-	} else if state.State == GameIn {
-		state.RWMutex.RUnlock()
+	case GameIn:
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "正在游戏中，请不要进房",
 		})
-		return
-	} else if state.State == NotIn {
-		state.RWMutex.RUnlock()
+	case NotIn:
 		RoomData[uint32(roomID)].Mutex.Lock()
 		//房间存在，房间当前人数不应该满了或者房间开始了
 		if room.UserNumber >= room.MaxUserNumber {
@@ -167,19 +155,10 @@ func UserIntoRoom(ctx *gin.Context) {
 		if err != nil {
 			utils.SendErrToUser(ws, "[UserIntoRoom]", err)
 		}
-		//要先检查状态是否依然是NotIn
-		state.RWMutex.Lock()
-		if state.State == NotIn {
-			state.State = RoomIn
-		}
-		state.RWMutex.Unlock()
-		zap.S().Infof("客户端连接状态:%d", state.State)
+		state = RoomIn
+		zap.S().Infof("客户端连接状态:%d", state)
 		RoomData[uint32(roomID)].Mutex.Unlock()
 		//因为房间更新，给所有订阅者发送房间信息
-		room, err = global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: uint32(roomID)})
-		if err != nil {
-			utils.SendErrToUser(ws, "[UserIntoRoom]", err)
-		}
 		BroadcastToAllRoomUsers(RoomData[uint32(roomID)], GrpcModelToResponse(room))
 		BroadcastToAllRoomUsers(RoomData[uint32(roomID)], response.RoomMsgResponse{
 			MsgType: response.RoomMsgResponseType,
@@ -255,17 +234,9 @@ func SelectUserState(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
 	state := UsersState[userID]
-	if state == nil {
-		state = &UserState{
-			State:   NotIn,
-			RWMutex: sync.RWMutex{},
-		}
-	}
-	state.RWMutex.RLock()
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": state.State,
+		"data": state,
 	})
-	state.RWMutex.RUnlock()
 }
 
 // 房间信息

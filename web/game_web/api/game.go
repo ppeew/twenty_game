@@ -63,9 +63,7 @@ func RunGame(roomID uint32) {
 		user.Ready = false
 	}
 	for u, _ := range game.Users {
-		UsersState[u].RWMutex.Lock()
-		UsersState[u].State = RoomIn
-		UsersState[u].RWMutex.Unlock()
+		UsersState[u] = RoomIn
 	}
 	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
 	if err != nil {

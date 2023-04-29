@@ -142,20 +142,13 @@ func QuitRoom(roomID uint32, message model.Message) {
 				break
 			}
 		}
-		UsersState[message.UserID].RWMutex.Lock()
-		UsersState[message.UserID].State = NotIn
-		UsersState[message.UserID].RWMutex.Unlock()
+		UsersState[message.UserID] = NotIn
 		_, err := global.GameSrvClient.UpdateRoom(context.Background(), room)
 		if err != nil {
 			zap.S().Infof("[QuitRoom]错误:%s", err)
 		}
 		//房间变化，广播
-		searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
-		if err != nil {
-			utils.SendErrToUser(users[message.UserID], "[DropRoom]", err)
-			return
-		}
-		resp := GrpcModelToResponse(searchRoom)
+		resp := GrpcModelToResponse(room)
 		BroadcastToAllRoomUsers(RoomData[roomID], resp)
 	} else {
 		// 房主退出会销毁房间
@@ -173,9 +166,7 @@ func QuitRoom(roomID uint32, message model.Message) {
 		time.Sleep(2 * time.Second)
 		<-RoomData[roomID].ReadExit
 		for u, conn := range RoomData[roomID].UsersConn {
-			UsersState[u].RWMutex.Lock()
-			UsersState[u].State = NotIn
-			UsersState[u].RWMutex.Unlock()
+			UsersState[u] = NotIn
 			conn.CloseConn()
 		}
 		delete(RoomData, roomID)
@@ -234,12 +225,7 @@ func UpdateRoom(roomID uint32, message model.Message) {
 		MsgData: "更新房间成功",
 	})
 	//更新房间，发送广播
-	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
-	if err != nil {
-		utils.SendErrToUser(users[message.UserID], "[UpdateRoom]", err)
-		return
-	}
-	resp := GrpcModelToResponse(searchRoom)
+	resp := GrpcModelToResponse(room)
 	BroadcastToAllRoomUsers(RoomData[roomID], resp)
 }
 
@@ -266,16 +252,11 @@ func UpdateUserReadyState(roomID uint32, message model.Message) {
 			utils.SendErrToUser(users[message.UserID], "[UpdateUserReadyState]", err)
 			return
 		}
-		searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
-		if err != nil {
-			utils.SendErrToUser(users[message.UserID], "[UpdateUserReadyState]", err)
-			return
-		}
 		utils.SendMsgToUser(users[message.UserID], response.RoomMsgResponse{
 			MsgType: response.RoomMsgResponseType,
 			MsgData: fmt.Sprintf("玩家%d准备状态更新", message.UserID),
 		})
-		resp := GrpcModelToResponse(searchRoom)
+		resp := GrpcModelToResponse(room)
 		BroadcastToAllRoomUsers(RoomData[roomID], resp)
 	} else {
 		utils.SendErrToUser(users[message.UserID], "[UpdateUserReadyState]", errors.New("没找到该用户"))
@@ -309,9 +290,7 @@ func BeginGame(roomID uint32, message model.Message) {
 	}
 	//游戏开始,房间线程先暂停
 	for u, _ := range RoomData[roomID].UsersConn {
-		UsersState[u].RWMutex.Lock()
-		UsersState[u].State = GameIn
-		UsersState[u].RWMutex.Unlock()
+		UsersState[u] = GameIn
 	}
 	room.RoomWait = false
 	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
