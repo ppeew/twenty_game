@@ -10,6 +10,7 @@ import (
 	"game_web/model/response"
 	"game_web/proto"
 	"game_web/utils"
+	"sync"
 	"time"
 
 	"go.uber.org/zap"
@@ -17,6 +18,7 @@ import (
 
 type Room struct {
 	RoomID    uint32
+	Mutex     sync.Mutex               //同时进入房间抢夺房间人数资源
 	MsgChan   chan model.Message       //接受信息管道
 	ExitChan  chan struct{}            //用于结束房间协程
 	ReadExit  chan struct{}            //告知读用户消息线程是否已经完成退出
@@ -140,20 +142,13 @@ func QuitRoom(roomID uint32, message model.Message) {
 				break
 			}
 		}
+		UsersState[message.UserID].RWMutex.Lock()
+		UsersState[message.UserID].State = NotIn
+		UsersState[message.UserID].RWMutex.Unlock()
 		_, err := global.GameSrvClient.UpdateRoom(context.Background(), room)
 		if err != nil {
 			zap.S().Infof("[QuitRoom]错误:%s", err)
 		}
-	} else {
-		_, err = global.GameSrvClient.DeleteRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
-		if err != nil {
-			utils.SendErrToUser(users[message.UserID], "[DropRoom]", err)
-			return
-		}
-		utils.SendMsgToUser(users[message.UserID], response.RoomMsgResponse{
-			MsgType: response.RoomMsgResponseType,
-			MsgData: "删除房间成功",
-		})
 		//房间变化，广播
 		searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
 		if err != nil {
@@ -162,11 +157,25 @@ func QuitRoom(roomID uint32, message model.Message) {
 		}
 		resp := GrpcModelToResponse(searchRoom)
 		BroadcastToAllRoomUsers(RoomData[roomID], resp)
+	} else {
+		// 房主退出会销毁房间
+		_, err = global.GameSrvClient.DeleteRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
+		if err != nil {
+			utils.SendErrToUser(users[message.UserID], "[DropRoom]", err)
+			return
+		}
+		utils.SendMsgToUser(users[message.UserID], response.RoomMsgResponse{
+			MsgType: response.RoomMsgResponseType,
+			MsgData: "房主退出房间成功",
+		})
 		// 在全局变量内存中删除,防止浪费空间(让房间主线程停下，包括其中的读取队列,还有用户的连接)
 		RoomData[roomID].ExitChan <- struct{}{}
 		time.Sleep(2 * time.Second)
 		<-RoomData[roomID].ReadExit
-		for _, conn := range RoomData[roomID].UsersConn {
+		for u, conn := range RoomData[roomID].UsersConn {
+			UsersState[u].RWMutex.Lock()
+			UsersState[u].State = NotIn
+			UsersState[u].RWMutex.Unlock()
 			conn.CloseConn()
 		}
 		delete(RoomData, roomID)
@@ -298,11 +307,6 @@ func BeginGame(roomID uint32, message model.Message) {
 		})
 		return
 	}
-	//都准备好了，可以进入游戏模块,向所有用户发送游戏开始
-	BroadcastToAllRoomUsers(RoomData[roomID], response.RoomMsgResponse{
-		MsgType: response.RoomMsgResponseType,
-		MsgData: "正在进入游戏",
-	})
 	//游戏开始,房间线程先暂停
 	for u, _ := range RoomData[roomID].UsersConn {
 		UsersState[u].RWMutex.Lock()

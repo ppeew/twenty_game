@@ -21,7 +21,6 @@ type Game struct {
 	GameCount  uint32
 	UserNumber uint32
 
-	InitChan   chan struct{}          //通知游戏初始化已经完成
 	CommonChan chan model.Message     //游戏逻辑管道
 	ChatChan   chan model.ChatMsgData //聊天管道
 	ItemChan   chan model.ItemMsgData //使用物品管道
@@ -82,7 +81,6 @@ func NewGame(roomID uint32) *Game {
 			RoomID:     roomID,
 			Users:      make(map[uint32]*model.UserGameInfo),
 			CommonChan: make(chan model.Message, 1024),
-			InitChan:   make(chan struct{}),
 			ChatChan:   make(chan model.ChatMsgData, 1024),
 			ItemChan:   make(chan model.ItemMsgData, 1024),
 			HealthChan: make(chan model.Message, 1024),
@@ -99,7 +97,7 @@ func NewGame(roomID uint32) *Game {
 	go game.ProcessChatMsg(context.TODO())
 	go game.ProcessItemMsg(context.TODO())
 	go game.ProcessHealthMsg(context.TODO())
-	for _, info := range room.Users {
+	for u, info := range room.Users {
 		itemsInfo, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{Id: info.ID})
 		if err != nil {
 			zap.S().Panic("[RunGame]无法查找到物品信息")
@@ -113,14 +111,16 @@ func NewGame(roomID uint32) *Game {
 			},
 			IsGetCard: false,
 			Score:     0,
-			WS:        nil,
+			WS:        RoomData[roomID].UsersConn[uint32(u)],
 		}
 		//对于每个用户开启一个协程，用于读取他的消息到游戏管道（分发消息功能）
 		go game.ReadGameUserMsg(info.ID)
 	}
-	//采用关闭的方式通知用户可以连接了，因为是多消费者对一生产者,关闭之后能读
-	close(game.InitChan)
-	//等待用户的连接,完成，超时都不完成的直接开始游戏(用户可以后续再连接进来，这里不需要设置chan监听用户是否进入了)
+	BroadcastToAllGameUsers(game, response.RoomMsgResponse{
+		MsgType: response.RoomMsgResponseType,
+		MsgData: "可以进入游戏了",
+	})
+	//等待用户的连接,完成，超时都不完成的直接开始游戏
 	time.Sleep(6 * time.Second)
 	return game
 }
