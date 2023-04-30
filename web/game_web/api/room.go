@@ -19,14 +19,16 @@ import (
 type Room struct {
 	RoomID   uint32
 	MsgChan  chan model.Message //接受信息管道
-	ExitChan chan struct{}      //用于结束房间协程
+	ExitChan chan int           //用于结束房间协程
+	wg       sync.WaitGroup     //协调所有协程关闭
 }
 
 func NewRoom(roomID uint32) *Room {
 	room := &Room{
 		RoomID:   roomID,
 		MsgChan:  make(chan model.Message, 1024),
-		ExitChan: make(chan struct{}, 3),
+		ExitChan: make(chan int, 3),
+		wg:       sync.WaitGroup{},
 	}
 	return room
 }
@@ -35,72 +37,69 @@ func NewRoom(roomID uint32) *Room {
 func startRoomThread(roomID uint32) {
 	//初始化房间信息
 	room := NewRoom(roomID)
-	//房间对要求实时性不高，只开一协程去拿websocket到的数据
+	dealFunc := NewDealFunc(room)
 	ctx, cancel := context.WithCancel(context.Background())
-	wg := sync.WaitGroup{}
-	go room.ReadRoomData(&wg, ctx)
-	wg.Add(1)
+	go func(ctx context.Context) {
+		room.wg.Add(1)
+		for true {
+			select {
+			case userID := <-CHAN:
+				go room.ReadRoomUserMsg(ctx, userID)
+				room.wg.Add(1)
+			case <-ctx.Done():
+				room.wg.Done()
+				return
+			}
+		}
+	}(ctx)
 	//协程主要作用在于处理房间内用户websocket的消息
 	for {
 		select {
 		case msg := <-room.MsgChan:
-			zap.S().Info("收到", msg)
-			switch msg.Type {
-			case model.QuitRoomMsg:
-				room.QuitRoom(msg)
-			case model.UpdateRoomMsg:
-				room.UpdateRoom(msg)
-			case model.GetRoomMsg:
-				room.RoomInfo(msg)
-			case model.UserReadyStateMsg:
-				room.UpdateUserReadyState(msg)
-			case model.RoomBeginGameMsg:
-				room.BeginGame(msg)
-			}
-			//dealFuncs[msg.Type](roomID, msg)
-		case <-room.ExitChan:
+			zap.S().Infof("收到%+v", msg)
+			dealFunc[msg.Type](msg)
+		case msg := <-room.ExitChan:
 			// 停止信号，关闭主函数及读取用户通道函数，优雅退出
 			cancel()
-			wg.Wait()
-			return
+			room.wg.Wait()
+			if msg == model.RoomQuit {
+				return
+			} else if msg == model.GameStart {
+				go RunGame(roomID)
+				return
+			}
 		}
 	}
 }
 
-// 读取发送到房间的信息入管道
-func (roomInfo *Room) ReadRoomData(wg *sync.WaitGroup, ctx context.Context) {
+// ReadRoomUserMsg 读取发送到房间的信息入管道
+func (roomInfo *Room) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 	for true {
 		select {
 		case <-ctx.Done():
-			//收到退出信号,关闭传输通道(一生产者对一消费者的通道模式，没其他生产者，关闭对其他生产者没影响)
-			close(roomInfo.MsgChan)
-			wg.Done()
+			roomInfo.wg.Done()
 			return
 		default:
-			room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+			data, err := UsersStateAndConn[userID].WS.InChanRead()
 			if err != nil {
-				zap.S().Errorf("[ReadRoomData]:%s", err)
+				//如果与用户的websocket关闭，退出读取协程
+				roomInfo.wg.Done()
+				return
 			}
-			for _, info := range room.Users {
-				data, err := UsersStateAndConn[info.ID].WS.InChanRead()
-				if err != nil {
-					continue
-				}
-				message := model.Message{}
-				err = json.Unmarshal(data, &message)
-				if err != nil {
-					zap.S().Info("客户端发送数据有误:", string(data))
-					utils.SendErrToUser(UsersStateAndConn[info.ID].WS, "[ReadRoomData]", err)
-					continue
-				}
-				message.UserID = info.ID //添加标识，能够识别用户
-				roomInfo.MsgChan <- message
+			message := model.Message{}
+			err = json.Unmarshal(data, &message)
+			if err != nil {
+				zap.S().Info("客户端发送数据有误:", string(data))
+				utils.SendErrToUser(UsersStateAndConn[userID].WS, "[ReadRoomData]", err)
+				continue
 			}
+			message.UserID = userID //添加标识，能够识别用户
+			roomInfo.MsgChan <- message
 		}
 	}
 }
 
-// 房间信息
+// RoomInfo 房间信息
 func (roomInfo *Room) RoomInfo(message model.Message) {
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
 	if err != nil {
@@ -111,7 +110,7 @@ func (roomInfo *Room) RoomInfo(message model.Message) {
 	utils.SendMsgToUser(UsersStateAndConn[message.UserID].WS, resp)
 }
 
-// 退出房间（房主退出会导致全部房间删除）
+// QuitRoom 退出房间（房主退出会导致全部房间删除）
 func (roomInfo *Room) QuitRoom(message model.Message) {
 	//先查询房间是否存在
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
@@ -121,26 +120,21 @@ func (roomInfo *Room) QuitRoom(message model.Message) {
 	}
 	if room.RoomOwner != message.UserID {
 		//游戏玩家的退出
-		for _, info := range room.Users {
-			if info.ID == message.UserID {
-				UsersStateAndConn[message.UserID].WS.CloseConn()
-				break
-			}
-		}
 		for i, user := range room.Users {
 			if message.UserID == user.ID {
+				UsersStateAndConn[message.UserID].WS.CloseConn()
 				room.Users = append(room.Users[:i], room.Users[i:]...)
+				UsersStateAndConn[message.UserID].State = NotIn
+				_, err := global.GameSrvClient.UpdateRoom(context.Background(), room)
+				if err != nil {
+					zap.S().Error("[QuitRoom]错误:%s", err)
+				}
+				//房间变化，广播
+				resp := GrpcModelToResponse(room)
+				BroadcastToAllRoomUsers(room, resp)
 				break
 			}
 		}
-		UsersStateAndConn[message.UserID].State = NotIn
-		_, err := global.GameSrvClient.UpdateRoom(context.Background(), room)
-		if err != nil {
-			zap.S().Error("[QuitRoom]错误:%s", err)
-		}
-		//房间变化，广播
-		resp := GrpcModelToResponse(room)
-		BroadcastToAllRoomUsers(room, resp)
 	} else {
 		// 房主退出会销毁房间
 		utils.SendMsgToUser(UsersStateAndConn[message.UserID].WS, response.RoomMsgResponse{
@@ -159,11 +153,11 @@ func (roomInfo *Room) QuitRoom(message model.Message) {
 			zap.S().Error("[QuitRoom]:%s", err)
 			return
 		}
-		roomInfo.ExitChan <- struct{}{}
+		roomInfo.ExitChan <- model.RoomQuit
 	}
 }
 
-// 更新房间的房主或者游戏配置(仅房主)
+// UpdateRoom 更新房间的房主或者游戏配置(仅房主)
 func (roomInfo *Room) UpdateRoom(message model.Message) {
 	//先查询房间是否存在
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
@@ -216,7 +210,7 @@ func (roomInfo *Room) UpdateRoom(message model.Message) {
 	BroadcastToAllRoomUsers(room, resp)
 }
 
-// 玩家准备状态
+// UpdateUserReadyState 玩家准备状态
 func (roomInfo *Room) UpdateUserReadyState(message model.Message) {
 	//先查询房间是否存在
 	userInfo := UsersStateAndConn[message.UserID]
@@ -225,32 +219,28 @@ func (roomInfo *Room) UpdateUserReadyState(message model.Message) {
 		zap.S().Error("[UpdateUserReadyState]:%s", err)
 		return
 	}
-	isFind := false
 	for _, user := range room.Users {
 		if user.ID == message.UserID {
 			user.Ready = message.ReadyStateData.IsReady
-			isFind = true
-		}
-	}
-	if isFind {
-		//更新房间，发送广播
-		_, err := global.GameSrvClient.UpdateRoom(context.Background(), room)
-		if err != nil {
-			zap.S().Error("[UpdateUserReadyState]:%s", err)
+			//更新房间，发送广播
+			_, err := global.GameSrvClient.UpdateRoom(context.Background(), room)
+			if err != nil {
+				zap.S().Error("[UpdateUserReadyState]:%s", err)
+				return
+			}
+			utils.SendMsgToUser(userInfo.WS, response.RoomMsgResponse{
+				MsgType: response.RoomMsgResponseType,
+				MsgData: fmt.Sprintf("玩家%d准备状态更新", message.UserID),
+			})
+			resp := GrpcModelToResponse(room)
+			BroadcastToAllRoomUsers(room, resp)
 			return
 		}
-		utils.SendMsgToUser(userInfo.WS, response.RoomMsgResponse{
-			MsgType: response.RoomMsgResponseType,
-			MsgData: fmt.Sprintf("玩家%d准备状态更新", message.UserID),
-		})
-		resp := GrpcModelToResponse(room)
-		BroadcastToAllRoomUsers(room, resp)
-	} else {
-		utils.SendErrToUser(userInfo.WS, "[UpdateUserReadyState]", errors.New("没找到该用户"))
 	}
+	utils.SendErrToUser(userInfo.WS, "[UpdateUserReadyState]", errors.New("没找到该用户"))
 }
 
-// 开始游戏
+// BeginGame 开始游戏
 func (roomInfo *Room) BeginGame(message model.Message) {
 	//查看房间是否存在
 	userInfo := UsersStateAndConn[message.UserID]
@@ -285,8 +275,7 @@ func (roomInfo *Room) BeginGame(message model.Message) {
 		zap.S().Error("[BeginGame]:%s", err)
 		return
 	}
-	go RunGame(roomInfo.RoomID)
-	roomInfo.ExitChan <- struct{}{}
+	roomInfo.ExitChan <- model.GameStart
 }
 
 func (roomInfo *Room) ChatProcess(message model.Message) {
@@ -339,15 +328,16 @@ func BroadcastToAllRoomUsers(roomInfo *proto.RoomInfo, message interface{}) {
 	}
 }
 
-//func init() {
-//	dealFuncs[model.CheckHealthMsg] = CheckHealth
-//	dealFuncs[model.QuitRoomMsg] = QuitRoom
-//	dealFuncs[model.GetRoomMsg] = RoomInfo
-//	dealFuncs[model.RoomBeginGameMsg] = BeginGame
-//	dealFuncs[model.UserReadyStateMsg] = UpdateUserReadyState
-//	dealFuncs[model.UpdateRoomMsg] = UpdateRoom
-//	dealFuncs[model.ChatMsg] = ChatProcess
-//}
-//type dealFunc func(roomID uint32, message model.Message)
-//
-//var dealFuncs = make(map[uint32]dealFunc)
+type dealFunc func(message model.Message)
+
+func NewDealFunc(room *Room) map[uint32]dealFunc {
+	var dealFun = make(map[uint32]dealFunc)
+	dealFun[model.CheckHealthMsg] = room.CheckHealth
+	dealFun[model.QuitRoomMsg] = room.QuitRoom
+	dealFun[model.GetRoomMsg] = room.RoomInfo
+	dealFun[model.RoomBeginGameMsg] = room.BeginGame
+	dealFun[model.UserReadyStateMsg] = room.UpdateUserReadyState
+	dealFun[model.UpdateRoomMsg] = room.UpdateRoom
+	dealFun[model.ChatMsg] = room.ChatProcess
+	return dealFun
+}

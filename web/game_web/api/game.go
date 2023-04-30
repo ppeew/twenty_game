@@ -83,7 +83,7 @@ func NewGame(roomID uint32) *Game {
 	return game
 }
 
-// 游戏主函数
+// RunGame 游戏主函数
 func RunGame(roomID uint32) {
 	//游戏初始化阶段
 	game := NewGame(roomID)
@@ -155,7 +155,7 @@ func (game *Game) BackToRoom() {
 	for _, user := range room.Users {
 		user.Ready = false
 	}
-	for u, _ := range game.Users {
+	for u := range game.Users {
 		UsersStateAndConn[u].State = RoomIn
 	}
 	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
@@ -190,6 +190,7 @@ func (game *Game) DoScoreCount() {
 
 func (game *Game) DoHandleSpecialCard() {
 	//监听用户特殊卡环节,这块要设置超时时间，非一直读取
+	handleFunc := NewHandleFunc(game)
 	for true {
 		select {
 		case msg := <-game.CommonChan:
@@ -203,7 +204,7 @@ func (game *Game) DoHandleSpecialCard() {
 						//找到卡，执行
 						findCard = true
 						game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards[:i], game.Users[msg.UserID].SpecialCards[i+1:]...)
-						HandleCard[card.Type](game, msg)
+						handleFunc[card.Type](msg)
 					}
 				}
 				if findCard == false {
@@ -419,18 +420,7 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 	}
 }
 
-func init() {
-	HandleCard[model.AddCard] = HandleAddCard
-	HandleCard[model.DeleteCard] = HandleDeleteCard
-	HandleCard[model.UpdateCard] = HandleUpdateCard
-	HandleCard[model.ChangeCard] = HandleChangeCard
-}
-
-type HandlerCard func(*Game, model.Message)
-
-var HandleCard map[uint32]HandlerCard = make(map[uint32]HandlerCard)
-
-func HandleChangeCard(game *Game, msg model.Message) {
+func (game *Game) HandleChangeCard(msg model.Message) {
 	ws := UsersStateAndConn[msg.UserID].WS
 	data := msg.UseSpecialData.ChangeCardData
 	//先找到两卡
@@ -478,7 +468,7 @@ func HandleChangeCard(game *Game, msg model.Message) {
 
 }
 
-func HandleUpdateCard(game *Game, msg model.Message) {
+func (game *Game) HandleUpdateCard(msg model.Message) {
 	ws := UsersStateAndConn[msg.UserID].WS
 	data := msg.UseSpecialData.UpdateCardData
 	findUpdateCard := false
@@ -507,7 +497,7 @@ func HandleUpdateCard(game *Game, msg model.Message) {
 
 }
 
-func HandleDeleteCard(game *Game, msg model.Message) {
+func (game *Game) HandleDeleteCard(msg model.Message) {
 	ws := UsersStateAndConn[msg.UserID].WS
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
@@ -535,7 +525,7 @@ func HandleDeleteCard(game *Game, msg model.Message) {
 	BroadcastToAllGameUsers(game, rsp)
 }
 
-func HandleAddCard(game *Game, msg model.Message) {
+func (game *Game) HandleAddCard(msg model.Message) {
 	data := msg.UseSpecialData.AddCardData
 	game.MakeCardID++
 	game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, model.BaseCard{
@@ -558,7 +548,7 @@ func BroadcastToAllGameUsers(game *Game, msg interface{}) {
 		"data": msg,
 	}
 	marshal, _ := json.Marshal(c)
-	for userID, _ := range game.Users {
+	for userID := range game.Users {
 		err := UsersStateAndConn[userID].WS.OutChanWrite(marshal)
 		if err != nil {
 			UsersStateAndConn[userID].WS.CloseConn()
@@ -584,4 +574,15 @@ func CardModelToResponse(game *Game) response.GameStateResponse {
 		RandCard:  game.RandCard,
 	}
 	return resp
+}
+
+type HandlerCard func(model.Message)
+
+func NewHandleFunc(game *Game) map[uint32]HandlerCard {
+	var HandleCard = make(map[uint32]HandlerCard)
+	HandleCard[model.AddCard] = game.HandleAddCard
+	HandleCard[model.DeleteCard] = game.HandleDeleteCard
+	HandleCard[model.UpdateCard] = game.HandleUpdateCard
+	HandleCard[model.ChangeCard] = game.HandleChangeCard
+	return HandleCard
 }

@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"errors"
+	"game_web/api"
 	"game_web/global"
 	"game_web/model"
 	"net/http"
@@ -40,6 +41,12 @@ func JWTAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		if api.UsersStateAndConn[claims.ID] == nil {
+			api.UsersStateAndConn[claims.ID] = &api.UserStateAndConn{
+				State: api.NotIn,
+				WS:    nil,
+			}
+		}
 		c.Set("claims", claims)
 		c.Next()
 	}
@@ -71,6 +78,12 @@ func JWTAuthInParam() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, "未登陆")
 			c.Abort()
 			return
+		}
+		if api.UsersStateAndConn[claims.ID] == nil {
+			api.UsersStateAndConn[claims.ID] = &api.UserStateAndConn{
+				State: api.NotIn,
+				WS:    nil,
+			}
 		}
 		c.Set("claims", claims)
 		c.Next()

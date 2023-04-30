@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"game_web/global"
 	"game_web/model"
@@ -18,8 +19,16 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+const (
+	NotIn = iota
+	RoomIn
+	GameIn
+)
+
+var CHAN chan uint32 = make(chan uint32, 1024)
+
 // 升级websocket
-var upgrader = websocket.Upgrader{
+var upgrade = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
@@ -27,21 +36,15 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-// 用户ID -> 用户结构体（用户状态+用户连接）
-var UsersStateAndConn map[uint32]*UserStateAndConn = make(map[uint32]*UserStateAndConn)
+// UsersStateAndConn 用户ID -> 用户结构体（用户状态+用户连接）
+var UsersStateAndConn = make(map[uint32]*UserStateAndConn)
 
 type UserStateAndConn struct {
 	State uint32
 	WS    *model.WSConn
 }
 
-const (
-	NotIn = iota
-	RoomIn
-	GameIn
-)
-
-// 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息
+// CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息
 func CreateRoom(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
@@ -56,13 +59,13 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	//if UsersState[userID] != NotIn {
-	//	// 用户在其他房间不能创房
-	//	ctx.JSON(http.StatusOK, gin.H{
-	//		"err": errors.New("请先退出其他房间再创房"),
-	//	})
-	//	return
-	//}
+	if UsersStateAndConn[userID].State != NotIn {
+		// 用户在其他房间不能创房
+		ctx.JSON(http.StatusOK, gin.H{
+			"err": errors.New("请先退出其他房间再创房"),
+		})
+		return
+	}
 	_, err = global.GameSrvClient.CreateRoom(context.Background(), &proto.RoomInfo{
 		RoomID:        uint32(roomID),
 		MaxUserNumber: uint32(maxUserNumber),
@@ -86,7 +89,7 @@ func CreateRoom(ctx *gin.Context) {
 	return
 }
 
-// 玩家进入房间
+// UserIntoRoom 玩家进入房间
 func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	claims, _ := ctx.Get("claims")
@@ -98,12 +101,12 @@ func UserIntoRoom(ctx *gin.Context) {
 		return
 	}
 	//一个用户同时间只能够在一间房（房间或者游戏）存在
-	if UsersStateAndConn[userID] == nil {
-		UsersStateAndConn[userID] = &UserStateAndConn{
-			State: NotIn,
-			WS:    nil,
-		}
-	}
+	//if UsersStateAndConn[userID] == nil {
+	//	UsersStateAndConn[userID] = &UserStateAndConn{
+	//		State: NotIn,
+	//		WS:    nil,
+	//	}
+	//}
 	stateAndConn := UsersStateAndConn[userID]
 	zap.S().Info("用户进入房间，此时状态为：", stateAndConn.State)
 	switch stateAndConn.State {
@@ -131,7 +134,7 @@ func UserIntoRoom(ctx *gin.Context) {
 		}
 		// 允许进入房间,建立websocket连接
 		//RoomData[uint32(roomID)].Mutex.Lock() // 假设多用户访问这个加入接口，会涉及房间位置的抢夺
-		conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+		conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"err": "无法连接房间服务器",
@@ -149,6 +152,8 @@ func UserIntoRoom(ctx *gin.Context) {
 			zap.S().Infof("[UserIntoRoom]:%s", err)
 		}
 		stateAndConn.State = RoomIn
+		// 告知房间主函数，要创建协程来读取用户信息
+		CHAN <- userID
 		//RoomData[uint32(roomID)].Mutex.Unlock()
 		zap.S().Infof("客户端连接状态:%d", stateAndConn.State)
 		// 因为房间更新，给所有订阅者发送房间信息
@@ -160,16 +165,16 @@ func UserIntoRoom(ctx *gin.Context) {
 	}
 }
 
-// 重连服务器
+// Reconnect 重连服务器
 func Reconnect(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	if UsersStateAndConn[userID] == nil {
-		UsersStateAndConn[userID] = &UserStateAndConn{
-			State: NotIn,
-			WS:    nil,
-		}
-	}
+	//if UsersStateAndConn[userID] == nil {
+	//	UsersStateAndConn[userID] = &UserStateAndConn{
+	//		State: NotIn,
+	//		WS:    nil,
+	//	}
+	//}
 	stateAndConn := UsersStateAndConn[userID]
 	if stateAndConn.State == NotIn {
 		// 没有需要重连的
@@ -178,7 +183,7 @@ func Reconnect(ctx *gin.Context) {
 		})
 		return
 	}
-	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "无法连接房间服务器",
@@ -187,19 +192,25 @@ func Reconnect(ctx *gin.Context) {
 	}
 	stateAndConn.WS = model.InitWebSocket(conn, userID)
 	utils.SendMsgToUser(stateAndConn.WS, "重连服务器成功")
+	CHAN <- userID
 }
 
-// 查询用户此时状态（用于断线重连）（是在房间还是游戏还是没进入房间）
+// SelectUserState 查询用户此时状态-->在房间还是游戏还是没进入房间）
 func SelectUserState(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	state := UsersStateAndConn[userID].State
+	//if UsersStateAndConn[userID] == nil {
+	//	UsersStateAndConn[userID] = &UserStateAndConn{
+	//		State: NotIn,
+	//		WS:    nil,
+	//	}
+	//}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": state,
+		"data": UsersStateAndConn[userID].State,
 	})
 }
 
-// 房间信息
+// GetRoomInfo 房间信息
 func GetRoomInfo(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: uint32(roomID)})
@@ -215,7 +226,7 @@ func GetRoomInfo(ctx *gin.Context) {
 	})
 }
 
-// 获取所有的房间
+// GetRoomList 获取所有的房间
 func GetRoomList(ctx *gin.Context) {
 	allRoom, err := global.GameSrvClient.SearchAllRoom(context.Background(), &emptypb.Empty{})
 	if err != nil {
@@ -234,7 +245,7 @@ func GetRoomList(ctx *gin.Context) {
 	})
 }
 
-// 查询个人的物品信息
+// SelectItems 查询个人的物品信息
 func SelectItems(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
