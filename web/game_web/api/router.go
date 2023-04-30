@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"game_web/global"
 	"game_web/model"
@@ -28,8 +27,13 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-// 用户ID -> 用户状态
-var UsersState map[uint32]uint32 = make(map[uint32]uint32)
+// 用户ID -> 用户结构体（用户状态+用户连接）
+var UsersStateAndConn map[uint32]*UserStateAndConn = make(map[uint32]*UserStateAndConn)
+
+type UserStateAndConn struct {
+	State uint32
+	WS    *model.WSConn
+}
 
 const (
 	NotIn = iota
@@ -82,7 +86,7 @@ func CreateRoom(ctx *gin.Context) {
 	return
 }
 
-// 玩家进入房间(断线重连)(假设多用户访问这个加入接口，会涉及房间位置的抢夺)
+// 玩家进入房间
 func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	claims, _ := ctx.Get("claims")
@@ -90,49 +94,43 @@ func UserIntoRoom(ctx *gin.Context) {
 	//查找房间是否存在
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: uint32(roomID)})
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"err": err.Error(),
-		})
-		return
-	}
-	if RoomData[uint32(roomID)] == nil {
-		//没有创房间
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "还没创房就进入",
-		})
+		zap.S().Infof("[UserIntoRoom]:%s", err)
 		return
 	}
 	//一个用户同时间只能够在一间房（房间或者游戏）存在
-	state := UsersState[userID]
-	zap.S().Info("用户进入房间，此时状态为：", state)
-	switch state {
-	case RoomIn:
-		//用户进入相同房间会重连,否则要求先退出该房间
-		err = ReConnRoom(RoomData[uint32(roomID)].UsersConn, ctx, userID)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"err": "请先退出之前的房间,再进入房间",
-			})
+	if UsersStateAndConn[userID] == nil {
+		UsersStateAndConn[userID] = &UserStateAndConn{
+			State: NotIn,
+			WS:    nil,
 		}
+	}
+	stateAndConn := UsersStateAndConn[userID]
+	zap.S().Info("用户进入房间，此时状态为：", stateAndConn.State)
+	switch stateAndConn.State {
+	case RoomIn:
+		//用户已经有房间，拒绝进入房间
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "请先退出之前的房间,再进入房间",
+		})
 	case GameIn:
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "正在游戏中，请不要进房",
 		})
 	case NotIn:
-		RoomData[uint32(roomID)].Mutex.Lock()
-		//房间存在，房间当前人数不应该满了或者房间开始了
 		if room.UserNumber >= room.MaxUserNumber {
-			ctx.JSON(http.StatusBadRequest, gin.H{
+			ctx.JSON(http.StatusOK, gin.H{
+				//房间存在，房间当前人数不应该满了或者房间开始了
 				"err": "房间满了",
 			})
 			return
 		} else if !room.RoomWait {
-			ctx.JSON(http.StatusBadRequest, gin.H{
+			ctx.JSON(http.StatusOK, gin.H{
 				"err": "房间已开始游戏",
 			})
 			return
 		}
-		//进入房间,建立websocket连接
+		// 允许进入房间,建立websocket连接
+		//RoomData[uint32(roomID)].Mutex.Lock() // 假设多用户访问这个加入接口，会涉及房间位置的抢夺
 		conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
@@ -140,12 +138,7 @@ func UserIntoRoom(ctx *gin.Context) {
 			})
 			return
 		}
-		//初始化websocket（两协程，分别用来读与写）
-		ws := model.InitWebSocket(conn, userID)
-		if RoomData[uint32(roomID)].UsersConn[userID] == nil {
-			RoomData[uint32(roomID)].UsersConn[userID] = new(model.WSConn)
-		}
-		RoomData[uint32(roomID)].UsersConn[userID] = ws
+		stateAndConn.WS = model.InitWebSocket(conn, userID)
 		room.Users = append(room.Users, &proto.RoomUser{
 			ID:    userID,
 			Ready: false,
@@ -153,87 +146,54 @@ func UserIntoRoom(ctx *gin.Context) {
 		room.UserNumber += 1
 		_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
 		if err != nil {
-			utils.SendErrToUser(ws, "[UserIntoRoom]", err)
+			zap.S().Infof("[UserIntoRoom]:%s", err)
 		}
-		state = RoomIn
-		zap.S().Infof("客户端连接状态:%d", state)
-		RoomData[uint32(roomID)].Mutex.Unlock()
-		//因为房间更新，给所有订阅者发送房间信息
-		BroadcastToAllRoomUsers(RoomData[uint32(roomID)], GrpcModelToResponse(room))
-		BroadcastToAllRoomUsers(RoomData[uint32(roomID)], response.RoomMsgResponse{
+		stateAndConn.State = RoomIn
+		//RoomData[uint32(roomID)].Mutex.Unlock()
+		zap.S().Infof("客户端连接状态:%d", stateAndConn.State)
+		// 因为房间更新，给所有订阅者发送房间信息
+		BroadcastToAllRoomUsers(room, GrpcModelToResponse(room))
+		BroadcastToAllRoomUsers(room, response.RoomMsgResponse{
 			MsgType: response.RoomMsgResponseType,
 			MsgData: fmt.Sprintf("ID:%d玩家进入房间", userID),
 		})
 	}
 }
 
-func ReConnRoom(usersConn map[uint32]*model.WSConn, ctx *gin.Context, userID uint32) error {
-	//断线重连机制
-	for u, _ := range usersConn {
-		if u == userID {
-			zap.S().Info("用户正在重连")
-			//存在用户,先把之前开的协程关闭
-			usersConn[u].CloseConn()
-			conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-			if err != nil {
-				zap.S().Panic("[ReConnRoom]重连服务器失败")
-				return nil
-			}
-			//初始化websocket（两协程，分别用来读与写）
-			ws := model.InitWebSocket(conn, userID)
-			if usersConn[userID] == nil {
-				usersConn[userID] = new(model.WSConn)
-			}
-			usersConn[userID] = ws
-			utils.SendMsgToUser(ws, "重连房间服务器成功")
-			return nil
-		}
-	}
-	return errors.New("该游戏玩家不在房间中")
-}
-
-// 玩家进入游戏(断线重连)
-func UserIntoGame(ctx *gin.Context) {
+// 重连服务器
+func Reconnect(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
-	if GameData[uint32(roomID)] == nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"err": "不存在该游戏房间，稍后再试",
-		})
-		return
-	}
-	isFindUser := false
-	for u, _ := range GameData[uint32(roomID)].Users {
-		if u == userID {
-			//找到用户，建立连接
-			isFindUser = true
-			break
+	if UsersStateAndConn[userID] == nil {
+		UsersStateAndConn[userID] = &UserStateAndConn{
+			State: NotIn,
+			WS:    nil,
 		}
 	}
-	if !isFindUser {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "该玩家不在该游戏房间",
+	stateAndConn := UsersStateAndConn[userID]
+	if stateAndConn.State == NotIn {
+		// 没有需要重连的
+		ctx.JSON(http.StatusOK, gin.H{
+			"data": "不需要重连",
 		})
 		return
 	}
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "无法连接游戏服务器",
+			"err": "无法连接房间服务器",
 		})
 		return
 	}
-	ws := model.InitWebSocket(conn, userID)
-	GameData[uint32(roomID)].Users[userID].WS = ws
-	utils.SendMsgToUser(ws, "连接游戏服务器成功")
+	stateAndConn.WS = model.InitWebSocket(conn, userID)
+	utils.SendMsgToUser(stateAndConn.WS, "重连服务器成功")
 }
 
 // 查询用户此时状态（用于断线重连）（是在房间还是游戏还是没进入房间）
 func SelectUserState(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	state := UsersState[userID]
+	state := UsersStateAndConn[userID].State
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": state,
 	})

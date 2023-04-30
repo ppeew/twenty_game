@@ -60,8 +60,7 @@ type BaseCard struct {
 type UserGameInfo struct {
 	BaseCards    []BaseCard    //普通卡
 	SpecialCards []SpecialCard //特殊卡
-	Items        []uint32
-	IsGetCard    bool //当前回合已经抢过卡了
+	Items        []uint32      //持有物品
+	IsGetCard    bool          //当前回合已经抢过卡了
 	Score        uint32
-	WS           *WSConn
 }
