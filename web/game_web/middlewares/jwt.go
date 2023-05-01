@@ -41,8 +41,8 @@ func JWTAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if api.UsersStateAndConn[claims.ID] == nil {
-			api.UsersStateAndConn[claims.ID] = &api.UserStateAndConn{
+		if api.UsersState[claims.ID] == nil {
+			api.UsersState[claims.ID] = &api.UserState{
 				State: api.NotIn,
 				WS:    nil,
 			}
@@ -79,8 +79,8 @@ func JWTAuthInParam() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if api.UsersStateAndConn[claims.ID] == nil {
-			api.UsersStateAndConn[claims.ID] = &api.UserStateAndConn{
+		if api.UsersState[claims.ID] == nil {
+			api.UsersState[claims.ID] = &api.UserState{
 				State: api.NotIn,
 				WS:    nil,
 			}

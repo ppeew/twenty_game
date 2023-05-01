@@ -156,7 +156,7 @@ func (game *Game) BackToRoom() {
 		user.Ready = false
 	}
 	for u := range game.Users {
-		UsersStateAndConn[u].State = RoomIn
+		UsersState[u].State = RoomIn
 	}
 	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
 	if err != nil {
@@ -194,7 +194,7 @@ func (game *Game) DoHandleSpecialCard() {
 	for true {
 		select {
 		case msg := <-game.CommonChan:
-			userInfo := UsersStateAndConn[msg.UserID]
+			userInfo := UsersState[msg.UserID]
 			switch msg.Type {
 			case model.UseSpecialCardMsg:
 				//只有这类型的消息才处理
@@ -227,7 +227,7 @@ func (game *Game) DoListenDistributeCard() {
 	for true {
 		select {
 		case msg := <-game.CommonChan:
-			userInfo := UsersStateAndConn[msg.UserID]
+			userInfo := UsersState[msg.UserID]
 			switch msg.Type {
 			//只有这类型的消息才处理
 			case model.ListenHandleCardMsg:
@@ -239,10 +239,6 @@ func (game *Game) DoListenDistributeCard() {
 					isOK := false
 					for _, card := range game.RandCard {
 						if data.GetCardID == card.CardID && !card.HasOwner {
-							//按理来说不会空
-							//if game.Users[msg.UserID] == nil {
-							//	game.Users[msg.UserID] = new(model.UserGameInfo)
-							//}
 							if card.Type == model.BaseType {
 								game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, card.BaseCardCardInfo)
 							} else if card.Type == model.SpecialType {
@@ -314,7 +310,7 @@ func (game *Game) ProcessHealthMsg(todo context.Context) {
 			game.wg.Done()
 			return
 		case msg := <-game.HealthChan:
-			utils.SendMsgToUser(UsersStateAndConn[msg.UserID].WS, response.CheckHealthResponse{
+			utils.SendMsgToUser(UsersState[msg.UserID].WS, response.CheckHealthResponse{
 				MsgType: response.CheckHealthResponseType,
 				Ok:      true,
 			})
@@ -329,7 +325,7 @@ func (game *Game) ProcessItemMsg(todo context.Context) {
 			game.wg.Done()
 			return
 		case item := <-game.ItemChan:
-			userInfo := UsersStateAndConn[item.UserID]
+			userInfo := UsersState[item.UserID]
 			items := make([]uint32, 2)
 			switch proto.Type(item.Item) {
 			case proto.Type_Apple:
@@ -386,7 +382,7 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 			game.wg.Done()
 			return
 		default:
-			wsConn := UsersStateAndConn[userID].WS
+			wsConn := UsersState[userID].WS
 			data, err := wsConn.InChanRead()
 			if err != nil {
 				continue
@@ -421,7 +417,7 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 }
 
 func (game *Game) HandleChangeCard(msg model.Message) {
-	ws := UsersStateAndConn[msg.UserID].WS
+	ws := UsersState[msg.UserID].WS
 	data := msg.UseSpecialData.ChangeCardData
 	//先找到两卡
 	findUserCard := false
@@ -469,7 +465,7 @@ func (game *Game) HandleChangeCard(msg model.Message) {
 }
 
 func (game *Game) HandleUpdateCard(msg model.Message) {
-	ws := UsersStateAndConn[msg.UserID].WS
+	ws := UsersState[msg.UserID].WS
 	data := msg.UseSpecialData.UpdateCardData
 	findUpdateCard := false
 	for _, card := range game.Users[data.TargetUserID].BaseCards {
@@ -498,7 +494,7 @@ func (game *Game) HandleUpdateCard(msg model.Message) {
 }
 
 func (game *Game) HandleDeleteCard(msg model.Message) {
-	ws := UsersStateAndConn[msg.UserID].WS
+	ws := UsersState[msg.UserID].WS
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
 	for i, card := range game.Users[data.TargetUserID].BaseCards {
@@ -549,9 +545,9 @@ func BroadcastToAllGameUsers(game *Game, msg interface{}) {
 	}
 	marshal, _ := json.Marshal(c)
 	for userID := range game.Users {
-		err := UsersStateAndConn[userID].WS.OutChanWrite(marshal)
+		err := UsersState[userID].WS.OutChanWrite(marshal)
 		if err != nil {
-			UsersStateAndConn[userID].WS.CloseConn()
+			UsersState[userID].WS.CloseConn()
 		}
 	}
 }

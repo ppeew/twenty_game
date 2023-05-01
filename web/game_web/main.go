@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"game_web/api"
 	"game_web/global"
 	"game_web/initialize"
+	"game_web/proto"
 	"os"
 	"os/signal"
 	"syscall"
@@ -32,13 +35,13 @@ func main() {
 		zap.S().Info("两次ctrl+c强制退出")
 		syscall.Exit(0)
 	}()
-	//for roomID, _ := range api.RoomData {
-	//	_, err := global.GameSrvClient.DeleteRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
-	//	if err != nil {
-	//		zap.S().Infof("关闭%d房间失败:%s", roomID, err.Error())
-	//	}
-	//	zap.S().Infof("已经将%d房间清空！", roomID)
-	//}
+	for roomID, _ := range api.CHAN {
+		_, err := global.GameSrvClient.DeleteRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
+		if err != nil {
+			zap.S().Infof("关闭%d房间失败:%s", roomID, err.Error())
+		}
+		zap.S().Infof("已经将%d房间清空！", roomID)
+	}
 	zap.S().Info("释放资源完毕，退出")
 	//if err = register_client.DeRegister(serviceId); err != nil {
 	//	zap.S().Info("注销失败:", err.Error())

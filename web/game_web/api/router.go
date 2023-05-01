@@ -25,7 +25,8 @@ const (
 	GameIn
 )
 
-var CHAN chan uint32 = make(chan uint32, 1024)
+// CHAN 房间号对应创建读取协程的管道
+var CHAN = make(map[uint32]chan uint32)
 
 // 升级websocket
 var upgrade = websocket.Upgrader{
@@ -36,10 +37,10 @@ var upgrade = websocket.Upgrader{
 	},
 }
 
-// UsersStateAndConn 用户ID -> 用户结构体（用户状态+用户连接）
-var UsersStateAndConn = make(map[uint32]*UserStateAndConn)
+// UsersState 用户ID -> 用户结构体（用户状态+用户连接+用户房间号）
+var UsersState = make(map[uint32]*UserState)
 
-type UserStateAndConn struct {
+type UserState struct {
 	State uint32
 	WS    *model.WSConn
 }
@@ -59,7 +60,7 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	if UsersStateAndConn[userID].State != NotIn {
+	if UsersState[userID].State != NotIn {
 		// 用户在其他房间不能创房
 		ctx.JSON(http.StatusOK, gin.H{
 			"err": errors.New("请先退出其他房间再创房"),
@@ -82,7 +83,6 @@ func CreateRoom(ctx *gin.Context) {
 	}
 	//启动房间协程
 	go startRoomThread(uint32(roomID))
-
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "创建成功",
 	})
@@ -100,14 +100,7 @@ func UserIntoRoom(ctx *gin.Context) {
 		zap.S().Infof("[UserIntoRoom]:%s", err)
 		return
 	}
-	//一个用户同时间只能够在一间房（房间或者游戏）存在
-	//if UsersStateAndConn[userID] == nil {
-	//	UsersStateAndConn[userID] = &UserStateAndConn{
-	//		State: NotIn,
-	//		WS:    nil,
-	//	}
-	//}
-	stateAndConn := UsersStateAndConn[userID]
+	stateAndConn := UsersState[userID]
 	zap.S().Info("用户进入房间，此时状态为：", stateAndConn.State)
 	switch stateAndConn.State {
 	case RoomIn:
@@ -153,7 +146,7 @@ func UserIntoRoom(ctx *gin.Context) {
 		}
 		stateAndConn.State = RoomIn
 		// 告知房间主函数，要创建协程来读取用户信息
-		CHAN <- userID
+		CHAN[uint32(roomID)] <- userID
 		//RoomData[uint32(roomID)].Mutex.Unlock()
 		zap.S().Infof("客户端连接状态:%d", stateAndConn.State)
 		// 因为房间更新，给所有订阅者发送房间信息
@@ -165,17 +158,11 @@ func UserIntoRoom(ctx *gin.Context) {
 	}
 }
 
-// Reconnect 重连服务器
+// Reconnect 重连游戏服务器
 func Reconnect(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	//if UsersStateAndConn[userID] == nil {
-	//	UsersStateAndConn[userID] = &UserStateAndConn{
-	//		State: NotIn,
-	//		WS:    nil,
-	//	}
-	//}
-	stateAndConn := UsersStateAndConn[userID]
+	stateAndConn := UsersState[userID]
 	if stateAndConn.State == NotIn {
 		// 没有需要重连的
 		ctx.JSON(http.StatusOK, gin.H{
@@ -192,21 +179,14 @@ func Reconnect(ctx *gin.Context) {
 	}
 	stateAndConn.WS = model.InitWebSocket(conn, userID)
 	utils.SendMsgToUser(stateAndConn.WS, "重连服务器成功")
-	CHAN <- userID
 }
 
 // SelectUserState 查询用户此时状态-->在房间还是游戏还是没进入房间）
 func SelectUserState(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	//if UsersStateAndConn[userID] == nil {
-	//	UsersStateAndConn[userID] = &UserStateAndConn{
-	//		State: NotIn,
-	//		WS:    nil,
-	//	}
-	//}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": UsersStateAndConn[userID].State,
+		"data": UsersState[userID].State,
 	})
 }
 
