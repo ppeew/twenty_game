@@ -40,3 +40,18 @@ type UseItemResponse struct {
 	MsgType     uint32            `json:"msgType"`
 	ItemMsgData model.ItemMsgData `json:"itemMsgData"`
 }
+
+type Info struct {
+	UserID uint32
+	Score  uint32
+}
+
+type ScoreRankResponse struct {
+	MsgType uint32 `json:"msgType"`
+	Ranks   []Info `json:"rank"`
+}
+
+// 游戏结束返回消息体
+type GameOverResponse struct {
+	MsgType uint32 `json:"msgType"`
+}

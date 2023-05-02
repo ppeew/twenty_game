@@ -1,0 +1,112 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option go_package = ".;proto";
+
+service Game{
+  //道具
+  rpc CreateUserItems(UserItemsInfo)returns(UserItemsInfoResponse);
+  //查询用户的金币钻石及道具
+  rpc GetUserItemsInfo(UserIDInfo) returns(UserItemsInfoResponse);
+  //增加金币
+  rpc AddGold(AddGoldRequest) returns(google.protobuf.Empty);
+  //增加钻石
+  rpc AddDiamond(AddDiamondInfo) returns(google.protobuf.Empty);
+  //增加道具(道具类型应该区别)
+  rpc AddItem(AddItemInfo) returns(google.protobuf.Empty);
+  //使用金币
+  rpc UseGold(UseGoldRequest) returns(IsOK);
+  //使用钻石
+  rpc UseDiamond(UseDiamondInfo) returns(IsOK);
+  //使用道具(道具类型应该区别)
+  rpc UseItem(UseItemInfo) returns(IsOK);
+
+  //房间
+  rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);
+  rpc CreateRoom(RoomInfo)returns (google.protobuf.Empty);
+  rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
+  rpc UpdateRoom(RoomInfo)returns (google.protobuf.Empty);
+  rpc DeleteRoom(RoomIDInfo)returns (google.protobuf.Empty);
+}
+
+message IsOK{
+  bool isOK=1;
+}
+
+message UseGoldRequest{
+  uint32 id=1;
+  uint32 count=2;
+}
+
+message UseDiamondInfo{
+  uint32 id=1;
+  uint32 count=2;
+}
+
+message UseItemInfo{
+  uint32 id=1;
+  repeated uint32 items=2;
+}
+
+message UserItemsInfo{
+  uint32 id=1;
+  uint32 gold=2;
+  uint32 diamond=3;
+  uint32 apple=4;
+  uint32 banana=5;
+}
+
+enum Type{
+  Apple=0;
+  Banana=1;
+}
+
+message UserIDInfo{
+  uint32 id=1;
+}
+
+message UserItemsInfoResponse{
+  uint32 id=1;
+  uint32 gold=2;
+  uint32 diamond=3;
+  //道具
+  repeated uint32 items=4;
+}
+
+message AddGoldRequest{
+  uint32 id=1;
+  uint32 count=2;
+}
+
+message AddDiamondInfo{
+  uint32 id=1;
+  uint32 count=2;
+}
+
+message AddItemInfo{
+  uint32 id=1;
+  repeated uint32 items=2;
+}
+
+message RoomIDInfo {
+  uint32 RoomID=1;
+}
+
+message RoomUser{
+  uint32 ID=1;
+  bool Ready=2;
+}
+
+message RoomInfo{
+  uint32 RoomID=1;
+  uint32 MaxUserNumber=2;
+  uint32 GameCount=3;
+  uint32 UserNumber=4;
+  uint32 RoomOwner=5;
+  bool RoomWait=6;
+  repeated RoomUser Users=7;
+
+}
+
+message AllRoomInfo{
+  repeated RoomInfo AllRoomInfo=1;
+}

@@ -40,6 +40,16 @@ func startRoomThread(roomID uint32) {
 	room := NewRoom(roomID)
 	dealFunc := NewDealFunc(room)
 	ctx, cancel := context.WithCancel(context.Background())
+	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
+	if err != nil {
+		zap.S().Infof("[startRoomThread]:%s", err)
+		cancel()
+		return
+	}
+	for _, info := range searchRoom.Users {
+		go room.ReadRoomUserMsg(ctx, info.ID)
+		room.wg.Add(1)
+	}
 	go func(ctx context.Context) {
 		room.wg.Add(1)
 		for true {
@@ -53,7 +63,6 @@ func startRoomThread(roomID uint32) {
 			}
 		}
 	}(ctx)
-	//协程主要作用在于处理房间内用户websocket的消息
 	for {
 		select {
 		case msg := <-room.MsgChan:
@@ -62,7 +71,9 @@ func startRoomThread(roomID uint32) {
 		case msg := <-room.ExitChan:
 			// 停止信号，关闭主函数及读取用户通道函数，优雅退出
 			cancel()
+			zap.S().Info("[startRoomThread]]:wg正在等待其他协程结束")
 			room.wg.Wait()
+			zap.S().Info("[startRoomThread]]:其他协程已关闭")
 			if msg == model.RoomQuit {
 				return
 			} else if msg == model.GameStart {
@@ -80,19 +91,9 @@ func (roomInfo *Room) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 		case <-ctx.Done():
 			roomInfo.wg.Done()
 			return
-		default:
-			data, err := UsersState[userID].WS.InChanRead()
-			if err != nil {
-				//如果与用户的websocket关闭，退出读取协程,并且将该玩家从房间剔除
-				roomInfo.wg.Done()
-				roomInfo.MsgChan <- model.Message{
-					Type:   model.QuitRoomMsg,
-					UserID: userID,
-				}
-				return
-			}
+		case data := <-UsersState[userID].WS.InChan:
 			message := model.Message{}
-			err = json.Unmarshal(data, &message)
+			err := json.Unmarshal(data, &message)
 			if err != nil {
 				zap.S().Info("客户端发送数据有误:", string(data))
 				utils.SendErrToUser(UsersState[userID].WS, "[ReadRoomData]", err)
@@ -100,6 +101,39 @@ func (roomInfo *Room) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 			}
 			message.UserID = userID //添加标识，能够识别用户
 			roomInfo.MsgChan <- message
+		case <-UsersState[userID].WS.CloseChan:
+			err := errors.New("连接断开")
+			if err != nil {
+				//如果与用户的websocket关闭，退出读取协程,并且将该玩家从房间剔除
+				roomInfo.wg.Done()
+				zap.S().Infof("[ReadRoomUserMsg]:%d用户掉线了", userID)
+				roomInfo.MsgChan <- model.Message{
+					Type:   model.QuitRoomMsg,
+					UserID: userID,
+				}
+				return
+			}
+			//default:
+			//	data, err := UsersState[userID].WS.InChanRead()
+			//	if err != nil {
+			//		//如果与用户的websocket关闭，退出读取协程,并且将该玩家从房间剔除
+			//		roomInfo.wg.Done()
+			//		zap.S().Infof("[ReadRoomUserMsg]:%d用户掉线了", userID)
+			//		roomInfo.MsgChan <- model.Message{
+			//			Type:   model.QuitRoomMsg,
+			//			UserID: userID,
+			//		}
+			//		return
+			//	}
+			//	message := model.Message{}
+			//	err = json.Unmarshal(data, &message)
+			//	if err != nil {
+			//		zap.S().Info("客户端发送数据有误:", string(data))
+			//		utils.SendErrToUser(UsersState[userID].WS, "[ReadRoomData]", err)
+			//		continue
+			//	}
+			//	message.UserID = userID //添加标识，能够识别用户
+			//	roomInfo.MsgChan <- message
 		}
 	}
 }

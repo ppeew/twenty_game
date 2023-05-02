@@ -15,6 +15,8 @@ const (
 	GameStateResponseType  //游戏状态信息
 	UseSpecialCardInfoType //用户使用特殊卡信息
 	UseItemResponseType    //用户使用道具信息
+	ScoreRankResponseType
+	GameOverResponseType
 )
 
 // 返回的聊天信息（通用）

@@ -9,7 +9,9 @@ import (
 	"game_web/proto"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -19,6 +21,15 @@ func main() {
 	initialize.InitConfig()
 	initialize.InitSrvConn()
 	routers := initialize.InitRouters()
+	go func() {
+		for true {
+			select {
+			case <-time.After(time.Second):
+				zap.S().Infof("协程数量->%d", runtime.NumGoroutine())
+			}
+		}
+	}()
+	time.Sleep(2 * time.Second)
 	go func() {
 		if err := routers.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
 			zap.S().Panic("启动失败:", err.Error())

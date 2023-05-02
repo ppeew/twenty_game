@@ -88,12 +88,10 @@ func UserRegister(ctx *gin.Context) {
 			"err": err.Error(),
 		})
 	}
-
 	var info *proto.UserInfoResponse
 	var err error
 	//保证一定能够生成，多次尝试
 	for true {
-		//
 		username := fmt.Sprintf("%05v", rand.New(rand.NewSource(time.Now().UnixNano())).Intn(100000))
 		info, err = global.UserSrvClient.CreateUser(context.Background(), &proto.CreateUserInfo{
 			Nickname: register.Nickname,
@@ -115,7 +113,6 @@ func UserRegister(ctx *gin.Context) {
 		}
 		//数据库存在，持续循环直到可以添加
 	}
-
 	//返回token，实际上默认已经完成登录过程了
 	j := middlewares.NewJWT()
 	claims := models.CustomClaims{

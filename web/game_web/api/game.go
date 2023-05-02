@@ -10,6 +10,7 @@ import (
 	"game_web/proto"
 	"game_web/utils"
 	"math/rand"
+	"sort"
 	"sync"
 	"time"
 
@@ -56,16 +57,17 @@ func NewGame(roomID uint32) *Game {
 	go game.ProcessHealthMsg(ctx)
 	game.wg.Add(3)
 	for _, info := range room.Users {
-		itemsInfo, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{Id: info.ID})
-		if err != nil {
-			zap.S().Panic("[RunGame]无法查找到物品信息")
-		}
+		//itemsInfo, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{Id: info.ID})
+		//if err != nil {
+		//	zap.S().Panic("[RunGame]无法查找到物品信息")
+		//}
+		zap.S().Infof("[NewGame]初始化用户%d", info.ID)
 		game.Users[info.ID] = &model.UserGameInfo{
 			BaseCards:    make([]model.BaseCard, 0),
 			SpecialCards: make([]model.SpecialCard, 0),
-			Items: []uint32{
-				itemsInfo.Items[proto.Type_Apple],
-				itemsInfo.Items[proto.Type_Banana],
+			Items:        []uint32{
+				//itemsInfo.Items[proto.Type_Apple],
+				//itemsInfo.Items[proto.Type_Banana],
 			},
 			IsGetCard: false,
 			Score:     0,
@@ -88,23 +90,32 @@ func RunGame(roomID uint32) {
 	//游戏初始化阶段
 	game := NewGame(roomID)
 	//初始化完成，进入游戏主要逻辑
+	zap.S().Info("游戏[NewGame]完成")
 	for i := uint32(0); i < game.GameCount; i++ {
 		BroadcastToAllGameUsers(game, CardModelToResponse(game))
+		zap.S().Info("游戏[BroadcastToAllGameUsers]完成")
 		//循环初始化
 		game.DoFlush()
+		zap.S().Info("游戏[DoFlush]完成")
 		//发牌阶段
 		game.DoDistributeCard()
+		zap.S().Info("游戏[DoDistributeCard]完成")
 		//抢卡阶段
 		game.DoListenDistributeCard()
+		zap.S().Info("游戏[DoListenDistributeCard]完成")
 		//特殊卡处理阶段
 		game.DoHandleSpecialCard()
+		zap.S().Info("游戏[DoHandleSpecialCard]完成")
 		//分数计算阶段
 		game.DoScoreCount()
+		zap.S().Info("游戏[DoScoreCount]完成")
 	}
 	//游戏结束计算排名发奖励阶段
 	game.DoEndGame()
+	zap.S().Info("游戏[DoEndGame]完成")
 	// 回到房间
 	game.BackToRoom()
+	zap.S().Info("游戏[BackToRoom]完成")
 }
 
 func (game *Game) DoFlush() {
@@ -115,34 +126,20 @@ func (game *Game) DoFlush() {
 }
 
 func (game *Game) DoEndGame() {
-	type Info struct {
-		UserID uint32
-		Score  uint32
-	}
-	var ranks []Info
+	var ranks []response.Info
 	for userID, info := range game.Users {
-		ranks = append(ranks, Info{UserID: userID, Score: info.Score})
+		ranks = append(ranks, response.Info{UserID: userID, Score: info.Score})
 	}
-
-	max := uint32(0)
-	userID := uint32(0)
-	maxIndex := 0
-	for i := 0; i < len(ranks); i++ {
-		for j := i; i < len(ranks); i++ {
-			if ranks[j].Score > max {
-				max = ranks[i].Score
-				userID = ranks[i].UserID
-				maxIndex = j
-			}
+	sort.Slice(ranks, func(i, j int) bool {
+		if ranks[i].Score == ranks[j].Score {
+			return ranks[i].UserID > ranks[j].UserID
 		}
-		temp := Info{
-			UserID: userID,
-			Score:  max,
-		}
-		ranks[maxIndex] = ranks[i]
-		ranks[i] = temp
-	}
-	BroadcastToAllGameUsers(game, ranks)
+		return ranks[i].Score > ranks[j].Score
+	})
+	BroadcastToAllGameUsers(game, response.ScoreRankResponse{
+		MsgType: response.ScoreRankResponseType,
+		Ranks:   ranks,
+	})
 }
 
 func (game *Game) BackToRoom() {
@@ -162,9 +159,12 @@ func (game *Game) BackToRoom() {
 	if err != nil {
 		zap.S().Info("[RunGame]更新房间失败")
 	}
+	BroadcastToAllGameUsers(game, response.GameOverResponse{MsgType: response.GameOverResponseType})
 	//完成所有环境，退出游戏协程，创建房间协程，回到房间协程来
 	game.exitCancel() //关闭子协程
-	game.wg.Wait()    //等待全部子协程关闭
+	zap.S().Info("[BackToRoom]等待其他子协程关闭")
+	game.wg.Wait() //等待全部子协程关闭
+	zap.S().Info("[BackToRoom]其他子协程已关闭")
 	go startRoomThread(game.RoomID)
 }
 
@@ -270,16 +270,17 @@ func (game *Game) DoListenDistributeCard() {
 
 func (game *Game) DoDistributeCard() {
 	//要生成userNumber*2的卡牌，其中包含普通卡和特殊卡,特殊卡数量应该在玩家数量（1/4-1/3）
-	needCount := int(game.UserNumber * 2)
+	needCount := int(game.UserNumber + 2)
 	//先生成特殊卡
 	rand.Seed(time.Now().Unix())
-	special := needCount / (rand.Intn(2) + 3)
+	special := rand.Intn(2)
 	for i := 0; i < special; i++ {
 		//生成一张随机的特殊卡
 		cardType := 1 << rand.Intn(5)
 		game.MakeCardID++
 		game.RandCard = append(game.RandCard, model.Card{
-			Type: model.SpecialType,
+			CardID: game.MakeCardID,
+			Type:   model.SpecialType,
 			SpecialCardInfo: model.SpecialCard{
 				CardID: game.MakeCardID, //这个字段每张卡必须唯一
 				Type:   uint32(cardType),
@@ -291,7 +292,8 @@ func (game *Game) DoDistributeCard() {
 	for i := 0; i < needCount; i++ {
 		game.MakeCardID++
 		game.RandCard = append(game.RandCard, model.Card{
-			Type: model.BaseType,
+			CardID: game.MakeCardID,
+			Type:   model.BaseType,
 			BaseCardCardInfo: model.BaseCard{
 				CardID: game.MakeCardID,
 				Number: uint32(1 + rand.Intn(11)),
@@ -307,6 +309,7 @@ func (game *Game) ProcessHealthMsg(todo context.Context) {
 	for true {
 		select {
 		case <-todo.Done():
+			zap.S().Info("[ProcessHealthMsg]退出")
 			game.wg.Done()
 			return
 		case msg := <-game.HealthChan:
@@ -322,6 +325,7 @@ func (game *Game) ProcessItemMsg(todo context.Context) {
 	for true {
 		select {
 		case <-todo.Done():
+			zap.S().Info("[ProcessItemMsg]退出")
 			game.wg.Done()
 			return
 		case item := <-game.ItemChan:
@@ -358,6 +362,7 @@ func (game *Game) ProcessChatMsg(todo context.Context) {
 	for true {
 		select {
 		case <-todo.Done():
+			zap.S().Info("[ProcessChatMsg]退出")
 			game.wg.Done()
 			return
 		case chat := <-game.ChatChan:
@@ -379,16 +384,12 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 	for true {
 		select {
 		case <-ctx.Done():
+			zap.S().Info("[ReadGameUserMsg]退出")
 			game.wg.Done()
 			return
-		default:
-			wsConn := UsersState[userID].WS
-			data, err := wsConn.InChanRead()
-			if err != nil {
-				continue
-			}
+		case data := <-UsersState[userID].WS.InChan:
 			message := model.Message{}
-			err = json.Unmarshal(data, &message)
+			err := json.Unmarshal(data, &message)
 			if err != nil {
 				//客户端发过来数据有误
 				zap.S().Info("客户端发送数据有误:", data)
@@ -411,6 +412,11 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 				//其他信息是通用信息
 				message.UserID = userID
 				game.CommonChan <- message
+			}
+		case <-UsersState[userID].WS.CloseChan:
+			err := errors.New("连接断开")
+			if err != nil {
+				continue
 			}
 		}
 	}
@@ -545,8 +551,10 @@ func BroadcastToAllGameUsers(game *Game, msg interface{}) {
 	}
 	marshal, _ := json.Marshal(c)
 	for userID := range game.Users {
+		zap.S().Infof("[BroadcastToAllGameUsers]:正在向用户%d发送信息", userID)
 		err := UsersState[userID].WS.OutChanWrite(marshal)
 		if err != nil {
+			zap.S().Infof("[BroadcastToAllGameUsers]:%d用户关闭了连接", userID)
 			UsersState[userID].WS.CloseConn()
 		}
 	}
