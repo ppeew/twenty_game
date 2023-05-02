@@ -306,11 +306,14 @@ func (roomInfo *Room) BeginGame(message model.Message) {
 	}
 	//游戏开始,房间线程先暂停
 	room.RoomWait = false
-	room.Users[room.RoomOwner].Ready = true
-	for _, user := range room.Users {
+	ownerIndex := uint32(0)
+	for i, user := range room.Users {
 		if user.Ready == false {
 			//没准备好
-			room.Users[room.RoomOwner].Ready = false
+			if user.ID == room.RoomOwner {
+				ownerIndex = uint32(i)
+				continue
+			}
 			utils.SendMsgToUser(userInfo.WS, response.RoomMsgResponse{
 				MsgType: response.RoomMsgResponseType,
 				MsgData: "其他玩家没准备好",
@@ -318,6 +321,7 @@ func (roomInfo *Room) BeginGame(message model.Message) {
 			return
 		}
 	}
+	room.Users[ownerIndex].Ready = true
 	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
 	for _, info := range room.Users {
 		UsersState[info.ID].State = GameIn

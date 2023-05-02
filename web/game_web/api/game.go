@@ -229,6 +229,7 @@ func (game *Game) DoListenDistributeCard() {
 		select {
 		case msg := <-game.CommonChan:
 			userInfo := UsersState[msg.UserID]
+			zap.S().Infof("[DoListenDistributeCard]:%+v", msg)
 			switch msg.Type {
 			//只有这类型的消息才处理
 			case model.ListenHandleCardMsg:
@@ -238,13 +239,17 @@ func (game *Game) DoListenDistributeCard() {
 				} else {
 					data := msg.GetCardData
 					isOK := false
+					zap.S().Infof("[DoListenDistributeCard]:%+v", data)
 					for _, card := range game.RandCard {
+						zap.S().Infof("[DoListenDistributeCard]:%v", card.HasOwner)
 						if data.GetCardID == card.CardID && !card.HasOwner {
 							if card.Type == model.BaseType {
 								game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, card.BaseCardInfo)
 							} else if card.Type == model.SpecialType {
 								game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards, card.SpecialCardInfo)
 							}
+							card.HasOwner = true
+							game.Users[msg.UserID].IsGetCard = true
 							isOK = true
 							break
 						}
