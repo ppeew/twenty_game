@@ -1,8 +1,10 @@
 package config
 
 type UserSrvConfig struct {
-	//Host string `mapstructure:"host" json:"host"`
-	//Port int    `mapstructure:"port" json:"port"`
+	Name string `mapstructure:"name" json:"name"`
+}
+
+type GameSrvConfig struct {
 	Name string `mapstructure:"name" json:"name"`
 }
 
@@ -16,10 +18,9 @@ type ConsulConfig struct {
 }
 
 type ServerConfig struct {
-	//Name        string        `mapstructure:"name" json:"name"`
-	//Host        string        `mapstructure:"host" json:"host"`
 	Port        int           `mapstructure:"port" json:"port"`
 	UserSrvInfo UserSrvConfig `mapstructure:"user_srv" json:"user_srv"`
+	GameSrvInfo GameSrvConfig `mapstructure:"game_srv" json:"game_srv"`
 	JWTInfo     JWTConfig     `mapstructure:"jwt" json:"jwt"`
 	ConsulInfo  ConsulConfig  `mapstructure:"consul" json:"consul"`
 }

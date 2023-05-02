@@ -38,6 +38,7 @@ func NewGame(roomID uint32) *Game {
 	if err != nil {
 		zap.S().Panic("[RunGame]无法查找到房间信息")
 	}
+	rand.Seed(time.Now().Unix())
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	game := &Game{
 		RoomID:     roomID,
@@ -240,7 +241,7 @@ func (game *Game) DoListenDistributeCard() {
 					for _, card := range game.RandCard {
 						if data.GetCardID == card.CardID && !card.HasOwner {
 							if card.Type == model.BaseType {
-								game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, card.BaseCardCardInfo)
+								game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, card.BaseCardInfo)
 							} else if card.Type == model.SpecialType {
 								game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards, card.SpecialCardInfo)
 							}
@@ -269,36 +270,51 @@ func (game *Game) DoListenDistributeCard() {
 }
 
 func (game *Game) DoDistributeCard() {
-	//要生成userNumber*2的卡牌，其中包含普通卡和特殊卡,特殊卡数量应该在玩家数量（1/4-1/3）
+	//要生成userNumber+2的卡牌，其中包含普通卡和特殊卡
 	needCount := int(game.UserNumber + 2)
 	//先生成特殊卡
-	rand.Seed(time.Now().Unix())
 	special := rand.Intn(2)
-	for i := 0; i < special; i++ {
-		//生成一张随机的特殊卡
-		cardType := 1 << rand.Intn(5)
-		game.MakeCardID++
-		game.RandCard = append(game.RandCard, model.Card{
-			CardID: game.MakeCardID,
-			Type:   model.SpecialType,
-			SpecialCardInfo: model.SpecialCard{
-				CardID: game.MakeCardID, //这个字段每张卡必须唯一
-				Type:   uint32(cardType),
-			},
-		})
-	}
-	//生成普通卡
-	needCount -= special
+	zap.S().Infof("special:%d", special)
+	hasMakeSpecial := 0
 	for i := 0; i < needCount; i++ {
-		game.MakeCardID++
-		game.RandCard = append(game.RandCard, model.Card{
-			CardID: game.MakeCardID,
-			Type:   model.BaseType,
-			BaseCardCardInfo: model.BaseCard{
+		if rand.Int()%needCount < special {
+			if hasMakeSpecial >= special {
+				//生成普通卡
+				game.MakeCardID++
+				game.RandCard = append(game.RandCard, model.Card{
+					CardID: game.MakeCardID,
+					Type:   model.BaseType,
+					BaseCardInfo: model.BaseCard{
+						CardID: game.MakeCardID,
+						Number: uint32(1 + rand.Intn(11)),
+					},
+				})
+				continue
+			}
+			//生成特殊卡
+			cardType := 1 << rand.Intn(5)
+			game.MakeCardID++
+			game.RandCard = append(game.RandCard, model.Card{
 				CardID: game.MakeCardID,
-				Number: uint32(1 + rand.Intn(11)),
-			},
-		})
+				Type:   model.SpecialType,
+				SpecialCardInfo: model.SpecialCard{
+					CardID: game.MakeCardID, //这个字段每张卡必须唯一
+					Type:   uint32(cardType),
+				},
+			})
+			hasMakeSpecial++
+		} else {
+			//生成普通卡
+			game.MakeCardID++
+			game.RandCard = append(game.RandCard, model.Card{
+				CardID: game.MakeCardID,
+				Type:   model.BaseType,
+				BaseCardInfo: model.BaseCard{
+					CardID: game.MakeCardID,
+					Number: uint32(1 + rand.Intn(11)),
+				},
+			})
+		}
 	}
 	//生成完成,通过websocket发送用户
 	resp := CardModelToResponse(game)
@@ -562,8 +578,9 @@ func BroadcastToAllGameUsers(game *Game, msg interface{}) {
 
 func CardModelToResponse(game *Game) response.GameStateResponse {
 	var users []response.UserGameInfoResponse
-	for _, info := range game.Users {
+	for userID, info := range game.Users {
 		user := response.UserGameInfoResponse{
+			UserID:       userID,
 			BaseCards:    info.BaseCards,
 			SpecialCards: info.SpecialCards,
 			IsGetCard:    info.IsGetCard,

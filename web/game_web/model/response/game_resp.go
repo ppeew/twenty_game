@@ -11,6 +11,7 @@ type GameStateResponse struct {
 }
 
 type UserGameInfoResponse struct {
+	UserID       uint32              `json:"userID"`
 	BaseCards    []model.BaseCard    `json:"baseCards"`    //普通卡
 	SpecialCards []model.SpecialCard `json:"specialCards"` //特殊卡
 	IsGetCard    bool                `json:"isGetCard"`    //当前回合已经抢过卡了

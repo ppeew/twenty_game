@@ -17,14 +17,10 @@ func main() {
 	initialize.InitSrvConn()
 
 	routers := initialize.InitRouters()
-
 	if err := routers.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
 		zap.S().Panic("启动失败:", err.Error())
 	}
-
 	//终止信号
-	fmt.Println("okok!!!!!")
-
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	<-quit

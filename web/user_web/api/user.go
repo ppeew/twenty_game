@@ -12,7 +12,10 @@ import (
 	"user_web/global/response"
 	"user_web/middlewares"
 	"user_web/models"
-	"user_web/proto"
+	"user_web/proto/game"
+	"user_web/proto/user"
+
+	"go.uber.org/zap"
 
 	"github.com/DanPlayer/randomname"
 	"github.com/dgrijalva/jwt-go"
@@ -67,7 +70,7 @@ func GetRandomNickName(ctx *gin.Context) {
 // 查询用户信息,通过id查询
 func GetUserInfo(ctx *gin.Context) {
 	queryID, _ := strconv.Atoi(ctx.Query("id"))
-	info, err := global.UserSrvClient.GetUserByID(context.Background(), &proto.UserIDInfo{Id: uint32(queryID)})
+	info, err := global.UserSrvClient.GetUserByID(context.Background(), &user.UserIDInfo{Id: uint32(queryID)})
 	if err != nil {
 		GrpcErrorToHttp(err, ctx)
 		return
@@ -88,18 +91,31 @@ func UserRegister(ctx *gin.Context) {
 			"err": err.Error(),
 		})
 	}
-	var info *proto.UserInfoResponse
+	var info *user.UserInfoResponse
 	var err error
 	//保证一定能够生成，多次尝试
 	for true {
 		username := fmt.Sprintf("%05v", rand.New(rand.NewSource(time.Now().UnixNano())).Intn(100000))
-		info, err = global.UserSrvClient.CreateUser(context.Background(), &proto.CreateUserInfo{
+		info, err = global.UserSrvClient.CreateUser(context.Background(), &user.CreateUserInfo{
 			Nickname: register.Nickname,
 			Gender:   ToBool(register.Gender),
 			UserName: username,
 			Password: "12345",
 		})
 		if err == nil {
+			//生成物品
+			zap.S().Info("正在生成物品")
+			_, err := global.GameSrvClient.CreateUserItems(context.Background(), &game.UserItemsInfo{
+				Id:      info.Id,
+				Gold:    100,
+				Diamond: 10,
+				Apple:   2,
+				Banana:  2,
+			})
+			if err != nil {
+				zap.S().Fatal("[UserRegister]数据库用户物品表插入失败")
+			}
+			zap.S().Info("成功生成物品")
 			break
 		}
 		code, _ := status.FromError(err)
@@ -152,14 +168,14 @@ func UserLogin(ctx *gin.Context) {
 		})
 		return
 	}
-	info, err := global.UserSrvClient.GetUserByUsername(context.Background(), &proto.UserNameInfo{UserName: login.Username})
+	info, err := global.UserSrvClient.GetUserByUsername(context.Background(), &user.UserNameInfo{UserName: login.Username})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "用户没注册",
 		})
 		return
 	}
-	verify, err := global.UserSrvClient.CheckPassword(context.Background(), &proto.CheckPasswordInfo{
+	verify, err := global.UserSrvClient.CheckPassword(context.Background(), &user.CheckPasswordInfo{
 		Password:       login.Password,
 		EncodePassword: info.Password,
 	})
@@ -217,7 +233,7 @@ func UserUpdate(ctx *gin.Context) {
 	}
 
 	//必须先查询是否有username=form.Username
-	_, err := global.UserSrvClient.GetUserByUsername(context.Background(), &proto.UserNameInfo{UserName: form.Username})
+	_, err := global.UserSrvClient.GetUserByUsername(context.Background(), &user.UserNameInfo{UserName: form.Username})
 	if err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"err": "用户名已经被使用",
@@ -225,7 +241,7 @@ func UserUpdate(ctx *gin.Context) {
 		return
 	}
 
-	_, err = global.UserSrvClient.UpdateUser(context.Background(), &proto.UpdateUserInfo{
+	_, err = global.UserSrvClient.UpdateUser(context.Background(), &user.UpdateUserInfo{
 		Id:       id,
 		Nickname: form.Nickname,
 		Gender:   ToBool(form.Gender),

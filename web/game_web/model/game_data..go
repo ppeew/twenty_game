@@ -28,16 +28,16 @@ type ItemMsgData struct {
 }
 
 type Card struct {
-	Type             uint32      `json:"type"`
-	CardID           uint32      `json:"cardID"`
-	SpecialCardInfo  SpecialCard `json:"specialCardInfo"`
-	BaseCardCardInfo BaseCard    `json:"baseCardCardInfo"`
-	HasOwner         bool        `json:"hasOwner"`
+	Type            uint32      `json:"type"`
+	CardID          uint32      `json:"cardID"`
+	SpecialCardInfo SpecialCard `json:"specialCardInfo"`
+	BaseCardInfo    BaseCard    `json:"baseCardCardInfo"`
+	HasOwner        bool        `json:"hasOwner"`
 }
 
 const (
-	SpecialType = 1 << iota
-	BaseType
+	BaseType = iota
+	SpecialType
 )
 
 type SpecialCard struct {
