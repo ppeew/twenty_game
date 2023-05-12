@@ -8,7 +8,7 @@ import (
 	"game_web/global"
 	"game_web/model"
 	"game_web/model/response"
-	"game_web/proto"
+	game_proto "game_web/proto/game"
 	"game_web/utils"
 	"sync"
 	"time"
@@ -40,7 +40,7 @@ func startRoomThread(roomID uint32) {
 	room := NewRoom(roomID)
 	dealFunc := NewDealFunc(room)
 	ctx, cancel := context.WithCancel(context.Background())
-	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
+	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
 		zap.S().Infof("[startRoomThread]:%s", err)
 		cancel()
@@ -113,34 +113,13 @@ func (roomInfo *Room) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 				}
 				return
 			}
-			//default:
-			//	data, err := UsersState[userID].WS.InChanRead()
-			//	if err != nil {
-			//		//如果与用户的websocket关闭，退出读取协程,并且将该玩家从房间剔除
-			//		roomInfo.wg.Done()
-			//		zap.S().Infof("[ReadRoomUserMsg]:%d用户掉线了", userID)
-			//		roomInfo.MsgChan <- model.Message{
-			//			Type:   model.QuitRoomMsg,
-			//			UserID: userID,
-			//		}
-			//		return
-			//	}
-			//	message := model.Message{}
-			//	err = json.Unmarshal(data, &message)
-			//	if err != nil {
-			//		zap.S().Info("客户端发送数据有误:", string(data))
-			//		utils.SendErrToUser(UsersState[userID].WS, "[ReadRoomData]", err)
-			//		continue
-			//	}
-			//	message.UserID = userID //添加标识，能够识别用户
-			//	roomInfo.MsgChan <- message
 		}
 	}
 }
 
 // RoomInfo 房间信息
 func (roomInfo *Room) RoomInfo(message model.Message) {
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
 	if err != nil {
 		zap.S().Error("[RoomInfo]:%s", err)
 		return
@@ -152,7 +131,7 @@ func (roomInfo *Room) RoomInfo(message model.Message) {
 // QuitRoom 退出房间（房主退出会导致全部房间删除）
 func (roomInfo *Room) QuitRoom(message model.Message) {
 	//先查询房间是否存在
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
 	if err != nil {
 		zap.S().Warnf("[QuitRoom]:%s", err)
 		return
@@ -187,7 +166,7 @@ func (roomInfo *Room) QuitRoom(message model.Message) {
 		}
 		// 资源释放
 		time.Sleep(2 * time.Second)
-		_, err = global.GameSrvClient.DeleteRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+		_, err = global.GameSrvClient.DeleteRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
 		if err != nil {
 			zap.S().Error("[QuitRoom]:%s", err)
 			return
@@ -199,7 +178,7 @@ func (roomInfo *Room) QuitRoom(message model.Message) {
 // UpdateRoom 更新房间的房主或者游戏配置(仅房主)
 func (roomInfo *Room) UpdateRoom(message model.Message) {
 	//先查询房间是否存在
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
 	if err != nil {
 		zap.S().Error("[UpdateRoom]:%s", err)
 		return
@@ -253,7 +232,7 @@ func (roomInfo *Room) UpdateRoom(message model.Message) {
 func (roomInfo *Room) UpdateUserReadyState(message model.Message) {
 	//先查询房间是否存在
 	userInfo := UsersState[message.UserID]
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
 	if err != nil {
 		zap.S().Error("[UpdateUserReadyState]:%s", err)
 		return
@@ -283,7 +262,7 @@ func (roomInfo *Room) UpdateUserReadyState(message model.Message) {
 func (roomInfo *Room) BeginGame(message model.Message) {
 	//查看房间是否存在
 	userInfo := UsersState[message.UserID]
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
 	if err != nil {
 		zap.S().Error("[BeginGame]:%s", err)
 		return
@@ -334,7 +313,7 @@ func (roomInfo *Room) BeginGame(message model.Message) {
 }
 
 func (roomInfo *Room) ChatProcess(message model.Message) {
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
 	if err != nil {
 		zap.S().Errorf("[ChatProcess]:%s", err)
 	}
@@ -351,7 +330,7 @@ func (roomInfo *Room) CheckHealth(message model.Message) {
 	})
 }
 
-func GrpcModelToResponse(roomInfo *proto.RoomInfo) response.RoomResponse {
+func GrpcModelToResponse(roomInfo *game_proto.RoomInfo) response.RoomResponse {
 	resp := response.RoomResponse{
 		MsgType:       response.RoomInfoResponseType,
 		RoomID:        roomInfo.RoomID,
@@ -370,7 +349,7 @@ func GrpcModelToResponse(roomInfo *proto.RoomInfo) response.RoomResponse {
 	return resp
 }
 
-func BroadcastToAllRoomUsers(roomInfo *proto.RoomInfo, message interface{}) {
+func BroadcastToAllRoomUsers(roomInfo *game_proto.RoomInfo, message interface{}) {
 	c := map[string]interface{}{
 		"data": message,
 	}

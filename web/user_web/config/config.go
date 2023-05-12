@@ -4,10 +4,6 @@ type UserSrvConfig struct {
 	Name string `mapstructure:"name" json:"name"`
 }
 
-type GameSrvConfig struct {
-	Name string `mapstructure:"name" json:"name"`
-}
-
 type JWTConfig struct {
 	SigningKey string `mapstructure:"key" json:"key"`
 }
@@ -20,7 +16,6 @@ type ConsulConfig struct {
 type ServerConfig struct {
 	Port        int           `mapstructure:"port" json:"port"`
 	UserSrvInfo UserSrvConfig `mapstructure:"user_srv" json:"user_srv"`
-	GameSrvInfo GameSrvConfig `mapstructure:"game_srv" json:"game_srv"`
 	JWTInfo     JWTConfig     `mapstructure:"jwt" json:"jwt"`
 	ConsulInfo  ConsulConfig  `mapstructure:"consul" json:"consul"`
 }

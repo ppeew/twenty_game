@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"game_srv/global"
 	"game_srv/model"
-	"game_srv/proto"
+	"game_srv/proto/game"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -16,14 +16,14 @@ import (
 )
 
 type GameServer struct {
-	proto.UnimplementedGameServer
+	game.UnimplementedGameServer
 }
 
-func ModelToResponse(user *model.UserItem) *proto.UserItemsInfoResponse {
+func ModelToResponse(user *model.UserItem) *game.UserItemsInfoResponse {
 	var record []uint32
 	record = append(record, user.Apple)
 	record = append(record, user.Banana)
-	userInfoRep := &proto.UserItemsInfoResponse{
+	userInfoRep := &game.UserItemsInfoResponse{
 		Id:      user.ID,
 		Gold:    user.Gold,
 		Diamond: user.Diamond,
@@ -32,16 +32,15 @@ func ModelToResponse(user *model.UserItem) *proto.UserItemsInfoResponse {
 	return userInfoRep
 }
 
-func (s *GameServer) CreateUserItems(ctx context.Context, req *proto.UserItemsInfo) (*proto.UserItemsInfoResponse, error) {
+func (s *GameServer) CreateUserItems(ctx context.Context, req *game.UserItemsInfo) (*game.UserItemsInfoResponse, error) {
 	zap.S().Info("用户访问CreateUserItems")
+	fmt.Println("用户访问CreateUserItems")
 	item := model.UserItem{
+		UserID:  req.Id,
 		Gold:    req.Gold,
 		Diamond: req.Diamond,
 		Apple:   req.Apple,
 		Banana:  req.Banana,
-	}
-	if req.Id != 0 {
-		item.BaseModel.ID = req.Id
 	}
 	res := global.MysqlDB.Create(&item)
 	if res.RowsAffected == 0 {
@@ -50,11 +49,9 @@ func (s *GameServer) CreateUserItems(ctx context.Context, req *proto.UserItemsIn
 	return ModelToResponse(&item), nil
 }
 
-func (s *GameServer) GetUserItemsInfo(ctx context.Context, req *proto.UserIDInfo) (*proto.UserItemsInfoResponse, error) {
+func (s *GameServer) GetUserItemsInfo(ctx context.Context, req *game.UserIDInfo) (*game.UserItemsInfoResponse, error) {
 	item := model.UserItem{
-		BaseModel: model.BaseModel{
-			ID: req.Id,
-		},
+		UserID: req.Id,
 	}
 	res := global.MysqlDB.First(&item)
 	if res.Error != nil {
@@ -67,11 +64,9 @@ func (s *GameServer) GetUserItemsInfo(ctx context.Context, req *proto.UserIDInfo
 }
 
 // 增加金币
-func (s *GameServer) AddGold(ctx context.Context, req *proto.AddGoldRequest) (*emptypb.Empty, error) {
+func (s *GameServer) AddGold(ctx context.Context, req *game.AddGoldRequest) (*emptypb.Empty, error) {
 	query := &model.UserItem{
-		BaseModel: model.BaseModel{
-			ID: req.Id,
-		},
+		UserID: req.Id,
 	}
 	tx := global.MysqlDB.First(&query)
 	if tx.Error != nil {
@@ -89,11 +84,9 @@ func (s *GameServer) AddGold(ctx context.Context, req *proto.AddGoldRequest) (*e
 }
 
 // 增加钻石
-func (s *GameServer) AddDiamond(ctx context.Context, req *proto.AddDiamondInfo) (*emptypb.Empty, error) {
+func (s *GameServer) AddDiamond(ctx context.Context, req *game.AddDiamondInfo) (*emptypb.Empty, error) {
 	query := &model.UserItem{
-		BaseModel: model.BaseModel{
-			ID: req.Id,
-		},
+		UserID: req.Id,
 	}
 	tx := global.MysqlDB.First(&query)
 	if tx.Error != nil {
@@ -111,12 +104,10 @@ func (s *GameServer) AddDiamond(ctx context.Context, req *proto.AddDiamondInfo) 
 }
 
 // 增加道具(道具类型应该区别)
-func (s *GameServer) AddItem(ctx context.Context, req *proto.AddItemInfo) (*emptypb.Empty, error) {
+func (s *GameServer) AddItem(ctx context.Context, req *game.AddItemInfo) (*emptypb.Empty, error) {
 	//要知道更新什么
 	query := &model.UserItem{
-		BaseModel: model.BaseModel{
-			ID: req.Id,
-		},
+		UserID: req.Id,
 	}
 	tx := global.MysqlDB.First(&query)
 	if tx.Error != nil {
@@ -126,8 +117,8 @@ func (s *GameServer) AddItem(ctx context.Context, req *proto.AddItemInfo) (*empt
 		return nil, status.Error(codes.NotFound, "用户不存在")
 	}
 	item := model.UserItem{
-		Apple:  req.Items[proto.Type_Apple] + query.Apple,
-		Banana: req.Items[proto.Type_Banana] + query.Banana,
+		Apple:  req.Items[game.Type_Apple] + query.Apple,
+		Banana: req.Items[game.Type_Banana] + query.Banana,
 	}
 	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Updates(item)
 	if res.RowsAffected == 0 {
@@ -136,90 +127,84 @@ func (s *GameServer) AddItem(ctx context.Context, req *proto.AddItemInfo) (*empt
 	return &emptypb.Empty{}, nil
 }
 
-func (s *GameServer) UseGold(ctx context.Context, req *proto.UseGoldRequest) (*proto.IsOK, error) {
+func (s *GameServer) UseGold(ctx context.Context, req *game.UseGoldRequest) (*game.IsOK, error) {
 	//要知道更新什么
 	query := &model.UserItem{
-		BaseModel: model.BaseModel{
-			ID: req.Id,
-		},
+		UserID: req.Id,
 	}
 	tx := global.MysqlDB.First(&query)
 	if tx.Error != nil {
-		return &proto.IsOK{IsOK: false}, tx.Error
+		return &game.IsOK{IsOK: false}, tx.Error
 	}
 	if tx.RowsAffected == 0 {
-		return &proto.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
+		return &game.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
 	}
 	if req.Count > query.Gold {
 		//不可以使用
-		return &proto.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
+		return &game.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
 	}
 	query.Gold -= req.Count
 	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", query.Gold))
 	if res.RowsAffected == 0 {
-		return &proto.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
+		return &game.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
 	}
-	return &proto.IsOK{IsOK: true}, nil
+	return &game.IsOK{IsOK: true}, nil
 
 }
 
-func (s *GameServer) UseDiamond(ctx context.Context, req *proto.UseDiamondInfo) (*proto.IsOK, error) {
+func (s *GameServer) UseDiamond(ctx context.Context, req *game.UseDiamondInfo) (*game.IsOK, error) {
 	//要知道更新什么
 	query := &model.UserItem{
-		BaseModel: model.BaseModel{
-			ID: req.Id,
-		},
+		UserID: req.Id,
 	}
 	tx := global.MysqlDB.First(&query)
 	if tx.Error != nil {
-		return &proto.IsOK{IsOK: false}, tx.Error
+		return &game.IsOK{IsOK: false}, tx.Error
 	}
 	if tx.RowsAffected == 0 {
-		return &proto.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
+		return &game.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
 	}
 	if req.Count > query.Diamond {
 		//不可以使用
-		return &proto.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
+		return &game.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
 	}
 	query.Diamond -= req.Count
 	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", query.Diamond))
 	if res.RowsAffected == 0 {
-		return &proto.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
+		return &game.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
 	}
-	return &proto.IsOK{IsOK: true}, nil
+	return &game.IsOK{IsOK: true}, nil
 }
 
-func (s *GameServer) UseItem(ctx context.Context, req *proto.UseItemInfo) (*proto.IsOK, error) {
+func (s *GameServer) UseItem(ctx context.Context, req *game.UseItemInfo) (*game.IsOK, error) {
 	//要知道更新什么
 	query := &model.UserItem{
-		BaseModel: model.BaseModel{
-			ID: req.Id,
-		},
+		UserID: req.Id,
 	}
 	tx := global.MysqlDB.First(&query)
 	if tx.Error != nil {
-		return &proto.IsOK{IsOK: false}, tx.Error
+		return &game.IsOK{IsOK: false}, tx.Error
 	}
 	if tx.RowsAffected == 0 {
-		return &proto.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
+		return &game.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
 	}
 	item := model.UserItem{
-		Apple:  query.Apple - req.Items[proto.Type_Apple],
-		Banana: query.Banana - req.Items[proto.Type_Banana],
+		Apple:  query.Apple - req.Items[game.Type_Apple],
+		Banana: query.Banana - req.Items[game.Type_Banana],
 	}
 	if item.Apple < 0 || item.Banana < 0 {
 		//不可以使用
-		return &proto.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
+		return &game.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
 	}
 	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Updates(item)
 	if res.RowsAffected == 0 {
-		return &proto.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
+		return &game.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
 	}
-	return &proto.IsOK{IsOK: true}, nil
+	return &game.IsOK{IsOK: true}, nil
 }
 
-func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*proto.AllRoomInfo, error) {
-	ret := &proto.AllRoomInfo{}
+func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*game.AllRoomInfo, error) {
+	ret := &game.AllRoomInfo{}
 	keys := global.RedisDB.Keys(ctx, "*")
 	if keys.Err() != nil {
 		return nil, keys.Err()
@@ -232,14 +217,14 @@ func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*pro
 		}
 		room := model.Room{}
 		_ = json.Unmarshal([]byte(result), &room)
-		var users []*proto.RoomUser
+		var users []*game.RoomUser
 		for _, user := range room.Users {
-			users = append(users, &proto.RoomUser{
+			users = append(users, &game.RoomUser{
 				ID:    user.ID,
 				Ready: user.Ready,
 			})
 		}
-		r := &proto.RoomInfo{
+		r := &game.RoomInfo{
 			RoomID:        room.RoomID,
 			MaxUserNumber: room.MaxUserNumber,
 			GameCount:     room.GameCount,
@@ -253,7 +238,7 @@ func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*pro
 	return ret, nil
 }
 
-func (s *GameServer) CreateRoom(ctx context.Context, in *proto.RoomInfo) (*emptypb.Empty, error) {
+func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptypb.Empty, error) {
 	var users []*model.User
 	room := model.Room{
 		RoomID:        in.RoomID,
@@ -272,7 +257,7 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *proto.RoomInfo) (*empty
 	return &emptypb.Empty{}, nil
 }
 
-func (s *GameServer) SearchRoom(ctx context.Context, in *proto.RoomIDInfo) (*proto.RoomInfo, error) {
+func (s *GameServer) SearchRoom(ctx context.Context, in *game.RoomIDInfo) (*game.RoomInfo, error) {
 	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
@@ -280,30 +265,25 @@ func (s *GameServer) SearchRoom(ctx context.Context, in *proto.RoomIDInfo) (*pro
 	}
 	room := model.Room{}
 	_ = json.Unmarshal([]byte(result), &room)
-	ret := &proto.RoomInfo{
+	ret := &game.RoomInfo{
 		RoomID:        room.RoomID,
 		MaxUserNumber: room.MaxUserNumber,
 		GameCount:     room.GameCount,
 		UserNumber:    room.UserNumber,
 		RoomOwner:     room.RoomOwner,
 		RoomWait:      room.RoomWait,
-		//Users:         make([]*proto.RoomUser, 0),  不用初始化也可以append
+		//Users:         make([]*game.RoomUser, 0),  不用初始化也可以append
 	}
 	for _, user := range room.Users {
-		ret.Users = append(ret.Users, &proto.RoomUser{
+		ret.Users = append(ret.Users, &game.RoomUser{
 			ID:    user.ID,
 			Ready: user.Ready,
 		})
 	}
-	//for i, user := range ret.Users {
-	//	println(i)
-	//	println(user.Ready)
-	//	println(user.ID)
-	//}
 	return ret, nil
 }
 
-func (s *GameServer) UpdateRoom(ctx context.Context, in *proto.RoomInfo) (*emptypb.Empty, error) {
+func (s *GameServer) UpdateRoom(ctx context.Context, in *game.RoomInfo) (*emptypb.Empty, error) {
 	room := model.Room{
 		RoomID:        in.RoomID,
 		MaxUserNumber: in.MaxUserNumber,
@@ -327,7 +307,7 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *proto.RoomInfo) (*empty
 	return &emptypb.Empty{}, nil
 }
 
-func (s *GameServer) DeleteRoom(ctx context.Context, in *proto.RoomIDInfo) (*emptypb.Empty, error) {
+func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
 	del := global.RedisDB.Del(ctx, fmt.Sprintf("%d", in.RoomID))
 	if del.Err() != nil {
 		return &emptypb.Empty{}, del.Err()

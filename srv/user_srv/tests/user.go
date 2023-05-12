@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"user_srv/proto"
+	"user_srv/proto/user"
 
 	_ "github.com/mbobakov/grpc-consul-resolver"
 	"google.golang.org/grpc"
 )
 
-var userClient proto.UserClient
+var userClient user.UserClient
 var conn *grpc.ClientConn
 
 func Init() {
@@ -20,11 +20,11 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	userClient = proto.NewUserClient(conn)
+	userClient = user.NewUserClient(conn)
 }
 
 func TestGetUser() {
-	rsp, err := userClient.GetUserByID(context.Background(), &proto.UserIDInfo{
+	rsp, err := userClient.GetUserByID(context.Background(), &user.UserIDInfo{
 		Id: 1,
 	})
 	if err != nil {
@@ -32,13 +32,13 @@ func TestGetUser() {
 	}
 	fmt.Println(rsp.Id, rsp.UserName, rsp.Password, rsp.Gender)
 
-	rsp, err = userClient.GetUserByUsername(context.Background(), &proto.UserNameInfo{UserName: "root"})
+	rsp, err = userClient.GetUserByUsername(context.Background(), &user.UserNameInfo{UserName: "root"})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(rsp.Id, rsp.UserName, rsp.Password, rsp.Gender)
 
-	check, err := userClient.CheckPassword(context.Background(), &proto.CheckPasswordInfo{
+	check, err := userClient.CheckPassword(context.Background(), &user.CheckPasswordInfo{
 		Password:       "123456",
 		EncodePassword: rsp.Password,
 	})
@@ -50,7 +50,7 @@ func TestGetUser() {
 }
 
 func TestCreateUser() {
-	rsp, err := userClient.CreateUser(context.Background(), &proto.CreateUserInfo{
+	rsp, err := userClient.CreateUser(context.Background(), &user.CreateUserInfo{
 		Nickname: "ppeew",
 		Gender:   true,
 		UserName: "root",

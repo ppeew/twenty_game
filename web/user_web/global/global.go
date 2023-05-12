@@ -2,7 +2,6 @@ package global
 
 import (
 	"user_web/config"
-	"user_web/proto/game"
 	"user_web/proto/user"
 )
 
@@ -11,5 +10,4 @@ var (
 	ServerConfig *config.ServerConfig = &config.ServerConfig{}
 
 	UserSrvClient user.UserClient
-	GameSrvClient game.GameClient
 )

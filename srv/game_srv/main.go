@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"game_srv/handler"
 	"game_srv/initialize"
-	"game_srv/proto"
+	"game_srv/proto/game"
 	"game_srv/utils"
 	"net"
 	"os"
@@ -21,7 +21,7 @@ func main() {
 	initialize.InitDB()
 
 	server := grpc.NewServer()
-	proto.RegisterGameServer(server, &handler.GameServer{})
+	game.RegisterGameServer(server, &handler.GameServer{})
 
 	port, err := utils.GetFreePort()
 	if err != nil {

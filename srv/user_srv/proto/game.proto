@@ -1,7 +1,7 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
+option go_package = "./game;game";
 package game;
-option go_package = "./game";
 
 service Game{
   //道具

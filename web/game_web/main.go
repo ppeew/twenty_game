@@ -6,7 +6,7 @@ import (
 	"game_web/api"
 	"game_web/global"
 	"game_web/initialize"
-	"game_web/proto"
+	game_proto "game_web/proto/game"
 	"os"
 	"os/signal"
 	"syscall"
@@ -46,7 +46,7 @@ func main() {
 		syscall.Exit(0)
 	}()
 	for roomID, _ := range api.CHAN {
-		_, err := global.GameSrvClient.DeleteRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
+		_, err := global.GameSrvClient.DeleteRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
 		if err != nil {
 			zap.S().Infof("关闭%d房间失败:%s", roomID, err.Error())
 		}

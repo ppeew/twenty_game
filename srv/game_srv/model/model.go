@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// mysql存储
 type BaseModel struct {
 	ID        uint32 `gorm:"primaryKey;autoIncrement"`
 	CreatedAt time.Time
@@ -20,12 +21,14 @@ type Items struct {
 
 type UserItem struct {
 	BaseModel
+	UserID  uint32 `gorm:"index;unique"` //外键，对应用户id
 	Gold    uint32
 	Diamond uint32
 	Apple   uint32
 	Banana  uint32
 }
 
+// redis存储
 type User struct {
 	ID    uint32 `json:"ID"`
 	Ready bool   `json:"Ready"`

@@ -7,7 +7,7 @@ import (
 	"game_web/global"
 	"game_web/model"
 	"game_web/model/response"
-	"game_web/proto"
+	game_proto "game_web/proto/game"
 	"game_web/utils"
 	"net/http"
 	"strconv"
@@ -53,7 +53,7 @@ func CreateRoom(ctx *gin.Context) {
 	maxUserNumber, _ := strconv.Atoi(ctx.DefaultQuery("max_user_number", "0"))
 	gameCount, _ := strconv.Atoi(ctx.DefaultQuery("game_count", "0"))
 	//查询房间
-	_, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: uint32(roomID)})
+	_, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
 	if err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"err": "房间已存在，不可创建",
@@ -67,7 +67,7 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	_, err = global.GameSrvClient.CreateRoom(context.Background(), &proto.RoomInfo{
+	_, err = global.GameSrvClient.CreateRoom(context.Background(), &game_proto.RoomInfo{
 		RoomID:        uint32(roomID),
 		MaxUserNumber: uint32(maxUserNumber),
 		GameCount:     uint32(gameCount),
@@ -95,7 +95,7 @@ func UserIntoRoom(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
 	//查找房间是否存在
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: uint32(roomID)})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
 	if err != nil {
 		zap.S().Infof("[UserIntoRoom]:%s", err)
 		return
@@ -135,7 +135,7 @@ func UserIntoRoom(ctx *gin.Context) {
 			return
 		}
 		stateAndConn.WS = model.InitWebSocket(conn, userID)
-		room.Users = append(room.Users, &proto.RoomUser{
+		room.Users = append(room.Users, &game_proto.RoomUser{
 			ID:    userID,
 			Ready: false,
 		})
@@ -193,7 +193,7 @@ func SelectUserState(ctx *gin.Context) {
 // GetRoomInfo 房间信息
 func GetRoomInfo(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: uint32(roomID)})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"err": err,
@@ -229,7 +229,7 @@ func GetRoomList(ctx *gin.Context) {
 func SelectItems(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	info, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{Id: userID})
+	info, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &game_proto.UserIDInfo{Id: userID})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"err": err.Error(),

@@ -7,7 +7,7 @@ import (
 	"game_web/global"
 	"game_web/model"
 	"game_web/model/response"
-	"game_web/proto"
+	game_proto "game_web/proto/game"
 	"game_web/utils"
 	"math/rand"
 	"sort"
@@ -34,7 +34,7 @@ type Game struct {
 }
 
 func NewGame(roomID uint32) *Game {
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: roomID})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
 		zap.S().Panic("[RunGame]无法查找到房间信息")
 	}
@@ -145,7 +145,7 @@ func (game *Game) DoEndGame() {
 
 func (game *Game) BackToRoom() {
 	//更改用户为非准备状态，并且房间为等待状态
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &proto.RoomIDInfo{RoomID: game.RoomID})
+	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: game.RoomID})
 	if err != nil {
 		zap.S().Infof("err:%s", err)
 	}
@@ -352,13 +352,13 @@ func (game *Game) ProcessItemMsg(todo context.Context) {
 		case item := <-game.ItemChan:
 			userInfo := UsersState[item.UserID]
 			items := make([]uint32, 2)
-			switch proto.Type(item.Item) {
-			case proto.Type_Apple:
-				items[proto.Type_Apple] = 1
-			case proto.Type_Banana:
-				items[proto.Type_Banana] = 1
+			switch game_proto.Type(item.Item) {
+			case game_proto.Type_Apple:
+				items[game_proto.Type_Apple] = 1
+			case game_proto.Type_Banana:
+				items[game_proto.Type_Banana] = 1
 			}
-			isOk, err := global.GameSrvClient.UseItem(context.Background(), &proto.UseItemInfo{
+			isOk, err := global.GameSrvClient.UseItem(context.Background(), &game_proto.UseItemInfo{
 				Id:    item.UserID,
 				Items: items,
 			})

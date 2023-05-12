@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"game_srv/proto"
+	game_proto "game_srv/proto/game"
 
 	_ "github.com/mbobakov/grpc-consul-resolver"
 	"google.golang.org/grpc"
 )
 
-var userClient proto.GameClient
+var userClient game_proto.GameClient
 var conn *grpc.ClientConn
 
 func Init() {
@@ -20,11 +20,11 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	userClient = proto.NewGameClient(conn)
+	userClient = game_proto.NewGameClient(conn)
 }
 
 func TestGetUserItem() {
-	rsp, err := userClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{
+	rsp, err := userClient.GetUserItemsInfo(context.Background(), &game_proto.UserIDInfo{
 		Id: 1,
 	})
 	if err != nil {
@@ -35,7 +35,7 @@ func TestGetUserItem() {
 }
 
 func TestCreateUserItem() {
-	rsp, err := userClient.CreateUserItems(context.Background(), &proto.UserItemsInfo{
+	rsp, err := userClient.CreateUserItems(context.Background(), &game_proto.UserItemsInfo{
 		Id:      1,
 		Gold:    10000,
 		Diamond: 100,

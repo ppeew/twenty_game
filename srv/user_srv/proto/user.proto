@@ -1,6 +1,7 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
-option go_package = ".;proto";
+option go_package = "./user;user";
+package user;
 
 service User{
   //创建用户

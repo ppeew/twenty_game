@@ -12,10 +12,7 @@ import (
 	"user_web/global/response"
 	"user_web/middlewares"
 	"user_web/models"
-	"user_web/proto/game"
 	"user_web/proto/user"
-
-	"go.uber.org/zap"
 
 	"github.com/DanPlayer/randomname"
 	"github.com/dgrijalva/jwt-go"
@@ -93,41 +90,18 @@ func UserRegister(ctx *gin.Context) {
 	}
 	var info *user.UserInfoResponse
 	var err error
-	//保证一定能够生成，多次尝试
-	for true {
-		username := fmt.Sprintf("%05v", rand.New(rand.NewSource(time.Now().UnixNano())).Intn(100000))
-		info, err = global.UserSrvClient.CreateUser(context.Background(), &user.CreateUserInfo{
-			Nickname: register.Nickname,
-			Gender:   ToBool(register.Gender),
-			UserName: username,
-			Password: "12345",
+	username := fmt.Sprintf("%05v", rand.New(rand.NewSource(time.Now().UnixNano())).Intn(100000))
+	info, err = global.UserSrvClient.CreateUser(context.Background(), &user.CreateUserInfo{
+		Nickname: register.Nickname,
+		Gender:   ToBool(register.Gender),
+		UserName: username,
+		Password: "12345",
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"err": err.Error(),
 		})
-		if err == nil {
-			//生成物品
-			zap.S().Info("正在生成物品")
-			_, err := global.GameSrvClient.CreateUserItems(context.Background(), &game.UserItemsInfo{
-				Id:      info.Id,
-				Gold:    100,
-				Diamond: 10,
-				Apple:   2,
-				Banana:  2,
-			})
-			if err != nil {
-				zap.S().Fatal("[UserRegister]数据库用户物品表插入失败")
-			}
-			zap.S().Info("成功生成物品")
-			break
-		}
-		code, _ := status.FromError(err)
-		if code.Code() != codes.AlreadyExists {
-			//服务错误
-			//GrpcErrorToHttp(err, ctx)
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"err": err.Error(),
-			})
-			return
-		}
-		//数据库存在，持续循环直到可以添加
+		return
 	}
 	//返回token，实际上默认已经完成登录过程了
 	j := middlewares.NewJWT()

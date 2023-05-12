@@ -2,8 +2,8 @@ package initialize
 
 import (
 	"fmt"
-	"game_web/global"
-	game_proto "game_web/proto/game"
+	"user_srv/global"
+	"user_srv/proto/game"
 
 	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"go.uber.org/zap"
@@ -12,14 +12,13 @@ import (
 
 func InitSrvConn() {
 	consulInfo := global.ServerConfig.ConsulInfo
-	userConn, err := grpc.Dial(
+	gameConn, err := grpc.Dial(
 		fmt.Sprintf("consul://%s:%d/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.GameSrvInfo.Name),
 		grpc.WithInsecure(),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
 	)
 	if err != nil {
-		zap.S().Fatal("[InitSrvConn] 连接 【用户服务失败】")
+		zap.S().Fatal("[InitSrvConn] 连接 【游戏物品服务失败】")
 	}
-	gameSrvClient := game_proto.NewGameClient(userConn)
-	global.GameSrvClient = gameSrvClient
+	global.GameSrvClient = game.NewGameClient(gameConn)
 }

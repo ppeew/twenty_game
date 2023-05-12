@@ -26,7 +26,12 @@ type ConsulConfig struct {
 }
 
 type ServerConfig struct {
-	Host       string       `json:"host"`
-	MysqlInfo  MysqlConfig  `json:"mysql"`
-	ConsulInfo ConsulConfig `json:"consul"`
+	Host        string        `json:"host"`
+	MysqlInfo   MysqlConfig   `json:"mysql"`
+	ConsulInfo  ConsulConfig  `json:"consul"`
+	GameSrvInfo GameSrvConfig `json:"gameSrvInfo"`
+}
+
+type GameSrvConfig struct {
+	Name string `json:"name"`
 }

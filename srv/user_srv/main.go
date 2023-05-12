@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"user_srv/handler"
 	"user_srv/initialize"
-	"user_srv/proto"
+	"user_srv/proto/user"
 	"user_srv/utils"
 
 	"go.uber.org/zap"
@@ -19,9 +19,10 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitDB()
+	initialize.InitSrvConn()
 
 	server := grpc.NewServer()
-	proto.RegisterUserServer(server, &handler.UserServer{})
+	user.RegisterUserServer(server, &handler.UserServer{})
 
 	//自动获取可用端口号
 	port, err := utils.GetFreePort()
