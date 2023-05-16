@@ -4,7 +4,24 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="13021904-845d-4de6-9c8b-8ff074fc795a" name="变更" comment="" />
+    <list default="true" id="13021904-845d-4de6-9c8b-8ff074fc795a" name="变更" comment="">
+      <change afterPath="$PROJECT_DIR$/game_web/proto/game/game/game.pb.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/game_web/proto/game/game/game_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../srv/game_srv/handler/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/../srv/game_srv/handler/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../srv/game_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/../srv/game_srv/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../srv/game_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/../srv/game_srv/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../srv/game_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/../srv/game_srv/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../srv/game_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/../srv/game_srv/proto/game/game_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_web/api/game.go" beforeDir="false" afterPath="$PROJECT_DIR$/game_web/api/game.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_web/api/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/game_web/api/room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_web/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/game_web/api/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/game_web/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_web/model/game_data..go" beforeDir="false" afterPath="$PROJECT_DIR$/game_web/model/game_data..go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/game_web/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/game_web/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/game_web/proto/game/game_grpc.pb.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -29,7 +46,9 @@
     "WebServerToolWindowFactoryState": "false",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/22378/GolandProjects/twenty_game/web/game_web"
+    "last_opened_file_path": "C:/Users/22378/GolandProjects/twenty_game/web",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />

@@ -1,6 +1,9 @@
 package response
 
-import "game_web/model"
+import (
+	"game_web/model"
+	"time"
+)
 
 // 游戏状态信息(玩家卡牌堆，分数信息)
 type GameStateResponse struct {
@@ -55,4 +58,16 @@ type ScoreRankResponse struct {
 // 游戏结束返回消息体
 type GameOverResponse struct {
 	MsgType uint32 `json:"msgType"`
+}
+
+// 游戏开始抢卡信息体
+type BeginListenDistributeCardResponse struct {
+	MsgType  uint32        `json:"msgType"`
+	Duration time.Duration `json:"duration"`
+}
+
+// 游戏开始特殊卡处理信息体
+type BeginHandleSpecialCardResponse struct {
+	MsgType  uint32        `json:"msgType"`
+	Duration time.Duration `json:"duration"`
 }

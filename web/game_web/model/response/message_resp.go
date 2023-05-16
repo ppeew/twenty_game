@@ -17,6 +17,8 @@ const (
 	UseItemResponseType    //用户使用道具信息
 	ScoreRankResponseType
 	GameOverResponseType
+	BeginListenDistributeCard
+	BeginHandleSpecialCard
 )
 
 // 返回的聊天信息（通用）

@@ -3,6 +3,7 @@ module game_srv
 go 1.19
 
 require (
+	github.com/go-redsync/redsync/v4 v4.8.1
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/consul/api v1.20.0
 	github.com/mbobakov/grpc-consul-resolver v1.5.2

@@ -4,6 +4,7 @@ package game
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -41,17 +42,15 @@ type GameClient interface {
 	SearchRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*RoomInfo, error)
 	DeleteRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 进入房间
-	UserIntoRoom(ctx context.Context, in *UserIntoRoomInfo, opts ...grpc.CallOption) (*IntoRoomRsp, error)
+	UserIntoRoom(ctx context.Context, in *UserIntoRoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 退出房间
 	QuitRoom(ctx context.Context, in *QuitRoomInfo, opts ...grpc.CallOption) (*QuitRsp, error)
 	// 房主更新房间信息
-	UpdateRoom(ctx context.Context, in *UpdateRoomInfo, opts ...grpc.CallOption) (*RoomInfo, error)
+	UpdateRoom(ctx context.Context, in *UpdateRoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 更新用户准备状态
-	UpdateUserReadyState(ctx context.Context, in *ReadyStateInfo, opts ...grpc.CallOption) (*RoomInfo, error)
+	UpdateUserReadyState(ctx context.Context, in *ReadyStateInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 房主开始游戏
-	BeginGame(ctx context.Context, in *BeginGameInfo, opts ...grpc.CallOption) (*BeginGameRsp, error)
-	// 回到房间
-	BackRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	BeginGame(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type gameClient struct {
@@ -170,8 +169,8 @@ func (c *gameClient) DeleteRoom(ctx context.Context, in *RoomIDInfo, opts ...grp
 	return out, nil
 }
 
-func (c *gameClient) UserIntoRoom(ctx context.Context, in *UserIntoRoomInfo, opts ...grpc.CallOption) (*IntoRoomRsp, error) {
-	out := new(IntoRoomRsp)
+func (c *gameClient) UserIntoRoom(ctx context.Context, in *UserIntoRoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/game.Game/UserIntoRoom", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -188,8 +187,8 @@ func (c *gameClient) QuitRoom(ctx context.Context, in *QuitRoomInfo, opts ...grp
 	return out, nil
 }
 
-func (c *gameClient) UpdateRoom(ctx context.Context, in *UpdateRoomInfo, opts ...grpc.CallOption) (*RoomInfo, error) {
-	out := new(RoomInfo)
+func (c *gameClient) UpdateRoom(ctx context.Context, in *UpdateRoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/game.Game/UpdateRoom", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -197,8 +196,8 @@ func (c *gameClient) UpdateRoom(ctx context.Context, in *UpdateRoomInfo, opts ..
 	return out, nil
 }
 
-func (c *gameClient) UpdateUserReadyState(ctx context.Context, in *ReadyStateInfo, opts ...grpc.CallOption) (*RoomInfo, error) {
-	out := new(RoomInfo)
+func (c *gameClient) UpdateUserReadyState(ctx context.Context, in *ReadyStateInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/game.Game/UpdateUserReadyState", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -206,18 +205,9 @@ func (c *gameClient) UpdateUserReadyState(ctx context.Context, in *ReadyStateInf
 	return out, nil
 }
 
-func (c *gameClient) BeginGame(ctx context.Context, in *BeginGameInfo, opts ...grpc.CallOption) (*BeginGameRsp, error) {
-	out := new(BeginGameRsp)
-	err := c.cc.Invoke(ctx, "/game.Game/BeginGame", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameClient) BackRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *gameClient) BeginGame(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/game.Game/BackRoom", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/game.Game/BeginGame", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -250,17 +240,15 @@ type GameServer interface {
 	SearchRoom(context.Context, *RoomIDInfo) (*RoomInfo, error)
 	DeleteRoom(context.Context, *RoomIDInfo) (*emptypb.Empty, error)
 	// 进入房间
-	UserIntoRoom(context.Context, *UserIntoRoomInfo) (*IntoRoomRsp, error)
+	UserIntoRoom(context.Context, *UserIntoRoomInfo) (*emptypb.Empty, error)
 	// 退出房间
 	QuitRoom(context.Context, *QuitRoomInfo) (*QuitRsp, error)
 	// 房主更新房间信息
-	UpdateRoom(context.Context, *UpdateRoomInfo) (*RoomInfo, error)
+	UpdateRoom(context.Context, *UpdateRoomInfo) (*emptypb.Empty, error)
 	// 更新用户准备状态
-	UpdateUserReadyState(context.Context, *ReadyStateInfo) (*RoomInfo, error)
+	UpdateUserReadyState(context.Context, *ReadyStateInfo) (*emptypb.Empty, error)
 	// 房主开始游戏
-	BeginGame(context.Context, *BeginGameInfo) (*BeginGameRsp, error)
-	// 回到房间
-	BackRoom(context.Context, *RoomIDInfo) (*emptypb.Empty, error)
+	BeginGame(context.Context, *RoomIDInfo) (*emptypb.Empty, error)
 	mustEmbedUnimplementedGameServer()
 }
 
@@ -304,23 +292,20 @@ func (UnimplementedGameServer) SearchRoom(context.Context, *RoomIDInfo) (*RoomIn
 func (UnimplementedGameServer) DeleteRoom(context.Context, *RoomIDInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoom not implemented")
 }
-func (UnimplementedGameServer) UserIntoRoom(context.Context, *UserIntoRoomInfo) (*IntoRoomRsp, error) {
+func (UnimplementedGameServer) UserIntoRoom(context.Context, *UserIntoRoomInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserIntoRoom not implemented")
 }
 func (UnimplementedGameServer) QuitRoom(context.Context, *QuitRoomInfo) (*QuitRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QuitRoom not implemented")
 }
-func (UnimplementedGameServer) UpdateRoom(context.Context, *UpdateRoomInfo) (*RoomInfo, error) {
+func (UnimplementedGameServer) UpdateRoom(context.Context, *UpdateRoomInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateRoom not implemented")
 }
-func (UnimplementedGameServer) UpdateUserReadyState(context.Context, *ReadyStateInfo) (*RoomInfo, error) {
+func (UnimplementedGameServer) UpdateUserReadyState(context.Context, *ReadyStateInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserReadyState not implemented")
 }
-func (UnimplementedGameServer) BeginGame(context.Context, *BeginGameInfo) (*BeginGameRsp, error) {
+func (UnimplementedGameServer) BeginGame(context.Context, *RoomIDInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BeginGame not implemented")
-}
-func (UnimplementedGameServer) BackRoom(context.Context, *RoomIDInfo) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method BackRoom not implemented")
 }
 func (UnimplementedGameServer) mustEmbedUnimplementedGameServer() {}
 
@@ -624,7 +609,7 @@ func _Game_UpdateUserReadyState_Handler(srv interface{}, ctx context.Context, de
 }
 
 func _Game_BeginGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BeginGameInfo)
+	in := new(RoomIDInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -636,25 +621,7 @@ func _Game_BeginGame_Handler(srv interface{}, ctx context.Context, dec func(inte
 		FullMethod: "/game.Game/BeginGame",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).BeginGame(ctx, req.(*BeginGameInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Game_BackRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RoomIDInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).BackRoom(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/BackRoom",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).BackRoom(ctx, req.(*RoomIDInfo))
+		return srv.(GameServer).BeginGame(ctx, req.(*RoomIDInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -733,10 +700,6 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BeginGame",
 			Handler:    _Game_BeginGame_Handler,
-		},
-		{
-			MethodName: "BackRoom",
-			Handler:    _Game_BackRoom_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

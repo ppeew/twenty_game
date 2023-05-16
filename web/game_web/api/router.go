@@ -37,7 +37,7 @@ var upgrade = websocket.Upgrader{
 	},
 }
 
-// UsersState 用户ID -> 用户结构体（用户状态+用户连接+用户房间号）
+// UsersState 用户ID -> 用户结构体（用户状态+用户连接）
 var UsersState = make(map[uint32]*UserState)
 
 type UserState struct {
@@ -94,12 +94,6 @@ func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	//查找房间是否存在
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
-	if err != nil {
-		zap.S().Infof("[UserIntoRoom]:%s", err)
-		return
-	}
 	stateAndConn := UsersState[userID]
 	zap.S().Info("用户进入房间，此时状态为：", stateAndConn.State)
 	switch stateAndConn.State {
@@ -113,20 +107,20 @@ func UserIntoRoom(ctx *gin.Context) {
 			"err": "正在游戏中，请不要进房",
 		})
 	case NotIn:
-		if room.UserNumber >= room.MaxUserNumber {
+		room, err := global.GameSrvClient.UserIntoRoom(context.Background(), &game_proto.UserIntoRoomInfo{
+			RoomID: uint32(roomID),
+			UserID: userID,
+		})
+		if err != nil {
+			zap.S().Infof("[UserIntoRoom]:%s", err.Error())
+		}
+		if room.ErrorMsg != "" {
 			ctx.JSON(http.StatusOK, gin.H{
-				//房间存在，房间当前人数不应该满了或者房间开始了
-				"err": "房间满了",
-			})
-			return
-		} else if !room.RoomWait {
-			ctx.JSON(http.StatusOK, gin.H{
-				"err": "房间已开始游戏",
+				"err": room.ErrorMsg,
 			})
 			return
 		}
 		// 允许进入房间,建立websocket连接
-		//RoomData[uint32(roomID)].Mutex.Lock() // 假设多用户访问这个加入接口，会涉及房间位置的抢夺
 		conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
@@ -135,23 +129,13 @@ func UserIntoRoom(ctx *gin.Context) {
 			return
 		}
 		stateAndConn.WS = model.InitWebSocket(conn, userID)
-		room.Users = append(room.Users, &game_proto.RoomUser{
-			ID:    userID,
-			Ready: false,
-		})
-		room.UserNumber += 1
-		_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
-		if err != nil {
-			zap.S().Infof("[UserIntoRoom]:%s", err)
-		}
 		stateAndConn.State = RoomIn
 		// 告知房间主函数，要创建协程来读取用户信息
 		CHAN[uint32(roomID)] <- userID
-		//RoomData[uint32(roomID)].Mutex.Unlock()
 		zap.S().Infof("客户端连接状态:%d", stateAndConn.State)
 		// 因为房间更新，给所有订阅者发送房间信息
-		BroadcastToAllRoomUsers(room, GrpcModelToResponse(room))
-		BroadcastToAllRoomUsers(room, response.RoomMsgResponse{
+		BroadcastToAllRoomUsers(room.RoomInfo, GrpcModelToResponse(room.RoomInfo))
+		BroadcastToAllRoomUsers(room.RoomInfo, response.RoomMsgResponse{
 			MsgType: response.RoomMsgResponseType,
 			MsgData: fmt.Sprintf("ID:%d玩家进入房间", userID),
 		})

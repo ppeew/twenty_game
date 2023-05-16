@@ -25,8 +25,66 @@ service Game{
   rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);
   rpc CreateRoom(RoomInfo)returns (google.protobuf.Empty);
   rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
-  rpc UpdateRoom(RoomInfo)returns (google.protobuf.Empty);
   rpc DeleteRoom(RoomIDInfo)returns (google.protobuf.Empty);
+  // srv层应该提供完成数据库连续操作的加工，web层是不做数据库的处理加工的
+
+  // 进入房间
+  rpc UserIntoRoom(UserIntoRoomInfo) returns (IntoRoomRsp);
+  // 退出房间
+  rpc QuitRoom(QuitRoomInfo)returns (QuitRsp);
+  // 房主更新房间信息
+  rpc UpdateRoom(UpdateRoomInfo)returns (RoomInfo);
+  // 更新用户准备状态
+  rpc UpdateUserReadyState(ReadyStateInfo)returns (RoomInfo);
+  // 房主开始游戏
+  rpc BeginGame(BeginGameInfo)returns(BeginGameRsp);
+  // 回到房间
+  rpc BackRoom(RoomIDInfo)returns(google.protobuf.Empty);
+}
+
+message IntoRoomRsp{
+  RoomInfo roomInfo=1;
+  string errorMsg=2;
+}
+
+message BeginGameRsp{
+  RoomInfo roomInfo=1;
+  string errorMsg=2;
+}
+
+message BeginGameInfo{
+  uint32 roomID=1;
+  uint32 userID=2;
+}
+
+message QuitRsp{
+  RoomInfo roomInfo=1;
+  bool isOwnerQuit=2;
+}
+
+message ReadyStateInfo{
+  uint32 roomID=1;
+  uint32 userID=2;
+  bool isReady=3;
+}
+
+message UpdateRoomInfo{
+  uint32 roomID=1;
+  uint32 userID=2;
+  uint32 maxUserNumber=3;
+  uint32 gameCount=4;
+  uint32 owner=5;
+  uint32 kicker=6;
+}
+
+message QuitRoomInfo{
+  uint32 roomID=1;
+  uint32 userID=2;
+}
+
+message UserIntoRoomInfo{
+  uint32 roomID=1;
+  uint32 userID=2;
 }
 
 message IsOK{

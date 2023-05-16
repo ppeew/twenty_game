@@ -67,7 +67,10 @@ func startRoomThread(roomID uint32) {
 		select {
 		case msg := <-room.MsgChan:
 			zap.S().Infof("收到%+v", msg)
-			dealFunc[msg.Type](msg)
+			if msg.Type >= model.QuitRoomMsg && msg.Type <= model.RoomBeginGameMsg {
+				//只有这类消息才处理
+				dealFunc[msg.Type](msg)
+			}
 		case msg := <-room.ExitChan:
 			// 停止信号，关闭主函数及读取用户通道函数，优雅退出
 			cancel()
@@ -130,94 +133,58 @@ func (roomInfo *Room) RoomInfo(message model.Message) {
 
 // QuitRoom 退出房间（房主退出会导致全部房间删除）
 func (roomInfo *Room) QuitRoom(message model.Message) {
-	//先查询房间是否存在
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	info, err := global.GameSrvClient.QuitRoom(context.Background(), &game_proto.QuitRoomInfo{
+		RoomID: roomInfo.RoomID,
+		UserID: message.UserID,
+	})
 	if err != nil {
 		zap.S().Warnf("[QuitRoom]:%s", err)
 		return
 	}
-	if room.RoomOwner != message.UserID {
-		//游戏玩家的退出
-		for i, user := range room.Users {
-			if message.UserID == user.ID {
-				UsersState[message.UserID].WS.CloseConn()
-				room.Users = append(room.Users[:i], room.Users[i:]...)
-				UsersState[message.UserID].State = NotIn
-				_, err := global.GameSrvClient.UpdateRoom(context.Background(), room)
-				if err != nil {
-					zap.S().Error("[QuitRoom]错误:%s", err)
-				}
-				//房间变化，广播
-				resp := GrpcModelToResponse(room)
-				BroadcastToAllRoomUsers(room, resp)
-				break
-			}
-		}
-	} else {
+	if info.IsOwnerQuit {
 		// 房主退出会销毁房间
 		utils.SendMsgToUser(UsersState[message.UserID].WS, response.RoomMsgResponse{
 			MsgType: response.RoomMsgResponseType,
 			MsgData: "房主退出房间成功",
 		})
-		BroadcastToAllRoomUsers(room, "房主退出房间，房间已关闭")
-		for _, info := range room.Users {
+		BroadcastToAllRoomUsers(info.RoomInfo, "房主退出房间，房间已关闭")
+		time.Sleep(1 * time.Second)
+		UsersState[message.UserID].State = NotIn
+		UsersState[message.UserID].WS.CloseConn()
+		for _, info := range info.RoomInfo.Users {
 			UsersState[info.ID].State = NotIn
 			UsersState[info.ID].WS.CloseConn()
 		}
-		// 资源释放
-		time.Sleep(2 * time.Second)
-		_, err = global.GameSrvClient.DeleteRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
-		if err != nil {
-			zap.S().Error("[QuitRoom]:%s", err)
-			return
-		}
 		roomInfo.ExitChan <- model.RoomQuit
+	} else {
+		//游戏玩家的退出
+		UsersState[message.UserID].WS.CloseConn()
+		UsersState[message.UserID].State = NotIn
+		//房间变化，广播
+		resp := GrpcModelToResponse(info.RoomInfo)
+		BroadcastToAllRoomUsers(info.RoomInfo, resp)
 	}
 }
 
 // UpdateRoom 更新房间的房主或者游戏配置(仅房主)
 func (roomInfo *Room) UpdateRoom(message model.Message) {
-	//先查询房间是否存在
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	room, err := global.GameSrvClient.UpdateRoom(context.Background(), &game_proto.UpdateRoomInfo{
+		RoomID:        roomInfo.RoomID,
+		MaxUserNumber: message.UpdateData.MaxUserNumber,
+		GameCount:     message.UpdateData.GameCount,
+		Owner:         message.UpdateData.Owner,
+		Kicker:        message.UpdateData.Kicker,
+	})
 	if err != nil {
 		zap.S().Error("[UpdateRoom]:%s", err)
 		return
 	}
-	if room.RoomOwner != message.UserID {
-		utils.SendErrToUser(UsersState[message.UserID].WS, "[UpdateRoom]", errors.New("非房主不可修改房间"))
-		return
-	}
-	if message.UpdateData.MaxUserNumber != 0 {
-		room.MaxUserNumber = message.UpdateData.MaxUserNumber
-	}
-	if message.UpdateData.GameCount != 0 {
-		room.GameCount = message.UpdateData.GameCount
-	}
-	if message.UpdateData.Owner != 0 {
-		room.RoomOwner = message.UpdateData.Owner
-	}
-	//T人(房主不能t自己)
 	if message.UpdateData.Kicker != 0 {
-		if message.UpdateData.Kicker == room.RoomOwner {
-			utils.SendErrToUser(UsersState[message.UserID].WS, "[UpdateRoom]", errors.New("房主不可t自己"))
-			return
-		}
 		//发送给被t的玩家
 		utils.SendMsgToUser(UsersState[message.UpdateData.Kicker].WS, response.KickerResponse{MsgType: response.KickerResponseType})
-		for i, user := range room.Users {
-			if user.ID == message.UpdateData.Kicker {
-				room.Users = append(room.Users[:i], room.Users[i+1:]...)
-			}
-		}
-		room.UserNumber--
 		//t人了还需要关闭房间里面的连接(等待一段时间再关闭连接，为了被t的玩家已经收到被t信息了)
 		time.Sleep(1 * time.Second)
 		UsersState[message.UpdateData.Kicker].WS.CloseConn()
-	}
-	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
-	if err != nil {
-		zap.S().Error("[UpdateRoom]:%s", err)
-		return
 	}
 	utils.SendMsgToUser(UsersState[message.UserID].WS, response.RoomMsgResponse{
 		MsgType: response.RoomMsgResponseType,
@@ -230,84 +197,43 @@ func (roomInfo *Room) UpdateRoom(message model.Message) {
 
 // UpdateUserReadyState 玩家准备状态
 func (roomInfo *Room) UpdateUserReadyState(message model.Message) {
-	//先查询房间是否存在
-	userInfo := UsersState[message.UserID]
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	room, err := global.GameSrvClient.UpdateUserReadyState(context.Background(), &game_proto.ReadyStateInfo{
+		RoomID:  roomInfo.RoomID,
+		UserID:  message.UserID,
+		IsReady: message.ReadyStateData.IsReady,
+	})
 	if err != nil {
-		zap.S().Error("[UpdateUserReadyState]:%s", err)
+		zap.S().Infof("[UpdateUserReadyState]:%s", err.Error())
 		return
 	}
-	for _, user := range room.Users {
-		if user.ID == message.UserID {
-			user.Ready = message.ReadyStateData.IsReady
-			//更新房间，发送广播
-			_, err := global.GameSrvClient.UpdateRoom(context.Background(), room)
-			if err != nil {
-				zap.S().Error("[UpdateUserReadyState]:%s", err)
-				return
-			}
-			utils.SendMsgToUser(userInfo.WS, response.RoomMsgResponse{
-				MsgType: response.RoomMsgResponseType,
-				MsgData: fmt.Sprintf("玩家%d准备状态更新", message.UserID),
-			})
-			resp := GrpcModelToResponse(room)
-			BroadcastToAllRoomUsers(room, resp)
-			return
-		}
-	}
-	utils.SendErrToUser(userInfo.WS, "[UpdateUserReadyState]", errors.New("没找到该用户"))
+	utils.SendMsgToUser(UsersState[message.UserID].WS, response.RoomMsgResponse{
+		MsgType: response.RoomMsgResponseType,
+		MsgData: fmt.Sprintf("玩家%d准备状态更新", message.UserID),
+	})
+	resp := GrpcModelToResponse(room)
+	BroadcastToAllRoomUsers(room, resp)
 }
 
 // BeginGame 开始游戏
 func (roomInfo *Room) BeginGame(message model.Message) {
-	//查看房间是否存在
-	userInfo := UsersState[message.UserID]
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
+	room, err := global.GameSrvClient.BeginGame(context.Background(), &game_proto.BeginGameInfo{
+		RoomID: roomInfo.RoomID,
+		UserID: message.UserID,
+	})
 	if err != nil {
-		zap.S().Error("[BeginGame]:%s", err)
+		zap.S().Infof("[BeginGame]:%s")
 		return
 	}
-	//检查是否是房主
-	if room.RoomOwner != message.UserID {
-		utils.SendMsgToUser(userInfo.WS, response.RoomMsgResponse{
+	if room.ErrorMsg != "" {
+		utils.SendMsgToUser(UsersState[message.UserID].WS, response.RoomMsgResponse{
 			MsgType: response.RoomMsgResponseType,
-			MsgData: "非房主不可开始游戏",
-		})
-		return
-	}
-	//检查是否够人了
-	if room.UserNumber != room.MaxUserNumber {
-		utils.SendMsgToUser(userInfo.WS, response.RoomMsgResponse{
-			MsgType: response.RoomMsgResponseType,
-			MsgData: "人数不足，无法开始",
+			MsgData: room.ErrorMsg,
 		})
 		return
 	}
 	//游戏开始,房间线程先暂停
-	room.RoomWait = false
-	ownerIndex := uint32(0)
-	for i, user := range room.Users {
-		if user.Ready == false {
-			//没准备好
-			if user.ID == room.RoomOwner {
-				ownerIndex = uint32(i)
-				continue
-			}
-			utils.SendMsgToUser(userInfo.WS, response.RoomMsgResponse{
-				MsgType: response.RoomMsgResponseType,
-				MsgData: "其他玩家没准备好",
-			})
-			return
-		}
-	}
-	room.Users[ownerIndex].Ready = true
-	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
-	for _, info := range room.Users {
+	for _, info := range room.RoomInfo.Users {
 		UsersState[info.ID].State = GameIn
-	}
-	if err != nil {
-		zap.S().Error("[BeginGame]:%s", err)
-		return
 	}
 	roomInfo.ExitChan <- model.GameStart
 }

@@ -57,24 +57,16 @@ func NewGame(roomID uint32) *Game {
 	go game.ProcessItemMsg(ctx)
 	go game.ProcessHealthMsg(ctx)
 	game.wg.Add(3)
-	for _, info := range room.Users {
-		//itemsInfo, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &proto.UserIDInfo{Id: info.ID})
-		//if err != nil {
-		//	zap.S().Panic("[RunGame]无法查找到物品信息")
-		//}
-		zap.S().Infof("[NewGame]初始化用户%d", info.ID)
-		game.Users[info.ID] = &model.UserGameInfo{
+	for _, user := range room.Users {
+		zap.S().Infof("[NewGame]初始化用户%d", user.ID)
+		game.Users[user.ID] = &model.UserGameInfo{
 			BaseCards:    make([]model.BaseCard, 0),
 			SpecialCards: make([]model.SpecialCard, 0),
-			Items:        []uint32{
-				//itemsInfo.Items[proto.Type_Apple],
-				//itemsInfo.Items[proto.Type_Banana],
-			},
-			IsGetCard: false,
-			Score:     0,
+			IsGetCard:    false,
+			Score:        0,
 		}
 		//对于每个用户开启一个协程，用于读取他的消息到游戏管道（分发消息功能）
-		go game.ReadGameUserMsg(ctx, info.ID)
+		go game.ReadGameUserMsg(ctx, user.ID)
 		game.wg.Add(1)
 	}
 	BroadcastToAllGameUsers(game, response.RoomMsgResponse{
@@ -102,10 +94,10 @@ func RunGame(roomID uint32) {
 		game.DoDistributeCard()
 		zap.S().Info("游戏[DoDistributeCard]完成")
 		//抢卡阶段
-		game.DoListenDistributeCard()
+		game.DoListenDistributeCard(3, 8)
 		zap.S().Info("游戏[DoListenDistributeCard]完成")
 		//特殊卡处理阶段
-		game.DoHandleSpecialCard()
+		game.DoHandleSpecialCard(5, 18)
 		zap.S().Info("游戏[DoHandleSpecialCard]完成")
 		//分数计算阶段
 		game.DoScoreCount()
@@ -145,20 +137,12 @@ func (game *Game) DoEndGame() {
 
 func (game *Game) BackToRoom() {
 	//更改用户为非准备状态，并且房间为等待状态
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: game.RoomID})
+	_, err := global.GameSrvClient.BackRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: game.RoomID})
 	if err != nil {
 		zap.S().Infof("err:%s", err)
 	}
-	room.RoomWait = true
-	for _, user := range room.Users {
-		user.Ready = false
-	}
 	for u := range game.Users {
 		UsersState[u].State = RoomIn
-	}
-	_, err = global.GameSrvClient.UpdateRoom(context.Background(), room)
-	if err != nil {
-		zap.S().Info("[RunGame]更新房间失败")
 	}
 	BroadcastToAllGameUsers(game, response.GameOverResponse{MsgType: response.GameOverResponseType})
 	//完成所有环境，退出游戏协程，创建房间协程，回到房间协程来
@@ -189,7 +173,12 @@ func (game *Game) DoScoreCount() {
 	}
 }
 
-func (game *Game) DoHandleSpecialCard() {
+func (game *Game) DoHandleSpecialCard(min, max int) {
+	duration := time.Duration(rand.Intn(max)+min) * time.Second
+	BroadcastToAllGameUsers(game, response.BeginHandleSpecialCardResponse{
+		MsgType:  response.BeginHandleSpecialCard,
+		Duration: duration,
+	})
 	//监听用户特殊卡环节,这块要设置超时时间，非一直读取
 	handleFunc := NewHandleFunc(game)
 	for true {
@@ -216,14 +205,19 @@ func (game *Game) DoHandleSpecialCard() {
 				//其他消息不处理,给用户返回超时
 				utils.SendErrToUser(userInfo.WS, "[DoListenDistributeCard]", errors.New("其他信息不处理"))
 			}
-		case <-time.After(time.Second * 10):
+		case <-time.After(duration):
 			//超时处理,超时就直接返回了
 			return
 		}
 	}
 }
 
-func (game *Game) DoListenDistributeCard() {
+func (game *Game) DoListenDistributeCard(min, max int) {
+	duration := time.Duration(rand.Intn(max)+min) * time.Second
+	BroadcastToAllGameUsers(game, response.BeginListenDistributeCardResponse{
+		MsgType:  response.BeginListenDistributeCard,
+		Duration: duration,
+	})
 	//监听用户抢牌环节,这块要设置超时时间，非一直读取
 	for true {
 		select {
@@ -267,7 +261,7 @@ func (game *Game) DoListenDistributeCard() {
 				//其他消息不处理,给用户返回超时
 				utils.SendErrToUser(userInfo.WS, "[DoListenDistributeCard]", errors.New("超时信息不处理"))
 			}
-		case <-time.After(time.Second * 10):
+		case <-time.After(duration):
 			//超时处理,超时就直接返回了
 			return
 		}
