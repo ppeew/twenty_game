@@ -10,6 +10,8 @@ import (
 	"game_srv/proto/game"
 	"game_srv/utils"
 
+	"github.com/go-redsync/redsync/v4"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -297,18 +299,22 @@ func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*empt
 
 func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo) (*game.IntoRoomRsp, error) {
 	mutex, _ := utils.GetRedSync(in.RoomID)
+	defer func(mutex *redsync.Mutex) {
+		err := utils.ReleaseRedSync(mutex)
+		if err != nil {
+			zap.S().Errorf("[UserIntoRoom]%s", err)
+		}
+	}(mutex)
 	//查找房间是否存在
 	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
-		_ = utils.ReleaseRedSync(mutex)
 		return nil, get.Err()
 	}
 	room := model.Room{}
 	_ = json.Unmarshal([]byte(result), &room)
 	//是否满人
 	if room.MaxUserNumber == room.UserNumber {
-		_ = utils.ReleaseRedSync(mutex)
 		return &game.IntoRoomRsp{ErrorMsg: "房间满人了"}, nil
 	}
 	//处理加入房间逻辑
@@ -320,10 +326,8 @@ func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo
 	marshal, _ := json.Marshal(room)
 	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
 	if set.Err() != nil {
-		_ = utils.ReleaseRedSync(mutex)
 		return nil, set.Err()
 	}
-	_ = utils.ReleaseRedSync(mutex)
 	ret := &game.RoomInfo{
 		RoomID:        room.RoomID,
 		MaxUserNumber: room.MaxUserNumber,
@@ -343,11 +347,16 @@ func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo
 
 func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game.QuitRsp, error) {
 	mutex, _ := utils.GetRedSync(in.RoomID)
+	defer func(mutex *redsync.Mutex) {
+		err := utils.ReleaseRedSync(mutex)
+		if err != nil {
+			zap.S().Errorf("[UserIntoRoom]%s", err)
+		}
+	}(mutex)
 	//查找房间是否存在
 	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
-		_ = utils.ReleaseRedSync(mutex)
 		return nil, get.Err()
 	}
 	room := model.Room{}
@@ -355,7 +364,6 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 	if in.UserID == room.RoomOwner {
 		// 如果是房主退出，销毁房间
 		del := global.RedisDB.Del(ctx, fmt.Sprintf("%d", in.RoomID))
-		_ = utils.ReleaseRedSync(mutex)
 		if del.Err() != nil {
 			return nil, del.Err()
 		}
@@ -387,7 +395,6 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 		}
 		marshal, _ := json.Marshal(room)
 		set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
-		_ = utils.ReleaseRedSync(mutex)
 		if set.Err() != nil {
 			return nil, set.Err()
 		}
@@ -411,11 +418,16 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 
 func (s *GameServer) UpdateRoom(ctx context.Context, in *game.UpdateRoomInfo) (*game.RoomInfo, error) {
 	mutex, _ := utils.GetRedSync(in.RoomID)
+	defer func(mutex *redsync.Mutex) {
+		err := utils.ReleaseRedSync(mutex)
+		if err != nil {
+			zap.S().Errorf("[UserIntoRoom]%s", err)
+		}
+	}(mutex)
 	//查找房间是否存在
 	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
-		_ = utils.ReleaseRedSync(mutex)
 		return nil, get.Err()
 	}
 	room := model.Room{}
@@ -423,7 +435,6 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *game.UpdateRoomInfo) (*
 
 	// 判断是不是房主
 	if in.UserID != room.RoomOwner {
-		_ = utils.ReleaseRedSync(mutex)
 		return nil, errors.New("非房主不可修改")
 	}
 
@@ -450,7 +461,6 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *game.UpdateRoomInfo) (*
 	}
 	marshal, _ := json.Marshal(room)
 	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
-	_ = utils.ReleaseRedSync(mutex)
 	if set.Err() != nil {
 		return nil, set.Err()
 	}
@@ -473,11 +483,16 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *game.UpdateRoomInfo) (*
 
 func (s *GameServer) UpdateUserReadyState(ctx context.Context, in *game.ReadyStateInfo) (*game.RoomInfo, error) {
 	mutex, _ := utils.GetRedSync(in.RoomID)
+	defer func(mutex *redsync.Mutex) {
+		err := utils.ReleaseRedSync(mutex)
+		if err != nil {
+			zap.S().Errorf("[UserIntoRoom]%s", err)
+		}
+	}(mutex)
 	//查找房间是否存在
 	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
-		_ = utils.ReleaseRedSync(mutex)
 		return nil, get.Err()
 	}
 	room := model.Room{}
@@ -489,7 +504,6 @@ func (s *GameServer) UpdateUserReadyState(ctx context.Context, in *game.ReadySta
 	}
 	marshal, _ := json.Marshal(room)
 	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
-	_ = utils.ReleaseRedSync(mutex)
 	if set.Err() != nil {
 		return nil, set.Err()
 	}
@@ -512,30 +526,32 @@ func (s *GameServer) UpdateUserReadyState(ctx context.Context, in *game.ReadySta
 
 func (s *GameServer) BeginGame(ctx context.Context, in *game.BeginGameInfo) (*game.BeginGameRsp, error) {
 	mutex, _ := utils.GetRedSync(in.RoomID)
+	defer func(mutex *redsync.Mutex) {
+		err := utils.ReleaseRedSync(mutex)
+		if err != nil {
+			zap.S().Errorf("[UserIntoRoom]%s", err)
+		}
+	}(mutex)
 	//查找房间是否存在
 	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
-		_ = utils.ReleaseRedSync(mutex)
 		return nil, get.Err()
 	}
 	room := model.Room{}
 	_ = json.Unmarshal([]byte(result), &room)
 	//判断是否是房主
 	if in.UserID != room.RoomOwner {
-		_ = utils.ReleaseRedSync(mutex)
 		return &game.BeginGameRsp{ErrorMsg: "非房主"}, nil
 	}
 	//检查是否满人
 	if room.UserNumber != room.MaxUserNumber {
-		_ = utils.ReleaseRedSync(mutex)
 		return &game.BeginGameRsp{ErrorMsg: "没满人"}, nil
 	}
 	//检查其他人是否准备了
 	ownerIndex := 0
 	for i, user := range room.Users {
 		if user.ID != room.RoomOwner && user.Ready == false {
-			_ = utils.ReleaseRedSync(mutex)
 			return &game.BeginGameRsp{ErrorMsg: "有玩家未准备"}, nil
 		}
 		if user.ID == room.RoomOwner {
@@ -547,7 +563,6 @@ func (s *GameServer) BeginGame(ctx context.Context, in *game.BeginGameInfo) (*ga
 	room.RoomWait = false
 	marshal, _ := json.Marshal(room)
 	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
-	_ = utils.ReleaseRedSync(mutex)
 	if set.Err() != nil {
 		return nil, set.Err()
 	}
@@ -570,11 +585,16 @@ func (s *GameServer) BeginGame(ctx context.Context, in *game.BeginGameInfo) (*ga
 
 func (s *GameServer) BackRoom(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
 	mutex, _ := utils.GetRedSync(in.RoomID)
+	defer func(mutex *redsync.Mutex) {
+		err := utils.ReleaseRedSync(mutex)
+		if err != nil {
+			zap.S().Errorf("[UserIntoRoom]%s", err)
+		}
+	}(mutex)
 	//查找房间是否存在
 	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
-		_ = utils.ReleaseRedSync(mutex)
 		return nil, get.Err()
 	}
 	room := model.Room{}
@@ -587,7 +607,6 @@ func (s *GameServer) BackRoom(ctx context.Context, in *game.RoomIDInfo) (*emptyp
 	}
 	marshal, _ := json.Marshal(room)
 	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
-	_ = utils.ReleaseRedSync(mutex)
 	if set.Err() != nil {
 		return nil, set.Err()
 	}

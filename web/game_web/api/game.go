@@ -275,7 +275,22 @@ func (game *Game) DoDistributeCard() {
 	special := rand.Intn(2)
 	zap.S().Infof("special:%d", special)
 	hasMakeSpecial := 0
-	for i := 0; i < needCount; i++ {
+	for ; needCount > 0; needCount-- {
+		if needCount == special-hasMakeSpecial {
+			//这种情况下把剩下牌生成特殊卡
+			cardType := 1 << rand.Intn(5)
+			game.MakeCardID++
+			game.RandCard = append(game.RandCard, model.Card{
+				CardID: game.MakeCardID,
+				Type:   model.SpecialType,
+				SpecialCardInfo: model.SpecialCard{
+					CardID: game.MakeCardID, //这个字段每张卡必须唯一
+					Type:   uint32(cardType),
+				},
+			})
+			hasMakeSpecial++
+		}
+
 		if rand.Int()%needCount < special {
 			if hasMakeSpecial >= special {
 				//生成普通卡
