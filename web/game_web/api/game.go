@@ -133,6 +133,7 @@ func (game *Game) DoEndGame() {
 		MsgType: response.ScoreRankResponseType,
 		Ranks:   ranks,
 	})
+	// 分别给第一名和其他名次玩家发放奖励(第一名发放钻石，第一第二名，发放物品，全部玩家名发放金币) TODO
 }
 
 func (game *Game) BackToRoom() {
@@ -271,40 +272,33 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 func (game *Game) DoDistributeCard() {
 	//要生成userNumber+2的卡牌，其中包含普通卡和特殊卡
 	needCount := int(game.UserNumber + 2)
-	//先生成特殊卡
+	//特殊卡数量[0,1]
 	special := rand.Intn(2)
 	zap.S().Infof("special:%d", special)
-	hasMakeSpecial := 0
-	for ; needCount > 0; needCount-- {
-		if needCount == special-hasMakeSpecial {
-			//这种情况下把剩下牌生成特殊卡
-			cardType := 1 << rand.Intn(5)
+	cards := make([]int, needCount)
+	used := make([]bool, needCount)
+	for i := needCount - 1; i >= needCount-special; i-- {
+		cards[i] = 1
+	}
+	for i := 0; i < needCount; i++ {
+		index := rand.Intn(needCount)
+		for used[index] {
+			index = (index + 1) % needCount
+		}
+		//持续过程，直到找到第一个没使用的
+		used[index] = true
+		if cards[index] == 0 {
+			//生成普通卡
 			game.MakeCardID++
 			game.RandCard = append(game.RandCard, model.Card{
 				CardID: game.MakeCardID,
-				Type:   model.SpecialType,
-				SpecialCardInfo: model.SpecialCard{
-					CardID: game.MakeCardID, //这个字段每张卡必须唯一
-					Type:   uint32(cardType),
+				Type:   model.BaseType,
+				BaseCardInfo: model.BaseCard{
+					CardID: game.MakeCardID,
+					Number: uint32(1 + rand.Intn(11)),
 				},
 			})
-			hasMakeSpecial++
-		}
-
-		if rand.Int()%needCount < special {
-			if hasMakeSpecial >= special {
-				//生成普通卡
-				game.MakeCardID++
-				game.RandCard = append(game.RandCard, model.Card{
-					CardID: game.MakeCardID,
-					Type:   model.BaseType,
-					BaseCardInfo: model.BaseCard{
-						CardID: game.MakeCardID,
-						Number: uint32(1 + rand.Intn(11)),
-					},
-				})
-				continue
-			}
+		} else {
 			//生成特殊卡
 			cardType := 1 << rand.Intn(5)
 			game.MakeCardID++
@@ -314,18 +308,6 @@ func (game *Game) DoDistributeCard() {
 				SpecialCardInfo: model.SpecialCard{
 					CardID: game.MakeCardID, //这个字段每张卡必须唯一
 					Type:   uint32(cardType),
-				},
-			})
-			hasMakeSpecial++
-		} else {
-			//生成普通卡
-			game.MakeCardID++
-			game.RandCard = append(game.RandCard, model.Card{
-				CardID: game.MakeCardID,
-				Type:   model.BaseType,
-				BaseCardInfo: model.BaseCard{
-					CardID: game.MakeCardID,
-					Number: uint32(1 + rand.Intn(11)),
 				},
 			})
 		}

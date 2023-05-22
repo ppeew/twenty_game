@@ -24,9 +24,9 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	<-quit
-	//if err = register_client.DeRegister(serviceId); err != nil {
-	//	zap.S().Info("注销失败:", err.Error())
-	//}else{
-	//	zap.S().Info("注销成功:")
-	//}
+	go func() {
+		<-quit
+		zap.S().Info("两次ctrl+c强制退出")
+		syscall.Exit(0)
+	}()
 }

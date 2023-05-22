@@ -85,6 +85,7 @@ func CreateRoom(ctx *gin.Context) {
 	go startRoomThread(uint32(roomID))
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "创建成功",
+		"err":  "",
 	})
 	return
 }
@@ -113,6 +114,10 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		if err != nil {
 			zap.S().Infof("[UserIntoRoom]:%s", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"err": err,
+			})
+			return
 		}
 		if room.ErrorMsg != "" {
 			ctx.JSON(http.StatusOK, gin.H{
@@ -171,6 +176,7 @@ func SelectUserState(ctx *gin.Context) {
 	userID := claims.(*model.CustomClaims).ID
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": UsersState[userID].State,
+		"err":  "",
 	})
 }
 
@@ -187,6 +193,7 @@ func GetRoomInfo(ctx *gin.Context) {
 	resp := GrpcModelToResponse(room)
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": resp,
+		"err":  "",
 	})
 }
 
@@ -206,6 +213,7 @@ func GetRoomList(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": resp,
+		"err":  "",
 	})
 }
 
@@ -222,5 +230,6 @@ func SelectItems(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": info,
+		"err":  "",
 	})
 }

@@ -40,7 +40,6 @@ func main() {
 	<-quit
 	// 资源释放
 	go func() {
-		// 强制退出
 		<-quit
 		zap.S().Info("两次ctrl+c强制退出")
 		syscall.Exit(0)
@@ -53,9 +52,4 @@ func main() {
 		zap.S().Infof("已经将%d房间清空！", roomID)
 	}
 	zap.S().Info("释放资源完毕，退出")
-	//if err = register_client.DeRegister(serviceId); err != nil {
-	//	zap.S().Info("注销失败:", err.Error())
-	//}else{
-	//	zap.S().Info("注销成功:")
-	//}
 }
