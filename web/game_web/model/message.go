@@ -16,6 +16,8 @@ type Message struct {
 	ItemMsgData    ItemMsgData    `json:"itemMsgInfo"`
 	GetCardData    GetCardData    `json:"getCardData"`
 	UseSpecialData UseSpecialData `json:"useSpecialData"`
+	//错误
+	ErrData ErrData `json:"errData"`
 }
 
 const (
@@ -32,7 +34,13 @@ const (
 	ItemMsg
 	ListenHandleCardMsg
 	UseSpecialCardMsg
+	//错误类型信息
+	ErrMsg
 )
+
+type ErrData struct {
+	Error error `json:"error"`
+}
 
 type UseSpecialData struct {
 	SpecialCardID uint32 `json:"specialCardID"`

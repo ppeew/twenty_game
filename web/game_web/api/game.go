@@ -18,16 +18,17 @@ import (
 )
 
 type Game struct {
-	RoomID     uint32
-	Users      map[uint32]*model.UserGameInfo
-	GameCount  uint32
-	UserNumber uint32
-	CommonChan chan model.Message     //游戏逻辑管道
-	ChatChan   chan model.ChatMsgData //聊天管道
-	ItemChan   chan model.ItemMsgData //使用物品管道
-	HealthChan chan model.Message     //心脏包管道
-	MakeCardID uint32                 //依次生成卡的id
-	RandCard   []model.Card           //卡id->卡信息(包含特殊和普通卡)
+	RoomID       uint32
+	Users        map[uint32]*model.UserGameInfo
+	GameCount    uint32 //游戏总回合数
+	CurrentCount uint32 //当前是第几回合
+	UserNumber   uint32
+	CommonChan   chan model.Message     //游戏逻辑管道
+	ChatChan     chan model.ChatMsgData //聊天管道
+	ItemChan     chan model.ItemMsgData //使用物品管道
+	HealthChan   chan model.Message     //心脏包管道
+	MakeCardID   uint32                 //依次生成卡的id
+	RandCard     []model.Card           //卡id->卡信息(包含特殊和普通卡)
 
 	exitCancel context.CancelFunc //负责退出
 	wg         sync.WaitGroup     //等待其他协程退出
@@ -41,16 +42,17 @@ func NewGame(roomID uint32) *Game {
 	rand.Seed(time.Now().Unix())
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	game := &Game{
-		RoomID:     roomID,
-		Users:      make(map[uint32]*model.UserGameInfo),
-		GameCount:  room.GameCount,
-		UserNumber: room.UserNumber,
-		CommonChan: make(chan model.Message, 1024),
-		ChatChan:   make(chan model.ChatMsgData, 1024),
-		ItemChan:   make(chan model.ItemMsgData, 1024),
-		HealthChan: make(chan model.Message, 1024),
-		exitCancel: cancelFunc,
-		wg:         sync.WaitGroup{},
+		RoomID:       roomID,
+		Users:        make(map[uint32]*model.UserGameInfo),
+		GameCount:    room.GameCount,
+		CurrentCount: 0,
+		UserNumber:   room.UserNumber,
+		CommonChan:   make(chan model.Message, 1024),
+		ChatChan:     make(chan model.ChatMsgData, 1024),
+		ItemChan:     make(chan model.ItemMsgData, 1024),
+		HealthChan:   make(chan model.Message, 1024),
+		exitCancel:   cancelFunc,
+		wg:           sync.WaitGroup{},
 	}
 	//创建三个协程，用来处理用户聊天消息和用户使用道具和心脏包回复，异步执行
 	go game.ProcessChatMsg(ctx)
@@ -85,11 +87,11 @@ func RunGame(roomID uint32) {
 	//初始化完成，进入游戏主要逻辑
 	zap.S().Info("游戏[NewGame]完成")
 	for i := uint32(0); i < game.GameCount; i++ {
-		BroadcastToAllGameUsers(game, CardModelToResponse(game))
-		zap.S().Info("游戏[BroadcastToAllGameUsers]完成")
 		//循环初始化
 		game.DoFlush()
 		zap.S().Info("游戏[DoFlush]完成")
+		BroadcastToAllGameUsers(game, CardModelToResponse(game))
+		zap.S().Info("游戏[BroadcastToAllGameUsers]完成")
 		//发牌阶段
 		game.DoDistributeCard()
 		zap.S().Info("游戏[DoDistributeCard]完成")
@@ -116,6 +118,7 @@ func (game *Game) DoFlush() {
 	for _, info := range game.Users {
 		info.IsGetCard = false
 	}
+	game.CurrentCount++
 }
 
 func (game *Game) DoEndGame() {
@@ -428,7 +431,8 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 		case <-UsersState[userID].WS.CloseChan:
 			err := errors.New("连接断开")
 			if err != nil {
-				continue
+				//采用轮询方式不断尝试用户连接重新建立
+				time.Sleep(time.Second)
 			}
 		}
 	}
@@ -585,10 +589,11 @@ func CardModelToResponse(game *Game) response.GameStateResponse {
 		users = append(users, user)
 	}
 	resp := response.GameStateResponse{
-		MsgType:   response.GameStateResponseType,
-		GameCount: game.GameCount,
-		Users:     users,
-		RandCard:  game.RandCard,
+		MsgType:      response.GameStateResponseType,
+		GameCount:    game.GameCount,
+		GameCurCount: game.CurrentCount,
+		Users:        users,
+		RandCard:     game.RandCard,
 	}
 	return resp
 }

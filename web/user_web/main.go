@@ -15,6 +15,7 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitSrvConn()
+	initialize.InitSentinel()
 
 	routers := initialize.InitRouters()
 	if err := routers.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {

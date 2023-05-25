@@ -10,7 +10,7 @@ import (
 func InitRouters() *gin.Engine {
 	engine := gin.Default()
 	//中间件
-	engine.Use(middlewares.Cors())
+	engine.Use(middlewares.FlowBegin(), middlewares.Cors())
 	versionGroup := engine.Group("/v1")
 	//使用中间件,要求只有登录的用户才能使用游戏接口
 	router.InitCommonRouter(versionGroup)

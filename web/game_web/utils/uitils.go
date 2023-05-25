@@ -2,9 +2,12 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"game_web/model"
-	"go.uber.org/zap"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 func StringToBool(str string) bool {
@@ -16,8 +19,12 @@ func StringToBool(str string) bool {
 
 func SendErrToUser(ws *model.WSConn, handlerFunc string, error error) {
 	if error != nil {
+		errMsg := model.Message{
+			Type:    model.ErrMsg,
+			ErrData: model.ErrData{Error: errors.New(fmt.Sprintf("[%s]:%s", handlerFunc, error))},
+		}
 		c := map[string]interface{}{
-			"err": handlerFunc + error.Error(),
+			"data": errMsg,
 		}
 		marshal, _ := json.Marshal(c)
 		err2 := ws.OutChanWrite(marshal)

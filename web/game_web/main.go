@@ -19,6 +19,7 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitSrvConn()
+	initialize.InitSentinel()
 	routers := initialize.InitRouters()
 	//go func() {
 	//	for true {

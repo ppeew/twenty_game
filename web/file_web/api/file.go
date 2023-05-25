@@ -1,7 +1,6 @@
 package api
 
 import (
-	"file_web/model"
 	"fmt"
 	"net/http"
 
@@ -47,8 +46,8 @@ func UploadFile(ctx *gin.Context) {
 
 func DownloadFile(ctx *gin.Context) {
 	//从数据库找到该objectKey，在OSS服务查找
-	claims, _ := ctx.Get("claims")
-	userID := claims.(*model.CustomClaims).ID
+	//claims, _ := ctx.Get("claims")
+	//userID := claims.(*model.CustomClaims).ID
 	objectKey := ""
 
 	oss, err := NewOSS()

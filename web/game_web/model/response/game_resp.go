@@ -7,10 +7,11 @@ import (
 
 // 游戏状态信息(玩家卡牌堆，分数信息)
 type GameStateResponse struct {
-	MsgType   uint32                 `json:"msgType"`
-	GameCount uint32                 `json:"gameCount"`
-	Users     []UserGameInfoResponse `json:"users"`
-	RandCard  []model.Card           `json:"randCard"`
+	MsgType      uint32                 `json:"msgType"`
+	GameCount    uint32                 `json:"gameCount"` //游戏总回合数
+	GameCurCount uint32                 `json:"gameCurCount"`
+	Users        []UserGameInfoResponse `json:"users"`
+	RandCard     []model.Card           `json:"randCard"`
 }
 
 type UserGameInfoResponse struct {

@@ -214,7 +214,6 @@ func UserUpdate(ctx *gin.Context) {
 		})
 		return
 	}
-
 	_, err = global.UserSrvClient.UpdateUser(context.Background(), &user.UpdateUserInfo{
 		Id:       id,
 		Nickname: form.Nickname,

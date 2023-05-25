@@ -8,5 +8,5 @@ import (
 )
 
 func InitGameRouter(group *gin.RouterGroup) {
-	group.GET("selectItems", middlewares.JWTAuth(), api.SelectItems)
+	group.GET("selectItems", middlewares.JWTAuth(), api.SelectItems, middlewares.FlowEnd())
 }
