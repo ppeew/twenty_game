@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"game_web/model"
+	"game_web/model/response"
 	"strings"
 
 	"go.uber.org/zap"
@@ -19,10 +20,7 @@ func StringToBool(str string) bool {
 
 func SendErrToUser(ws *model.WSConn, handlerFunc string, error error) {
 	if error != nil {
-		errMsg := model.Message{
-			Type:    model.ErrMsg,
-			ErrData: model.ErrData{Error: errors.New(fmt.Sprintf("[%s]:%s", handlerFunc, error))},
-		}
+		errMsg := response.ErrData{MsgType: response.ErrMsg, Error: errors.New(fmt.Sprintf("[%s]:%s", handlerFunc, error))}
 		c := map[string]interface{}{
 			"data": errMsg,
 		}
@@ -38,6 +36,7 @@ func SendMsgToUser(ws *model.WSConn, data interface{}) {
 	c := map[string]interface{}{
 		"data": data,
 	}
+	zap.S().Infof("[SendMsgToUser]:正在向用户%d发送信息,消息为:%v", ws.UserID, data)
 	marshal, _ := json.Marshal(c)
 	err := ws.OutChanWrite(marshal)
 	if err != nil {

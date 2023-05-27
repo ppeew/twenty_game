@@ -19,7 +19,14 @@ const (
 	GameOverResponseType
 	BeginListenDistributeCard
 	BeginHandleSpecialCard
+	//错误类型信息
+	ErrMsg
 )
+
+type ErrData struct {
+	MsgType uint32 `json:"msgType"`
+	Error   error  `json:"error"`
+}
 
 // 返回的聊天信息（通用）
 type ChatResponse struct {
@@ -30,5 +37,5 @@ type ChatResponse struct {
 
 type CheckHealthResponse struct {
 	MsgType uint32 `json:"msgType"`
-	Ok      bool   `json:"ok"`
+	State   uint32 `json:"state"`
 }
