@@ -42,10 +42,11 @@ func startRoomThread(roomID uint32) {
 	ctx, cancel := context.WithCancel(context.Background())
 	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		zap.S().Infof("[startRoomThread]:%s", err)
+		//zap.S().Infof("[startRoomThread]:%s", err)
 		cancel()
 		return
 	}
+	//BroadcastToAllRoomUsers(searchRoom, GrpcModelToResponse(searchRoom))
 	for _, info := range searchRoom.Users {
 		go room.ReadRoomUserMsg(ctx, info.ID)
 		room.wg.Add(1)

@@ -94,6 +94,7 @@ func RunGame(roomID uint32) {
 		//抢卡阶段
 		game.DoListenDistributeCard(5, 8)
 		//zap.S().Info("游戏[DoListenDistributeCard]完成")
+		time.Sleep(time.Second)
 		//特殊卡处理阶段
 		game.DoHandleSpecialCard(5, 18)
 		//zap.S().Info("游戏[DoHandleSpecialCard]完成")
