@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 )
@@ -31,4 +32,32 @@ func TestChan(t *testing.T) {
 	mm2()
 	time.Sleep(10 * time.Second)
 
+}
+
+func TestChan1(t *testing.T) {
+	c := make(chan int)
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+	count := 10000
+	go func() {
+		for i := 0; i < count; i++ {
+			c <- i
+			println("write ", i)
+		}
+		println("write ending")
+		wg.Done()
+	}()
+
+	time.Sleep(time.Second * 3)
+	go func() {
+		for {
+			num := <-c
+			if num == count-1 {
+				wg.Done()
+			}
+			println("num: ", num)
+			time.Sleep(time.Second)
+		}
+	}()
+	wg.Wait()
 }

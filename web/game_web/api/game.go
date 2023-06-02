@@ -92,11 +92,12 @@ func RunGame(roomID uint32) {
 		game.DoDistributeCard()
 		//zap.S().Info("游戏[DoDistributeCard]完成")
 		//抢卡阶段
-		game.DoListenDistributeCard(5, 8)
+		time.Sleep(time.Second * 2)
+		game.DoListenDistributeCard(6, 8)
 		//zap.S().Info("游戏[DoListenDistributeCard]完成")
-		time.Sleep(time.Second)
+		time.Sleep(time.Second * 2)
 		//特殊卡处理阶段
-		game.DoHandleSpecialCard(5, 18)
+		game.DoHandleSpecialCard(6, 18)
 		//zap.S().Info("游戏[DoHandleSpecialCard]完成")
 		//分数计算阶段
 		game.DoScoreCount()
@@ -163,24 +164,22 @@ func (game *Game) DoScoreCount() {
 		}
 		//处理分数
 		sum := uint32(0)
-		for i, card := range info.BaseCards {
+		for _, card := range info.BaseCards {
 			sum += card.Number
-			//删除这张卡
-			if i+1 >= len(info.BaseCards) {
-				info.BaseCards = info.BaseCards[:i]
+		}
+		if sum/12 == 1 {
+			info.BaseCards = []model.BaseCard{}
+			if sum%12 == 0 {
+				info.Score += 5
 			} else {
-				info.BaseCards = append(info.BaseCards[:i], info.BaseCards[i+1:]...)
+				//生成多的数字
+				game.MakeCardID++
+				info.BaseCards = append(info.BaseCards, model.BaseCard{
+					CardID: game.MakeCardID,
+					Number: sum % 12,
+				})
 			}
 		}
-		if sum%12 == 0 {
-			info.Score += sum / 12
-		}
-		//生成多的数字
-		game.MakeCardID++
-		info.BaseCards = append(info.BaseCards, model.BaseCard{
-			CardID: game.MakeCardID,
-			Number: sum % 12,
-		})
 	}
 }
 
@@ -192,6 +191,7 @@ func (game *Game) DoHandleSpecialCard(min, max int) {
 	})
 	//监听用户特殊卡环节,这块要设置超时时间，非一直读取
 	handleFunc := NewHandleFunc(game)
+	after := time.After(duration)
 	for true {
 		select {
 		case msg := <-game.CommonChan:
@@ -216,7 +216,7 @@ func (game *Game) DoHandleSpecialCard(min, max int) {
 				//其他消息不处理,给用户返回超时
 				utils.SendErrToUser(userInfo.WS, "[DoListenDistributeCard]", errors.New("其他信息不处理"))
 			}
-		case <-time.After(duration):
+		case <-after:
 			//超时处理,超时就直接返回了
 			return
 		}
@@ -230,6 +230,7 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 		Duration: duration,
 	})
 	//监听用户抢牌环节,这块要设置超时时间，非一直读取
+	after := time.After(duration)
 	for true {
 		select {
 		case msg := <-game.CommonChan:
@@ -268,11 +269,8 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 						utils.SendMsgToUser(userInfo.WS, "没抢到卡~~~")
 					}
 				}
-			default:
-				//其他消息不处理,给用户返回超时
-				utils.SendErrToUser(userInfo.WS, "[DoListenDistributeCard]", errors.New("超时信息不处理"))
 			}
-		case <-time.After(duration):
+		case <-after:
 			//超时处理,超时就直接返回了
 			return
 		}

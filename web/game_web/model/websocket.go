@@ -23,7 +23,7 @@ type WSConn struct {
 func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 	ws = &WSConn{
 		UserID:    userID,
-		InChan:    make(chan []byte, 1024),
+		InChan:    make(chan []byte, 5),
 		OutChan:   make(chan []byte, 1024),
 		CloseChan: make(chan struct{}),
 		conn:      conn,
