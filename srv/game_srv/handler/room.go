@@ -10,201 +10,12 @@ import (
 	"game_srv/proto/game"
 	"game_srv/utils"
 
-	"github.com/go-redsync/redsync/v4"
+	"github.com/redis/go-redis/v9"
 
+	"github.com/go-redsync/redsync/v4"
 	"go.uber.org/zap"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
-
-type GameServer struct {
-	game.UnimplementedGameServer
-}
-
-func ModelToResponse(user *model.UserItem) *game.UserItemsInfoResponse {
-	var record []uint32
-	record = append(record, user.Apple)
-	record = append(record, user.Banana)
-	userInfoRep := &game.UserItemsInfoResponse{
-		Id:      user.ID,
-		Gold:    user.Gold,
-		Diamond: user.Diamond,
-		Items:   record,
-	}
-	return userInfoRep
-}
-
-func (s *GameServer) CreateUserItems(ctx context.Context, req *game.UserItemsInfo) (*game.UserItemsInfoResponse, error) {
-	zap.S().Info("用户访问CreateUserItems")
-	fmt.Println("用户访问CreateUserItems")
-	item := model.UserItem{
-		UserID:  req.Id,
-		Gold:    req.Gold,
-		Diamond: req.Diamond,
-		Apple:   req.Apple,
-		Banana:  req.Banana,
-	}
-	res := global.MysqlDB.Create(&item)
-	if res.RowsAffected == 0 {
-		return nil, status.Error(codes.Internal, res.Error.Error())
-	}
-	return ModelToResponse(&item), nil
-}
-
-func (s *GameServer) GetUserItemsInfo(ctx context.Context, req *game.UserIDInfo) (*game.UserItemsInfoResponse, error) {
-	item := model.UserItem{
-		UserID: req.Id,
-	}
-	res := global.MysqlDB.First(&item)
-	if res.Error != nil {
-		return nil, res.Error
-	}
-	if res.RowsAffected == 0 {
-		return nil, status.Error(codes.NotFound, "用户不存在")
-	}
-	return ModelToResponse(&item), nil
-}
-
-// 增加金币
-func (s *GameServer) AddGold(ctx context.Context, req *game.AddGoldRequest) (*emptypb.Empty, error) {
-	query := &model.UserItem{
-		UserID: req.Id,
-	}
-	tx := global.MysqlDB.First(&query)
-	if tx.Error != nil {
-		return &emptypb.Empty{}, tx.Error
-	}
-	if tx.RowsAffected == 0 {
-		return nil, status.Error(codes.NotFound, "用户不存在")
-	}
-	query.Gold += req.Count
-	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("gold = ?", fmt.Sprintf("%d", query.Gold))
-	if res.RowsAffected == 0 {
-		return &emptypb.Empty{}, status.Error(codes.Internal, "更新用户失败")
-	}
-	return &emptypb.Empty{}, nil
-}
-
-// 增加钻石
-func (s *GameServer) AddDiamond(ctx context.Context, req *game.AddDiamondInfo) (*emptypb.Empty, error) {
-	query := &model.UserItem{
-		UserID: req.Id,
-	}
-	tx := global.MysqlDB.First(&query)
-	if tx.Error != nil {
-		return &emptypb.Empty{}, tx.Error
-	}
-	if tx.RowsAffected == 0 {
-		return nil, status.Error(codes.NotFound, "用户不存在")
-	}
-	query.Diamond += req.Count
-	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", query.Diamond))
-	if res.RowsAffected == 0 {
-		return &emptypb.Empty{}, status.Error(codes.Internal, "更新用户失败")
-	}
-	return &emptypb.Empty{}, nil
-}
-
-// 增加道具(道具类型应该区别)
-func (s *GameServer) AddItem(ctx context.Context, req *game.AddItemInfo) (*emptypb.Empty, error) {
-	//要知道更新什么
-	query := &model.UserItem{
-		UserID: req.Id,
-	}
-	tx := global.MysqlDB.First(&query)
-	if tx.Error != nil {
-		return &emptypb.Empty{}, tx.Error
-	}
-	if tx.RowsAffected == 0 {
-		return nil, status.Error(codes.NotFound, "用户不存在")
-	}
-	item := model.UserItem{
-		Apple:  req.Items[game.Type_Apple] + query.Apple,
-		Banana: req.Items[game.Type_Banana] + query.Banana,
-	}
-	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Updates(item)
-	if res.RowsAffected == 0 {
-		return &emptypb.Empty{}, status.Error(codes.Internal, "更新用户失败")
-	}
-	return &emptypb.Empty{}, nil
-}
-
-func (s *GameServer) UseGold(ctx context.Context, req *game.UseGoldRequest) (*game.IsOK, error) {
-	//要知道更新什么
-	query := &model.UserItem{
-		UserID: req.Id,
-	}
-	tx := global.MysqlDB.First(&query)
-	if tx.Error != nil {
-		return &game.IsOK{IsOK: false}, tx.Error
-	}
-	if tx.RowsAffected == 0 {
-		return &game.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
-	}
-	if req.Count > query.Gold {
-		//不可以使用
-		return &game.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
-	}
-	query.Gold -= req.Count
-	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", query.Gold))
-	if res.RowsAffected == 0 {
-		return &game.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
-	}
-	return &game.IsOK{IsOK: true}, nil
-
-}
-
-func (s *GameServer) UseDiamond(ctx context.Context, req *game.UseDiamondInfo) (*game.IsOK, error) {
-	//要知道更新什么
-	query := &model.UserItem{
-		UserID: req.Id,
-	}
-	tx := global.MysqlDB.First(&query)
-	if tx.Error != nil {
-		return &game.IsOK{IsOK: false}, tx.Error
-	}
-	if tx.RowsAffected == 0 {
-		return &game.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
-	}
-	if req.Count > query.Diamond {
-		//不可以使用
-		return &game.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
-	}
-	query.Diamond -= req.Count
-	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Update("diamond = ?", fmt.Sprintf("%d", query.Diamond))
-	if res.RowsAffected == 0 {
-		return &game.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
-	}
-	return &game.IsOK{IsOK: true}, nil
-}
-
-func (s *GameServer) UseItem(ctx context.Context, req *game.UseItemInfo) (*game.IsOK, error) {
-	//要知道更新什么
-	query := &model.UserItem{
-		UserID: req.Id,
-	}
-	tx := global.MysqlDB.First(&query)
-	if tx.Error != nil {
-		return &game.IsOK{IsOK: false}, tx.Error
-	}
-	if tx.RowsAffected == 0 {
-		return &game.IsOK{IsOK: false}, status.Error(codes.NotFound, "用户不存在")
-	}
-	item := model.UserItem{
-		Apple:  query.Apple - req.Items[game.Type_Apple],
-		Banana: query.Banana - req.Items[game.Type_Banana],
-	}
-	if item.Apple < 0 || item.Banana < 0 {
-		//不可以使用
-		return &game.IsOK{IsOK: false}, errors.New("道具不足，无法使用")
-	}
-	res := global.MysqlDB.Model(&model.UserItem{}).Where("id = ?", fmt.Sprintf("%d", req.Id)).Updates(item)
-	if res.RowsAffected == 0 {
-		return &game.IsOK{IsOK: false}, status.Error(codes.Internal, "更新用户失败")
-	}
-	return &game.IsOK{IsOK: true}, nil
-}
 
 func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*game.AllRoomInfo, error) {
 	ret := &game.AllRoomInfo{}
@@ -216,7 +27,7 @@ func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*gam
 		get := global.RedisDB.Get(ctx, value)
 		result := get.Val()
 		if result == "" {
-			return nil, get.Err()
+			continue
 		}
 		room := model.Room{}
 		_ = json.Unmarshal([]byte(result), &room)
@@ -253,7 +64,7 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptyp
 		Users:         users,
 	}
 	marshal, _ := json.Marshal(room)
-	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
+	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	if set.Err() != nil {
 		return &emptypb.Empty{}, set.Err()
 	}
@@ -261,7 +72,7 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptyp
 }
 
 func (s *GameServer) SearchRoom(ctx context.Context, in *game.RoomIDInfo) (*game.RoomInfo, error) {
-	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
+	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
 		return nil, get.Err()
@@ -287,7 +98,7 @@ func (s *GameServer) SearchRoom(ctx context.Context, in *game.RoomIDInfo) (*game
 }
 
 func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
-	del := global.RedisDB.Del(ctx, fmt.Sprintf("%d", in.RoomID))
+	del := global.RedisDB.Del(ctx, fmt.Sprintf("%s", NameRoom(in.RoomID)))
 	if del.Err() != nil {
 		return &emptypb.Empty{}, del.Err()
 	}
@@ -306,11 +117,11 @@ func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo
 		}
 	}(mutex)
 	//查找房间是否存在
-	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
-	result := get.Val()
-	if get.Val() == "" {
+	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
+	if get.Err() == redis.Nil {
 		return nil, get.Err()
 	}
+	result := get.Val()
 	room := model.Room{}
 	_ = json.Unmarshal([]byte(result), &room)
 	//是否满人
@@ -324,7 +135,7 @@ func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo
 	})
 	room.UserNumber++
 	marshal, _ := json.Marshal(room)
-	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
+	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	if set.Err() != nil {
 		return nil, set.Err()
 	}
@@ -354,7 +165,7 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 		}
 	}(mutex)
 	//查找房间是否存在
-	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
+	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
 		return nil, get.Err()
@@ -363,7 +174,7 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 	_ = json.Unmarshal([]byte(result), &room)
 	if in.UserID == room.RoomOwner {
 		// 如果是房主退出，销毁房间
-		del := global.RedisDB.Del(ctx, fmt.Sprintf("%d", in.RoomID))
+		del := global.RedisDB.Del(ctx, NameRoom(in.RoomID))
 		if del.Err() != nil {
 			return nil, del.Err()
 		}
@@ -394,7 +205,7 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 			}
 		}
 		marshal, _ := json.Marshal(room)
-		set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
+		set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 		if set.Err() != nil {
 			return nil, set.Err()
 		}
@@ -425,7 +236,7 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *game.UpdateRoomInfo) (*
 		}
 	}(mutex)
 	//查找房间是否存在
-	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
+	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
 		return nil, get.Err()
@@ -460,7 +271,7 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *game.UpdateRoomInfo) (*
 		}
 	}
 	marshal, _ := json.Marshal(room)
-	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
+	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	if set.Err() != nil {
 		return nil, set.Err()
 	}
@@ -490,7 +301,7 @@ func (s *GameServer) UpdateUserReadyState(ctx context.Context, in *game.ReadySta
 		}
 	}(mutex)
 	//查找房间是否存在
-	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
+	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
 		return nil, get.Err()
@@ -503,7 +314,7 @@ func (s *GameServer) UpdateUserReadyState(ctx context.Context, in *game.ReadySta
 		}
 	}
 	marshal, _ := json.Marshal(room)
-	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
+	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	if set.Err() != nil {
 		return nil, set.Err()
 	}
@@ -533,7 +344,7 @@ func (s *GameServer) BeginGame(ctx context.Context, in *game.BeginGameInfo) (*ga
 		}
 	}(mutex)
 	//查找房间是否存在
-	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
+	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
 		return nil, get.Err()
@@ -562,7 +373,7 @@ func (s *GameServer) BeginGame(ctx context.Context, in *game.BeginGameInfo) (*ga
 	room.Users[ownerIndex].Ready = true
 	room.RoomWait = false
 	marshal, _ := json.Marshal(room)
-	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
+	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	if set.Err() != nil {
 		return nil, set.Err()
 	}
@@ -592,7 +403,7 @@ func (s *GameServer) BackRoom(ctx context.Context, in *game.RoomIDInfo) (*emptyp
 		}
 	}(mutex)
 	//查找房间是否存在
-	get := global.RedisDB.Get(ctx, fmt.Sprintf("%d", in.RoomID))
+	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
 	result := get.Val()
 	if get.Val() == "" {
 		return nil, get.Err()
@@ -606,9 +417,13 @@ func (s *GameServer) BackRoom(ctx context.Context, in *game.RoomIDInfo) (*emptyp
 		user.Ready = false
 	}
 	marshal, _ := json.Marshal(room)
-	set := global.RedisDB.Set(ctx, fmt.Sprintf("%d", in.RoomID), marshal, 0)
+	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	if set.Err() != nil {
 		return nil, set.Err()
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func NameRoom(roomID uint32) string {
+	return fmt.Sprintf("Game:roomID%d", roomID)
 }

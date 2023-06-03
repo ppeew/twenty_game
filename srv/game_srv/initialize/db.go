@@ -26,8 +26,9 @@ func InitDB() {
 	//初始化redis,及redsync同步锁
 	redisInfo := global.ServerConfig.RedisInfo
 	global.RedisDB = redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%d", redisInfo.Host, redisInfo.Port),
-		DB:   redisInfo.Database,
+		Addr:     fmt.Sprintf("%s:%d", redisInfo.Host, redisInfo.Port),
+		DB:       redisInfo.Database,
+		Password: redisInfo.Password,
 	})
 	err = global.RedisDB.Ping(context.Background()).Err()
 	if err != nil {

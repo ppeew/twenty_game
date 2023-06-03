@@ -1,7 +1,7 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
+option go_package = "./user;user";
 package user;
-option go_package = "./user";
 
 service User{
   //创建用户
@@ -14,6 +14,20 @@ service User{
   rpc GetUserByUsername(UserNameInfo)returns(UserInfoResponse);
   //更改用户信息
   rpc UpdateUser(UpdateUserInfo)returns (google.protobuf.Empty);
+
+  //查询用户状态
+  rpc GetUserState(UserIDInfo)returns(UserStateResponse);
+  //修改用户状态
+  rpc UpdateUserState(UpdateUserStateInfo)returns(google.protobuf.Empty);
+}
+
+message UserStateResponse{
+  uint32 state=1;
+}
+
+message UpdateUserStateInfo{
+  uint32 id=1;
+  uint32 state=2;
 }
 
 message CreateUserInfo{

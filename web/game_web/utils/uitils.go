@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"game_web/model"
 	"game_web/model/response"
+	"runtime"
 	"strings"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -42,4 +44,15 @@ func SendMsgToUser(ws *model.WSConn, data interface{}) {
 	if err != nil {
 		zap.S().Infof("ID为%d的用户掉线了", ws.UserID)
 	}
+}
+
+func CheckGoRoutines() {
+	go func() {
+		for true {
+			select {
+			case <-time.After(time.Second):
+				zap.S().Infof("协程数量->%d", runtime.NumGoroutine())
+			}
+		}
+	}()
 }

@@ -8,6 +8,7 @@ import (
 	"game_web/model"
 	"game_web/model/response"
 	game_proto "game_web/proto/game"
+	"game_web/proto/user"
 	"game_web/utils"
 	"net/http"
 	"strconv"
@@ -19,8 +20,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+// 0->大厅 1->房间 2->游戏
 const (
-	NotIn = iota
+	OutSide = iota
 	RoomIn
 	GameIn
 )
@@ -37,13 +39,8 @@ var upgrade = websocket.Upgrader{
 	},
 }
 
-// UsersState 用户ID -> 用户结构体（用户状态+用户连接）
-var UsersState = make(map[uint32]*UserState)
-
-type UserState struct {
-	State uint32
-	WS    *model.WSConn
-}
+// UsersState 用户ID -> 用户连接
+var UsersState = make(map[uint32]*model.WSConn)
 
 // CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息
 func CreateRoom(ctx *gin.Context) {
@@ -60,9 +57,14 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	if UsersState[userID].State != NotIn {
-		// 用户在其他房间不能创房
-		ctx.JSON(http.StatusOK, gin.H{
+	//查看用户状态
+	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: userID})
+	if err != nil {
+		zap.S().Warnf("[CreateRoom]:%s", err)
+		return
+	}
+	if state.State != OutSide {
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": errors.New("请先退出其他房间再创房"),
 		})
 		return
@@ -87,7 +89,6 @@ func CreateRoom(ctx *gin.Context) {
 		"data": "创建成功",
 		"err":  "",
 	})
-	return
 }
 
 // UserIntoRoom 玩家进入房间
@@ -95,11 +96,14 @@ func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	stateAndConn := UsersState[userID]
-	zap.S().Info("用户进入房间，此时状态为：", stateAndConn.State)
-	switch stateAndConn.State {
+	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: userID})
+	if err != nil {
+		zap.S().Warnf("[CreateRoom]:%s", err)
+		return
+	}
+	//zap.S().Info("[UserIntoRoom]:此时状态为：", state.State)
+	switch state.State {
 	case RoomIn:
-		//用户已经有房间，拒绝进入房间
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "请先退出之前的房间,再进入房间",
 		})
@@ -107,7 +111,7 @@ func UserIntoRoom(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "正在游戏中，请不要进房",
 		})
-	case NotIn:
+	case OutSide:
 		room, err := global.GameSrvClient.UserIntoRoom(context.Background(), &game_proto.UserIntoRoomInfo{
 			RoomID: uint32(roomID),
 			UserID: userID,
@@ -117,6 +121,7 @@ func UserIntoRoom(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"err": err,
 			})
+			fmt.Println(err)
 			return
 		}
 		if room.ErrorMsg != "" {
@@ -133,11 +138,14 @@ func UserIntoRoom(ctx *gin.Context) {
 			})
 			return
 		}
-		stateAndConn.WS = model.InitWebSocket(conn, userID)
-		stateAndConn.State = RoomIn
+		UsersState[userID] = model.InitWebSocket(conn, userID)
+		_, err = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: userID, State: RoomIn})
+		if err != nil {
+			zap.S().Warnf("[UserIntoRoom]:%s", err)
+			return
+		}
 		// 告知房间主函数，要创建协程来读取用户信息
 		CHAN[uint32(roomID)] <- userID
-		zap.S().Infof("客户端连接状态:%d", stateAndConn.State)
 		// 因为房间更新，给所有订阅者发送房间信息
 		BroadcastToAllRoomUsers(room.RoomInfo, GrpcModelToResponse(room.RoomInfo))
 		BroadcastToAllRoomUsers(room.RoomInfo, response.RoomMsgResponse{
@@ -151,9 +159,12 @@ func UserIntoRoom(ctx *gin.Context) {
 func Reconnect(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	stateAndConn := UsersState[userID]
-	if stateAndConn.State == NotIn {
-		// 没有需要重连的
+	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: userID})
+	if err != nil {
+		zap.S().Warnf("[CreateRoom]:%s", err)
+		return
+	}
+	if state.State == OutSide {
 		ctx.JSON(http.StatusOK, gin.H{
 			"data": "不需要重连",
 		})
@@ -166,16 +177,20 @@ func Reconnect(ctx *gin.Context) {
 		})
 		return
 	}
-	stateAndConn.WS = model.InitWebSocket(conn, userID)
-	utils.SendMsgToUser(stateAndConn.WS, "重连服务器成功")
+	UsersState[userID] = model.InitWebSocket(conn, userID)
+	utils.SendMsgToUser(UsersState[userID], "重连服务器成功")
 }
 
 // SelectUserState 查询用户此时状态-->在房间还是游戏还是没进入房间）
 func SelectUserState(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
+	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: userID})
+	if err != nil {
+		zap.S().Warnf("[SelectUserState]:%s", err)
+	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": UsersState[userID].State,
+		"data": state.State,
 		"err":  "",
 	})
 }

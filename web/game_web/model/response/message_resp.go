@@ -37,5 +37,4 @@ type ChatResponse struct {
 
 type CheckHealthResponse struct {
 	MsgType uint32 `json:"msgType"`
-	State   uint32 `json:"state"`
 }

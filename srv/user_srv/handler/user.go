@@ -22,22 +22,11 @@ type UserServer struct {
 	user.UnimplementedUserServer
 }
 
-func ModelToResponse(u *model.User) *user.UserInfoResponse {
-	userInfoRep := &user.UserInfoResponse{
-		Nickname: u.Nickname,
-		Gender:   u.Gender,
-		UserName: u.UserName,
-		Password: u.Password,
-		Id:       u.ID,
-	}
-	return userInfoRep
-}
-
 // 用户注册
 func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (*user.UserInfoResponse, error) {
 	//先查询用户是否存在
 	var u model.User
-	result := global.DB.Where("user_name = ?", req.UserName).First(&u)
+	result := global.MysqlDB.Where("user_name = ?", req.UserName).First(&u)
 	if result.RowsAffected == 1 {
 		return nil, status.Error(codes.AlreadyExists, "用户已经存在")
 	}
@@ -57,7 +46,7 @@ func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (
 		Password: encodePassword,
 	}
 
-	tx := global.DB.Begin()
+	tx := global.MysqlDB.Begin()
 	res := tx.Create(u2)
 	if res.Error != nil {
 		tx.Rollback()
@@ -89,7 +78,7 @@ func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (
 // 通过id获得用户信息
 func (s *UserServer) GetUserByID(ctx context.Context, req *user.UserIDInfo) (*user.UserInfoResponse, error) {
 	var u model.User
-	result := global.DB.First(&u, req.Id)
+	result := global.MysqlDB.First(&u, req.Id)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -99,9 +88,10 @@ func (s *UserServer) GetUserByID(ctx context.Context, req *user.UserIDInfo) (*us
 	return ModelToResponse(&u), nil
 }
 
+// 通过username获得用户信息
 func (s *UserServer) GetUserByUsername(ctx context.Context, req *user.UserNameInfo) (*user.UserInfoResponse, error) {
 	var u model.User
-	result := global.DB.Where("user_name = ?", req.UserName).First(&u)
+	result := global.MysqlDB.Where("user_name = ?", req.UserName).First(&u)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -111,6 +101,7 @@ func (s *UserServer) GetUserByUsername(ctx context.Context, req *user.UserNameIn
 	return ModelToResponse(&u), nil
 }
 
+// 检查密码
 func (s *UserServer) CheckPassword(ctx context.Context, req *user.CheckPasswordInfo) (*user.CheckPasswordResponse, error) {
 	options := &password.Options{
 		SaltLen:      16,
@@ -126,7 +117,7 @@ func (s *UserServer) CheckPassword(ctx context.Context, req *user.CheckPasswordI
 // 更改用户信息
 func (s *UserServer) UpdateUser(ctx context.Context, req *user.UpdateUserInfo) (*emptypb.Empty, error) {
 	var u model.User
-	result := global.DB.First(&u, req.Id)
+	result := global.MysqlDB.First(&u, req.Id)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -142,15 +133,25 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *user.UpdateUserInfo) (
 	}
 	salt, encoded := password.Encode(req.Password, options)
 	encodePassword := fmt.Sprintf("%s$%s", salt, encoded)
-
-	res := global.DB.Model(&u).Where("id = ?", fmt.Sprintf("%d", req.Id)).Updates(map[string]interface{}{
-		"nickname":  req.Nickname,
-		"gender":    req.Gender,
-		"user_name": req.UserName,
-		"password":  encodePassword,
+	res := global.MysqlDB.Model(&u).Where("id=?", fmt.Sprintf("%d", req.Id)).Updates(model.User{
+		UserName: req.UserName,
+		Password: encodePassword,
+		Nickname: req.Nickname,
+		Gender:   req.Gender,
 	})
 	if res.RowsAffected == 0 {
 		return nil, status.Error(codes.Internal, "更新用户失败")
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func ModelToResponse(u *model.User) *user.UserInfoResponse {
+	userInfoRep := &user.UserInfoResponse{
+		Nickname: u.Nickname,
+		Gender:   u.Gender,
+		UserName: u.UserName,
+		Password: u.Password,
+		Id:       u.ID,
+	}
+	return userInfoRep
 }

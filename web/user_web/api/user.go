@@ -21,43 +21,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// GRPC错误转HTTP
-func GrpcErrorToHttp(err error, c *gin.Context) {
-	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.NotFound:
-				c.JSON(http.StatusNotFound, gin.H{
-					"msg": e.Message(),
-				})
-			case codes.Internal:
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"msg": "内部错误",
-				})
-			case codes.InvalidArgument:
-				c.JSON(http.StatusBadRequest, gin.H{
-					"msg": "参数错误",
-				})
-			case codes.Unavailable:
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"msg": "用户服务不可用",
-				})
-			default:
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"msg": e.Message(),
-				})
-			}
-		}
-	}
-}
-
-func ToBool(s string) bool {
-	if s == "true" {
-		return true
-	}
-	return false
-}
-
 func GetRandomNickName(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"nickname": randomname.GenerateName(),
@@ -228,4 +191,41 @@ func UserUpdate(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "更改信息成功",
 	})
+}
+
+// GRPC错误转HTTP
+func GrpcErrorToHttp(err error, c *gin.Context) {
+	if err != nil {
+		if e, ok := status.FromError(err); ok {
+			switch e.Code() {
+			case codes.NotFound:
+				c.JSON(http.StatusNotFound, gin.H{
+					"msg": e.Message(),
+				})
+			case codes.Internal:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"msg": "内部错误",
+				})
+			case codes.InvalidArgument:
+				c.JSON(http.StatusBadRequest, gin.H{
+					"msg": "参数错误",
+				})
+			case codes.Unavailable:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"msg": "用户服务不可用",
+				})
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"msg": e.Message(),
+				})
+			}
+		}
+	}
+}
+
+func ToBool(s string) bool {
+	if s == "true" {
+		return true
+	}
+	return false
 }

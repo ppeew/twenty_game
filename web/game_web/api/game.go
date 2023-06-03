@@ -8,6 +8,7 @@ import (
 	"game_web/model"
 	"game_web/model/response"
 	game_proto "game_web/proto/game"
+	"game_web/proto/user"
 	"game_web/utils"
 	"math/rand"
 	"sort"
@@ -59,16 +60,16 @@ func NewGame(roomID uint32) *Game {
 	go game.ProcessItemMsg(ctx)
 	go game.ProcessHealthMsg(ctx)
 	game.wg.Add(3)
-	for _, user := range room.Users {
-		zap.S().Infof("[NewGame]初始化用户%d", user.ID)
-		game.Users[user.ID] = &model.UserGameInfo{
+	for _, roomUser := range room.Users {
+		zap.S().Infof("[NewGame]初始化用户%d", roomUser.ID)
+		game.Users[roomUser.ID] = &model.UserGameInfo{
 			BaseCards:    make([]model.BaseCard, 0),
 			SpecialCards: make([]model.SpecialCard, 0),
 			IsGetCard:    false,
 			Score:        0,
 		}
 		//对于每个用户开启一个协程，用于读取他的消息到游戏管道（分发消息功能）
-		go game.ReadGameUserMsg(ctx, user.ID)
+		go game.ReadGameUserMsg(ctx, roomUser.ID)
 		game.wg.Add(1)
 	}
 	//等待用户页面初始化完成
@@ -144,7 +145,7 @@ func (game *Game) BackToRoom() {
 		zap.S().Infof("err:%s", err)
 	}
 	for u := range game.Users {
-		UsersState[u].State = RoomIn
+		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: u, State: RoomIn})
 	}
 	BroadcastToAllGameUsers(game, response.GameOverResponse{MsgType: response.GameOverResponseType})
 	//完成所有环境，退出游戏协程，创建房间协程，回到房间协程来
@@ -210,11 +211,11 @@ func (game *Game) DoHandleSpecialCard(min, max int) {
 				}
 				if findCard == false {
 					//找不到卡
-					utils.SendErrToUser(userInfo.WS, "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
+					utils.SendErrToUser(userInfo, "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
 				}
 			default:
 				//其他消息不处理,给用户返回超时
-				utils.SendErrToUser(userInfo.WS, "[DoListenDistributeCard]", errors.New("其他信息不处理"))
+				utils.SendErrToUser(userInfo, "[DoListenDistributeCard]", errors.New("其他信息不处理"))
 			}
 		case <-after:
 			//超时处理,超时就直接返回了
@@ -241,7 +242,7 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 			case model.ListenHandleCardMsg:
 				//每一局用户最多只能抢一张卡，检查
 				if game.Users[msg.UserID].IsGetCard {
-					utils.SendMsgToUser(userInfo.WS, "一回合只能抢一次噢！")
+					utils.SendMsgToUser(userInfo, "一回合只能抢一次噢！")
 				} else {
 					data := msg.GetCardData
 					isOK := false
@@ -262,11 +263,11 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 					}
 					//发送给用户信息
 					if isOK {
-						utils.SendMsgToUser(userInfo.WS, "抢到卡了！")
+						utils.SendMsgToUser(userInfo, "抢到卡了！")
 						resp := CardModelToResponse(game)
 						BroadcastToAllGameUsers(game, resp)
 					} else {
-						utils.SendMsgToUser(userInfo.WS, "没抢到卡~~~")
+						utils.SendMsgToUser(userInfo, "没抢到卡~~~")
 					}
 				}
 			}
@@ -332,9 +333,8 @@ func (game *Game) ProcessHealthMsg(todo context.Context) {
 			game.wg.Done()
 			return
 		case msg := <-game.HealthChan:
-			utils.SendMsgToUser(UsersState[msg.UserID].WS, response.CheckHealthResponse{
+			utils.SendMsgToUser(UsersState[msg.UserID], response.CheckHealthResponse{
 				MsgType: response.CheckHealthResponseType,
-				State:   UsersState[msg.UserID].State,
 			})
 		}
 	}
@@ -361,7 +361,7 @@ func (game *Game) ProcessItemMsg(todo context.Context) {
 				Items: items,
 			})
 			if isOk.IsOK == false {
-				utils.SendErrToUser(userInfo.WS, "[ProcessItemMsg]", err)
+				utils.SendErrToUser(userInfo, "[ProcessItemMsg]", err)
 			}
 			//处理用户的物品使用,广播所有用户
 			rsp := response.UseItemResponse{
@@ -406,7 +406,7 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 			zap.S().Info("[ReadGameUserMsg]退出")
 			game.wg.Done()
 			return
-		case data := <-UsersState[userID].WS.InChan:
+		case data := <-UsersState[userID].InChan:
 			message := model.Message{}
 			err := json.Unmarshal(data, &message)
 			if err != nil {
@@ -432,7 +432,7 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 				message.UserID = userID
 				game.CommonChan <- message
 			}
-		case <-UsersState[userID].WS.CloseChan:
+		case <-UsersState[userID].CloseChan:
 			err := errors.New("连接断开")
 			if err != nil {
 				//采用轮询方式不断尝试用户连接重新建立
@@ -443,7 +443,7 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 }
 
 func (game *Game) HandleChangeCard(msg model.Message) {
-	ws := UsersState[msg.UserID].WS
+	ws := UsersState[msg.UserID]
 	data := msg.UseSpecialData.ChangeCardData
 	//先找到两卡
 	findUserCard := false
@@ -492,7 +492,7 @@ func (game *Game) HandleChangeCard(msg model.Message) {
 }
 
 func (game *Game) HandleUpdateCard(msg model.Message) {
-	ws := UsersState[msg.UserID].WS
+	ws := UsersState[msg.UserID]
 	data := msg.UseSpecialData.UpdateCardData
 	findUpdateCard := false
 	for _, card := range game.Users[data.TargetUserID].BaseCards {
@@ -522,7 +522,7 @@ func (game *Game) HandleUpdateCard(msg model.Message) {
 }
 
 func (game *Game) HandleDeleteCard(msg model.Message) {
-	ws := UsersState[msg.UserID].WS
+	ws := UsersState[msg.UserID]
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
 	for i, card := range game.Users[data.TargetUserID].BaseCards {
@@ -598,10 +598,10 @@ func BroadcastToAllGameUsers(game *Game, msg interface{}) {
 	marshal, _ := json.Marshal(c)
 	for userID := range game.Users {
 		zap.S().Infof("[BroadcastToAllGameUsers]:正在向用户%d发送信息,消息为:%v", userID, msg)
-		err := UsersState[userID].WS.OutChanWrite(marshal)
+		err := UsersState[userID].OutChanWrite(marshal)
 		if err != nil {
 			zap.S().Infof("[BroadcastToAllGameUsers]:%d用户关闭了连接", userID)
-			UsersState[userID].WS.CloseConn()
+			UsersState[userID].CloseConn()
 		}
 	}
 }

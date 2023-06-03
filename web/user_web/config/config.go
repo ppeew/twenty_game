@@ -9,15 +9,17 @@ type JWTConfig struct {
 }
 
 type ConsulConfig struct {
-	Host string `mapstructure:"host" json:"host"`
-	Port int    `mapstructure:"port" json:"port"`
+	Host string `json:"host"`
+	Port int    `json:"port"`
+	Name string `json:"name"`
 }
 
 type ServerConfig struct {
-	Port        int           `mapstructure:"port" json:"port"`
-	UserSrvInfo UserSrvConfig `mapstructure:"user_srv" json:"user_srv"`
-	JWTInfo     JWTConfig     `mapstructure:"jwt" json:"jwt"`
-	ConsulInfo  ConsulConfig  `mapstructure:"consul" json:"consul"`
+	Host        string        `json:"host"`
+	Port        int           `json:"port"`
+	UserSrvInfo UserSrvConfig `json:"user_srv"`
+	JWTInfo     JWTConfig     `json:"jwt"`
+	ConsulInfo  ConsulConfig  `json:"consul"`
 }
 
 type NacosConfig struct {

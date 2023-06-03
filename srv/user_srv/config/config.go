@@ -25,13 +25,21 @@ type ConsulConfig struct {
 	ServerHost string `json:"server_host"`
 }
 
+type GameSrvConfig struct {
+	Name string `json:"name"`
+}
+
+type RedisConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Password string `json:"password"`
+	Database int    `json:"database"`
+}
+
 type ServerConfig struct {
 	Host        string        `json:"host"`
 	MysqlInfo   MysqlConfig   `json:"mysql"`
 	ConsulInfo  ConsulConfig  `json:"consul"`
 	GameSrvInfo GameSrvConfig `json:"gameSrvInfo"`
-}
-
-type GameSrvConfig struct {
-	Name string `json:"name"`
+	RedisInfo   RedisConfig   `json:"redis"`
 }

@@ -3,12 +3,16 @@ package initialize
 import (
 	"game_web/middlewares"
 	"game_web/router"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func InitRouters() *gin.Engine {
 	engine := gin.Default()
+	engine.GET("/health", func(context *gin.Context) {
+		context.Status(http.StatusOK)
+	})
 	//中间件
 	engine.Use(middlewares.FlowBegin(), middlewares.Cors())
 	versionGroup := engine.Group("/v1")

@@ -15,8 +15,10 @@ type BaseModel struct {
 
 type User struct {
 	BaseModel
-	Nickname string
-	Gender   bool
 	UserName string `gorm:"index;unique;not null"`
 	Password string
+	Nickname string `gorm:"index;not null"`
+	Gender   bool
+	//用户状态，经常修改，不设置索引
+	UserState uint32
 }
