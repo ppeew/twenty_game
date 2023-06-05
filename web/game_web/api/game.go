@@ -81,7 +81,6 @@ func NewGame(roomID uint32) *Game {
 func RunGame(roomID uint32) {
 	//游戏初始化阶段
 	game := NewGame(roomID)
-	//初始化完成，进入游戏主要逻辑
 	zap.S().Info("游戏[NewGame]完成")
 	for i := uint32(0); i < game.GameCount; i++ {
 		//循环初始化
@@ -104,12 +103,11 @@ func RunGame(roomID uint32) {
 		game.DoScoreCount()
 		//zap.S().Info("游戏[DoScoreCount]完成")
 	}
-	//游戏结束计算排名发奖励阶段
-	game.DoEndGame()
-	//zap.S().Info("游戏[DoEndGame]完成")
 	// 回到房间
 	game.BackToRoom()
-	zap.S().Info("游戏[BackToRoom]完成")
+	//游戏计算排名发奖励阶段
+	game.DoEndGame()
+	zap.S().Info("游戏[RunGame]完成")
 }
 
 func (game *Game) DoFlush() {
@@ -150,9 +148,9 @@ func (game *Game) BackToRoom() {
 	BroadcastToAllGameUsers(game, response.GameOverResponse{MsgType: response.GameOverResponseType})
 	//完成所有环境，退出游戏协程，创建房间协程，回到房间协程来
 	game.exitCancel() //关闭子协程
-	zap.S().Info("[BackToRoom]等待其他子协程关闭")
+	//zap.S().Info("[BackToRoom]等待其他子协程关闭")
 	game.wg.Wait() //等待全部子协程关闭
-	zap.S().Info("[BackToRoom]其他子协程已关闭")
+	//zap.S().Info("[BackToRoom]其他子协程已关闭")
 	go startRoomThread(game.RoomID)
 }
 
@@ -406,7 +404,7 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 			zap.S().Info("[ReadGameUserMsg]退出")
 			game.wg.Done()
 			return
-		case data := <-UsersState[userID].InChan:
+		case data := <-UsersState[userID].InChanRead():
 			message := model.Message{}
 			err := json.Unmarshal(data, &message)
 			if err != nil {
@@ -432,12 +430,8 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 				message.UserID = userID
 				game.CommonChan <- message
 			}
-		case <-UsersState[userID].CloseChan:
-			err := errors.New("连接断开")
-			if err != nil {
-				//采用轮询方式不断尝试用户连接重新建立
-				time.Sleep(time.Second)
-			}
+		default:
+			time.Sleep(time.Second)
 		}
 	}
 }
@@ -609,14 +603,14 @@ func BroadcastToAllGameUsers(game *Game, msg interface{}) {
 func CardModelToResponse(game *Game) response.GameStateResponse {
 	var users []response.UserGameInfoResponse
 	for userID, info := range game.Users {
-		user := response.UserGameInfoResponse{
+		userGameInfoResponse := response.UserGameInfoResponse{
 			UserID:       userID,
 			BaseCards:    info.BaseCards,
 			SpecialCards: info.SpecialCards,
 			IsGetCard:    info.IsGetCard,
 			Score:        info.Score,
 		}
-		users = append(users, user)
+		users = append(users, userGameInfoResponse)
 	}
 	resp := response.GameStateResponse{
 		MsgType:      response.GameStateResponseType,

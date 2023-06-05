@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"game_web/global"
 	"game_web/model"
@@ -96,7 +95,7 @@ func (roomInfo *Room) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 		case <-ctx.Done():
 			roomInfo.wg.Done()
 			return
-		case data := <-UsersState[userID].InChan:
+		case data := <-UsersState[userID].InChanRead():
 			message := model.Message{}
 			err := json.Unmarshal(data, &message)
 			if err != nil {
@@ -106,18 +105,15 @@ func (roomInfo *Room) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 			}
 			message.UserID = userID //添加标识，能够识别用户
 			roomInfo.MsgChan <- message
-		case <-UsersState[userID].CloseChan:
-			err := errors.New("连接断开")
-			if err != nil {
-				//如果与用户的websocket关闭，退出读取协程,并且将该玩家从房间剔除
-				roomInfo.wg.Done()
-				zap.S().Infof("[ReadRoomUserMsg]:%d用户掉线了", userID)
-				roomInfo.MsgChan <- model.Message{
-					Type:   model.QuitRoomMsg,
-					UserID: userID,
-				}
-				return
+		case <-UsersState[userID].IsDisConn():
+			//如果与用户的websocket关闭，退出读取协程,并且将该玩家从房间剔除
+			zap.S().Infof("[ReadRoomUserMsg]:%d用户掉线了", userID)
+			roomInfo.wg.Done()
+			roomInfo.MsgChan <- model.Message{
+				Type:   model.QuitRoomMsg,
+				UserID: userID,
 			}
+			return
 		}
 	}
 }

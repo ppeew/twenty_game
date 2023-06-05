@@ -27,10 +27,7 @@ func SendErrToUser(ws *model.WSConn, handlerFunc string, error error) {
 			"data": errMsg,
 		}
 		marshal, _ := json.Marshal(c)
-		err2 := ws.OutChanWrite(marshal)
-		if err2 != nil {
-			zap.S().Infof("ID为%d的用户掉线了", ws.UserID)
-		}
+		_ = ws.OutChanWrite(marshal)
 	}
 }
 
@@ -38,12 +35,9 @@ func SendMsgToUser(ws *model.WSConn, data interface{}) {
 	c := map[string]interface{}{
 		"data": data,
 	}
-	zap.S().Infof("[SendMsgToUser]:正在向用户%d发送信息,消息为:%v", ws.UserID, data)
+	zap.S().Infof("[SendMsgToUser]:正在向用户发送信息,消息为:%v", data)
 	marshal, _ := json.Marshal(c)
-	err := ws.OutChanWrite(marshal)
-	if err != nil {
-		zap.S().Infof("ID为%d的用户掉线了", ws.UserID)
-	}
+	_ = ws.OutChanWrite(marshal)
 }
 
 func CheckGoRoutines() {
