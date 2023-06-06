@@ -430,8 +430,6 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 				message.UserID = userID
 				game.CommonChan <- message
 			}
-		default:
-			time.Sleep(time.Second)
 		}
 	}
 }
