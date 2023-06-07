@@ -1,11 +1,16 @@
 package utils
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"game_web/api"
+	"game_web/global"
 	"game_web/model"
 	"game_web/model/response"
+	game_proto "game_web/proto/game"
+	"game_web/proto/user"
 	"runtime"
 	"strings"
 	"time"
@@ -49,4 +54,21 @@ func CheckGoRoutines() {
 			}
 		}
 	}()
+}
+
+func ReleaseResource() {
+	//释放房间
+	for roomID, _ := range api.CHAN {
+		_, err := global.GameSrvClient.DeleteRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
+		if err != nil {
+			zap.S().Infof("[ReleaseResource]:关闭%d房间失败:%s", roomID, err.Error())
+		}
+	}
+	//释放用户状态
+	for userID, _ := range api.UsersState {
+		_, err := global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: userID, State: api.OutSide})
+		if err != nil {
+			zap.S().Infof("[ReleaseResource]:%s", err)
+		}
+	}
 }

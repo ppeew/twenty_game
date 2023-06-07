@@ -1,12 +1,9 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"game_web/api"
 	"game_web/global"
 	"game_web/initialize"
-	game_proto "game_web/proto/game"
 	"game_web/utils"
 	"os"
 	"os/signal"
@@ -43,12 +40,7 @@ func main() {
 	if err := consulClient.Agent().ServiceDeregister(serverID); err != nil {
 		zap.S().Info("注销服务失败")
 	}
-
-	for roomID, _ := range api.CHAN {
-		_, err := global.GameSrvClient.DeleteRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
-		if err != nil {
-			zap.S().Infof("关闭%d房间失败:%s", roomID, err.Error())
-		}
-	}
+	//资源释放
+	utils.ReleaseResource()
 	zap.S().Info("释放资源完毕，退出")
 }
