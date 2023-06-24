@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"game_web/api"
 	"game_web/global"
 	"game_web/initialize"
+	game_proto "game_web/proto/game"
+	user_proto "game_web/proto/user"
 	"game_web/utils"
 	"os"
 	"os/signal"
@@ -41,6 +45,20 @@ func main() {
 		zap.S().Info("注销服务失败")
 	}
 	//资源释放
-	utils.ReleaseResource()
+
+	//释放房间
+	for roomID, _ := range api.CHAN {
+		_, err := global.GameSrvClient.DeleteRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
+		if err != nil {
+			zap.S().Infof("[ReleaseResource]:关闭%d房间失败:%s", roomID, err.Error())
+		}
+	}
+	//释放用户状态
+	for userID, _ := range api.UsersState {
+		_, err := global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: userID, State: api.OutSide})
+		if err != nil {
+			zap.S().Infof("[ReleaseResource]:%s", err)
+		}
+	}
 	zap.S().Info("释放资源完毕，退出")
 }

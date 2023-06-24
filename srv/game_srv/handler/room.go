@@ -53,6 +53,9 @@ func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*gam
 }
 
 func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptypb.Empty, error) {
+	if in.RoomID == 0 {
+		return &emptypb.Empty{}, nil
+	}
 	var users []*model.User
 	room := model.Room{
 		RoomID:        in.RoomID,

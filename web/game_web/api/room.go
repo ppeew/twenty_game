@@ -8,7 +8,7 @@ import (
 	"game_web/model"
 	"game_web/model/response"
 	game_proto "game_web/proto/game"
-	"game_web/proto/user"
+	user_proto "game_web/proto/user"
 	"game_web/utils"
 	"sync"
 	"time"
@@ -147,16 +147,16 @@ func (roomInfo *Room) QuitRoom(message model.Message) {
 		})
 		BroadcastToAllRoomUsers(info.RoomInfo, "房主退出房间，房间已关闭")
 		time.Sleep(1 * time.Second)
-		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: message.UserID, State: OutSide})
+		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: message.UserID, State: OutSide})
 		UsersState[message.UserID].CloseConn()
 		for _, info := range info.RoomInfo.Users {
-			_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: info.ID, State: OutSide})
+			_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: info.ID, State: OutSide})
 			UsersState[info.ID].CloseConn()
 		}
 		roomInfo.ExitChan <- model.RoomQuit
 	} else {
 		//游戏玩家的退出
-		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: message.UserID, State: OutSide})
+		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: message.UserID, State: OutSide})
 		UsersState[message.UserID].CloseConn()
 		//房间变化，广播
 		resp := GrpcModelToResponse(info.RoomInfo)
@@ -219,7 +219,7 @@ func (roomInfo *Room) BeginGame(message model.Message) {
 		UserID: message.UserID,
 	})
 	if err != nil {
-		zap.S().Infof("[BeginGame]:%s")
+		zap.S().Infof("[BeginGame]:%s", err)
 		return
 	}
 	if room.ErrorMsg != "" {
@@ -231,7 +231,7 @@ func (roomInfo *Room) BeginGame(message model.Message) {
 	}
 	//游戏开始,房间线程先暂停
 	for _, info := range room.RoomInfo.Users {
-		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: info.ID, State: GameIn})
+		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: info.ID, State: GameIn})
 	}
 	roomInfo.ExitChan <- model.GameStart
 }

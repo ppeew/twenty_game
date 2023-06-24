@@ -8,7 +8,7 @@ import (
 	"game_web/model"
 	"game_web/model/response"
 	game_proto "game_web/proto/game"
-	"game_web/proto/user"
+	user_proto "game_web/proto/user"
 	"game_web/utils"
 	"net/http"
 	"strconv"
@@ -58,7 +58,7 @@ func CreateRoom(ctx *gin.Context) {
 		return
 	}
 	//查看用户状态
-	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: userID})
+	state, err := global.UserSrvClient.GetUserState(context.Background(), &user_proto.UserIDInfo{Id: userID})
 	if err != nil {
 		zap.S().Warnf("[CreateRoom]:%s", err)
 		return
@@ -96,7 +96,7 @@ func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: userID})
+	state, err := global.UserSrvClient.GetUserState(context.Background(), &user_proto.UserIDInfo{Id: userID})
 	if err != nil {
 		zap.S().Warnf("[CreateRoom]:%s", err)
 		return
@@ -139,7 +139,7 @@ func UserIntoRoom(ctx *gin.Context) {
 			return
 		}
 		UsersState[userID] = model.InitWebSocket(conn, userID)
-		_, err = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: userID, State: RoomIn})
+		_, err = global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: userID, State: RoomIn})
 		if err != nil {
 			zap.S().Warnf("[UserIntoRoom]:%s", err)
 			return
@@ -159,7 +159,7 @@ func UserIntoRoom(ctx *gin.Context) {
 func Reconnect(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: userID})
+	state, err := global.UserSrvClient.GetUserState(context.Background(), &user_proto.UserIDInfo{Id: userID})
 	if err != nil {
 		zap.S().Warnf("[CreateRoom]:%s", err)
 		return
@@ -185,7 +185,7 @@ func Reconnect(ctx *gin.Context) {
 func SelectUserState(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: userID})
+	state, err := global.UserSrvClient.GetUserState(context.Background(), &user_proto.UserIDInfo{Id: userID})
 	if err != nil {
 		zap.S().Warnf("[SelectUserState]:%s", err)
 	}
