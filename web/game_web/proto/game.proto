@@ -163,7 +163,7 @@ message RoomInfo{
   uint32 RoomOwner=5;
   bool RoomWait=6;
   repeated RoomUser Users=7;
-
+  string RoomName=8;
 }
 
 message AllRoomInfo{

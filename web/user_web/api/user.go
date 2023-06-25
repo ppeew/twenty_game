@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -24,6 +26,56 @@ import (
 func GetRandomNickName(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"nickname": randomname.GenerateName(),
+	})
+}
+
+func GetRandomUsername(ctx *gin.Context) {
+	username := fmt.Sprintf("%05v", rand.New(rand.NewSource(time.Now().UnixNano())).Intn(100000))
+	ctx.JSON(http.StatusOK, gin.H{
+		"username": username,
+	})
+}
+
+func UploadImage(ctx *gin.Context) {
+	claims, _ := ctx.Get("claims")
+	currentUser := claims.(*models.CustomClaims)
+	id := currentUser.ID
+	formFile, err := ctx.FormFile("image")
+	if err != nil {
+		zap.S().Infof("[UploadImage]:%s", err)
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	file, err := formFile.Open()
+	if err != nil {
+		zap.S().Infof("[UploadImage]:%s", err)
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	data, _ := ioutil.ReadAll(file)
+	_, err = global.UserSrvClient.UploadImage(context.Background(), &user.UploadInfo{File: data, Id: id})
+	if err != nil {
+		zap.S().Infof("[UploadImage]:%s", err)
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	ctx.Status(http.StatusOK)
+}
+
+func DownloadImage(ctx *gin.Context) {
+	idStr := ctx.DefaultQuery("id", "0")
+	id, _ := strconv.Atoi(idStr)
+	if id == 0 {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	image, err := global.UserSrvClient.DownLoadImage(context.Background(), &user.DownloadInfo{Id: uint32(id)})
+	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": image,
 	})
 }
 
@@ -53,12 +105,11 @@ func UserRegister(ctx *gin.Context) {
 	}
 	var info *user.UserInfoResponse
 	var err error
-	username := fmt.Sprintf("%05v", rand.New(rand.NewSource(time.Now().UnixNano())).Intn(100000))
 	info, err = global.UserSrvClient.CreateUser(context.Background(), &user.CreateUserInfo{
 		Nickname: register.Nickname,
 		Gender:   ToBool(register.Gender),
-		UserName: username,
-		Password: "12345",
+		UserName: register.Username,
+		Password: register.Password,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{

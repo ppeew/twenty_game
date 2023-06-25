@@ -1,8 +1,9 @@
-package main
+package tests
 
 import (
 	"context"
 	"fmt"
+	"testing"
 	"user_srv/proto/user"
 
 	_ "github.com/mbobakov/grpc-consul-resolver"
@@ -23,7 +24,7 @@ func Init() {
 	userClient = user.NewUserClient(conn)
 }
 
-func TestGetUser() {
+func TestGetUser(t *testing.T) {
 	rsp, err := userClient.GetUserByID(context.Background(), &user.UserIDInfo{
 		Id: 1,
 	})
@@ -49,7 +50,7 @@ func TestGetUser() {
 
 }
 
-func TestCreateUser() {
+func TestCreateUser(t *testing.T) {
 	rsp, err := userClient.CreateUser(context.Background(), &user.CreateUserInfo{
 		Nickname: "ppeew",
 		Gender:   true,
@@ -60,12 +61,4 @@ func TestCreateUser() {
 		panic(err)
 	}
 	fmt.Println(rsp.Id)
-}
-
-func main() {
-	Init()
-	TestCreateUser()
-	TestGetUser()
-
-	conn.Close()
 }

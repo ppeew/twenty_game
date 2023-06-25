@@ -42,4 +42,5 @@ type Room struct {
 	RoomOwner     uint32  `json:"roomOwner"`
 	RoomWait      bool    `json:"roomWait"`
 	Users         []*User `json:"users"`
+	RoomName      string  `json:"roomName"`
 }

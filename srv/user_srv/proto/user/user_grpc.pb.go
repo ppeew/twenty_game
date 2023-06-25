@@ -29,6 +29,10 @@ type UserClient interface {
 	GetUserByUsername(ctx context.Context, in *UserNameInfo, opts ...grpc.CallOption) (*UserInfoResponse, error)
 	// 更改用户信息
 	UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 上传头像文件
+	UploadImage(ctx context.Context, in *UploadInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 下载文件
+	DownLoadImage(ctx context.Context, in *DownloadInfo, opts ...grpc.CallOption) (*DownloadResponse, error)
 	// 查询用户状态
 	GetUserState(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserStateResponse, error)
 	// 修改用户状态
@@ -88,6 +92,24 @@ func (c *userClient) UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ..
 	return out, nil
 }
 
+func (c *userClient) UploadImage(ctx context.Context, in *UploadInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/user.User/UploadImage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DownLoadImage(ctx context.Context, in *DownloadInfo, opts ...grpc.CallOption) (*DownloadResponse, error) {
+	out := new(DownloadResponse)
+	err := c.cc.Invoke(ctx, "/user.User/DownLoadImage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userClient) GetUserState(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserStateResponse, error) {
 	out := new(UserStateResponse)
 	err := c.cc.Invoke(ctx, "/user.User/GetUserState", in, out, opts...)
@@ -120,6 +142,10 @@ type UserServer interface {
 	GetUserByUsername(context.Context, *UserNameInfo) (*UserInfoResponse, error)
 	// 更改用户信息
 	UpdateUser(context.Context, *UpdateUserInfo) (*emptypb.Empty, error)
+	// 上传头像文件
+	UploadImage(context.Context, *UploadInfo) (*emptypb.Empty, error)
+	// 下载文件
+	DownLoadImage(context.Context, *DownloadInfo) (*DownloadResponse, error)
 	// 查询用户状态
 	GetUserState(context.Context, *UserIDInfo) (*UserStateResponse, error)
 	// 修改用户状态
@@ -145,6 +171,12 @@ func (UnimplementedUserServer) GetUserByUsername(context.Context, *UserNameInfo)
 }
 func (UnimplementedUserServer) UpdateUser(context.Context, *UpdateUserInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedUserServer) UploadImage(context.Context, *UploadInfo) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadImage not implemented")
+}
+func (UnimplementedUserServer) DownLoadImage(context.Context, *DownloadInfo) (*DownloadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownLoadImage not implemented")
 }
 func (UnimplementedUserServer) GetUserState(context.Context, *UserIDInfo) (*UserStateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserState not implemented")
@@ -255,6 +287,42 @@ func _User_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_UploadImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UploadImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.User/UploadImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UploadImage(ctx, req.(*UploadInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DownLoadImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DownloadInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DownLoadImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.User/DownLoadImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DownLoadImage(ctx, req.(*DownloadInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_GetUserState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserIDInfo)
 	if err := dec(in); err != nil {
@@ -317,6 +385,14 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUser",
 			Handler:    _User_UpdateUser_Handler,
+		},
+		{
+			MethodName: "UploadImage",
+			Handler:    _User_UploadImage_Handler,
+		},
+		{
+			MethodName: "DownLoadImage",
+			Handler:    _User_DownLoadImage_Handler,
 		},
 		{
 			MethodName: "GetUserState",

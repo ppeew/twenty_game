@@ -65,6 +65,7 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptyp
 		RoomOwner:     in.RoomOwner,
 		RoomWait:      in.RoomWait,
 		Users:         users,
+		RoomName:      in.RoomName,
 	}
 	marshal, _ := json.Marshal(room)
 	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
@@ -98,17 +99,6 @@ func (s *GameServer) SearchRoom(ctx context.Context, in *game.RoomIDInfo) (*game
 		})
 	}
 	return ret, nil
-}
-
-func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
-	del := global.RedisDB.Del(ctx, fmt.Sprintf("%s", NameRoom(in.RoomID)))
-	if del.Err() != nil {
-		return &emptypb.Empty{}, del.Err()
-	}
-	if del.Val() == 0 {
-		return &emptypb.Empty{}, errors.New("没有该房间")
-	}
-	return &emptypb.Empty{}, nil
 }
 
 func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo) (*game.IntoRoomRsp, error) {
@@ -423,6 +413,17 @@ func (s *GameServer) BackRoom(ctx context.Context, in *game.RoomIDInfo) (*emptyp
 	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	if set.Err() != nil {
 		return nil, set.Err()
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
+	del := global.RedisDB.Del(ctx, fmt.Sprintf("%s", NameRoom(in.RoomID)))
+	if del.Err() != nil {
+		return &emptypb.Empty{}, del.Err()
+	}
+	if del.Val() == 0 {
+		return &emptypb.Empty{}, errors.New("没有该房间")
 	}
 	return &emptypb.Empty{}, nil
 }

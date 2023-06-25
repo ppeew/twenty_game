@@ -49,6 +49,7 @@ func CreateRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.DefaultQuery("room_id", "0"))
 	maxUserNumber, _ := strconv.Atoi(ctx.DefaultQuery("max_user_number", "0"))
 	gameCount, _ := strconv.Atoi(ctx.DefaultQuery("game_count", "0"))
+	roomName := ctx.DefaultQuery("room_name", "不知名的房间")
 	//查询房间
 	_, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
 	if err == nil {
@@ -76,6 +77,7 @@ func CreateRoom(ctx *gin.Context) {
 		UserNumber:    0,
 		RoomOwner:     userID,
 		RoomWait:      true,
+		RoomName:      roomName,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
