@@ -9,6 +9,7 @@ type RoomResponse struct {
 	UserNumber    uint32         `json:"userNumber"`
 	RoomOwner     uint32         `json:"roomOwner"`
 	RoomWait      bool           `json:"roomWait"`
+	RoomName      string         `json:"roomName"`
 	Users         []UserResponse `json:"users"`
 }
 

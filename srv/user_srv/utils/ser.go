@@ -28,18 +28,17 @@ func RegistAndHealthCheck(server *grpc.Server, port int) (*api.Client, string) {
 	reg := new(api.AgentServiceRegistration)
 	reg.Name = global.ServerConfig.ConsulInfo.Name //服务name
 	serverID := uuid.NewString()
-	//serverID := uuid.New().String()
 	reg.ID = serverID //服务id
 	reg.Port = port
-	reg.Address = global.ServerConfig.ConsulInfo.ServerHost //消费者访问服务地址
-	//if !global.DEBUG {
-	//	reg.Check = &api.AgentServiceCheck{
-	//		GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, port),
-	//		DeregisterCriticalServiceAfter: "30s",
-	//		Interval:                       "10s",
-	//	}
-	//
-	//}
+	reg.Address = global.ServerConfig.Host //消费者访问服务地址
+	if !global.DEBUG {
+		reg.Check = &api.AgentServiceCheck{
+			GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, port),
+			DeregisterCriticalServiceAfter: "30s",
+			Interval:                       "10s",
+		}
+
+	}
 	err = client.Agent().ServiceRegister(reg)
 	if err != nil {
 		zap.S().Fatalf("[RegistAndHealthCheak]服务注册失败:%s", err.Error())

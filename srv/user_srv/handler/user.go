@@ -14,6 +14,8 @@ import (
 	"user_srv/proto/game"
 	"user_srv/proto/user"
 
+	"google.golang.org/grpc"
+
 	"go.uber.org/zap"
 
 	"github.com/anaskhan96/go-password-encoder"
@@ -138,7 +140,17 @@ func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (
 	}
 	zap.S().Info("插入用户成功，接下来插入物品")
 	//创建用户表成功，接下来为游戏用户添加物品表(跨服务调用,失败采用事务回滚)
-	_, err := global.GameSrvClient.CreateUserItems(ctx, &game.UserItemsInfo{
+	consulInfo := global.ServerConfig.ConsulInfo
+	gameConn, err := grpc.Dial(
+		fmt.Sprintf("consul://%s:%d/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.GameSrvInfo.Name),
+		grpc.WithInsecure(),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
+	)
+	if err != nil {
+		zap.S().Fatal("[InitSrvConn] 连接 【游戏物品服务失败】")
+	}
+	client := game.NewGameClient(gameConn)
+	_, err = client.CreateUserItems(ctx, &game.UserItemsInfo{
 		Id:      u2.ID,
 		Gold:    10000,
 		Diamond: 100,

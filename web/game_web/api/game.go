@@ -8,7 +8,6 @@ import (
 	"game_web/model"
 	"game_web/model/response"
 	game_proto "game_web/proto/game"
-	user_proto "game_web/proto/user"
 	"game_web/utils"
 	"math/rand"
 	"sort"
@@ -92,7 +91,7 @@ func RunGame(roomID uint32) {
 		game.DoDistributeCard()
 		//zap.S().Info("游戏[DoDistributeCard]完成")
 		//抢卡阶段
-		time.Sleep(time.Second * 2)
+		//time.Sleep(time.Second * 2)
 		game.DoListenDistributeCard(6, 8)
 		//zap.S().Info("游戏[DoListenDistributeCard]完成")
 		time.Sleep(time.Second * 2)
@@ -142,9 +141,9 @@ func (game *Game) BackToRoom() {
 	if err != nil {
 		zap.S().Infof("err:%s", err)
 	}
-	for u := range game.Users {
-		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: u, State: RoomIn})
-	}
+	//for u := range game.Users {
+	//	_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: u, State: RoomIn})
+	//}
 	BroadcastToAllGameUsers(game, response.GameOverResponse{MsgType: response.GameOverResponseType})
 	//完成所有环境，退出游戏协程，创建房间协程，回到房间协程来
 	game.exitCancel() //关闭子协程

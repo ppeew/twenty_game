@@ -12,5 +12,5 @@ func InitRoomRouter(group *gin.RouterGroup) {
 	group.GET("getRoomList", middlewares.JWTAuth(), api.GetRoomList, middlewares.FlowEnd())
 	group.POST("createRoom", middlewares.JWTAuth(), api.CreateRoom, middlewares.FlowEnd())
 	group.GET("getRoomInfo", middlewares.JWTAuth(), api.GetRoomInfo, middlewares.FlowEnd())
-	group.PUT("userIntoRoom", middlewares.JWTAuthInParam(), api.UserIntoRoom, middlewares.FlowEnd())
+	group.GET("userIntoRoom", middlewares.JWTAuthInParam(), api.UserIntoRoom, middlewares.FlowEnd())
 }

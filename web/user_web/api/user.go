@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -15,6 +14,8 @@ import (
 	"user_web/middlewares"
 	"user_web/models"
 	"user_web/proto/user"
+
+	"go.uber.org/zap"
 
 	"github.com/DanPlayer/randomname"
 	"github.com/dgrijalva/jwt-go"
@@ -241,6 +242,20 @@ func UserUpdate(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "更改信息成功",
+	})
+}
+
+// 获得用户的状态
+func SelectUserState(ctx *gin.Context) {
+	claims, _ := ctx.Get("claims")
+	userID := claims.(*models.CustomClaims).ID
+	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: userID})
+	if err != nil {
+		zap.S().Warnf("[SelectUserState]:%s", err)
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": state.State,
+		"err":  "",
 	})
 }
 

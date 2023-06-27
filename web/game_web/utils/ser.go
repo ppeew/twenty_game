@@ -22,13 +22,13 @@ func RegistAndHealthCheck() (*api.Client, string) {
 	reg.ID = serverID //服务id
 	reg.Port = global.ServerConfig.Port
 	reg.Address = global.ServerConfig.Host //消费者访问服务地址
-	//if !global.DEBUG {
-	//	reg.Check = &api.AgentServiceCheck{
-	//		HTTP:                           fmt.Sprintf("http://%s:%d/health", global.ServerConfig.Host, global.ServerConfig.Port),
-	//		DeregisterCriticalServiceAfter: "30s",
-	//		Interval:                       "10s",
-	//	}
-	//}
+	if !global.DEBUG {
+		reg.Check = &api.AgentServiceCheck{
+			HTTP:                           fmt.Sprintf("http://%s:%d/health", global.ServerConfig.Host, global.ServerConfig.Port),
+			DeregisterCriticalServiceAfter: "30s",
+			Interval:                       "10s",
+		}
+	}
 	err = client.Agent().ServiceRegister(reg)
 	if err != nil {
 		zap.S().Fatalf("[RegistAndHealthCheak]服务注册失败:%s", err.Error())

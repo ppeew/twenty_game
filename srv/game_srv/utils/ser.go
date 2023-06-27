@@ -30,15 +30,14 @@ func RegistAndHealthCheck(server *grpc.Server, port int) (*api.Client, string) {
 	serverID := uuid.NewString()
 	reg.ID = serverID //服务id
 	reg.Port = port
-	reg.Address = global.ServerConfig.ConsulInfo.ServerHost //消费者访问服务地址
-	//fmt.Println(reg.Address)
-	//if !global.DEBUG {
-	//	reg.Check = &api.AgentServiceCheck{
-	//		GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, port),
-	//		DeregisterCriticalServiceAfter: "30s",
-	//		Interval:                       "10s",
-	//	}
-	//}
+	reg.Address = global.ServerConfig.Host //消费者访问服务地址
+	if !global.DEBUG {
+		reg.Check = &api.AgentServiceCheck{
+			GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, port),
+			DeregisterCriticalServiceAfter: "30s",
+			Interval:                       "10s",
+		}
+	}
 	//fmt.Println(reg.Check.GRPC)
 	err = client.Agent().ServiceRegister(reg)
 	if err != nil {

@@ -9,5 +9,5 @@ import (
 
 func InitCommonRouter(group *gin.RouterGroup) {
 	group.POST("reconnect", middlewares.JWTAuthInParam(), api.Reconnect, middlewares.FlowEnd())
-	group.GET("selectUserState", middlewares.JWTAuth(), api.SelectUserState, middlewares.FlowEnd())
+	//group.GET("selectUserState", middlewares.JWTAuth(), api.SelectUserState, middlewares.FlowEnd())
 }

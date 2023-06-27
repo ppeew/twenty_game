@@ -19,14 +19,21 @@ func main() {
 	initialize.InitSentinel()
 
 	routers := initialize.InitRouters()
-	//服务注册及健康检查
-	consulClient, serverID := utils.RegistAndHealthCheck()
+
+	//自动找可用端口
+	port, err := utils.GetFreePort()
+	if err != nil {
+		panic(err)
+	}
+	global.ServerConfig.Port = port
 
 	go func() {
 		if err := routers.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
 			zap.S().Panic("启动失败:", err.Error())
 		}
 	}()
+	//服务注册及健康检查
+	consulClient, serverID := utils.RegistAndHealthCheck()
 	//终止信号
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)

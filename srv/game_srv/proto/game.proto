@@ -21,13 +21,14 @@ service Game{
   //使用道具(道具类型应该区别)
   rpc UseItem(UseItemInfo) returns(IsOK);
 
-  //房间
+  //查询所有房间
   rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);
+  //创建房间
   rpc CreateRoom(RoomInfo)returns (google.protobuf.Empty);
+  //查询房间
   rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
+  //删除房间
   rpc DeleteRoom(RoomIDInfo)returns (google.protobuf.Empty);
-  // srv层应该提供完成数据库连续操作的加工，web层是不做数据库的处理加工的
-
   // 进入房间
   rpc UserIntoRoom(UserIntoRoomInfo) returns (IntoRoomRsp);
   // 退出房间

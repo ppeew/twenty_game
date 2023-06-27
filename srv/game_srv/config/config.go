@@ -19,10 +19,9 @@ type NacosConfig struct {
 }
 
 type ConsulConfig struct {
-	Name       string `json:"name"` //服务在注册中心的名字
-	Host       string `json:"host"`
-	Port       int    `json:"port"`
-	ServerHost string `json:"server_host"`
+	Name string `json:"name"` //服务在注册中心的名字
+	Host string `json:"host"`
+	Port int    `json:"port"`
 }
 
 type RedisConfig struct {
@@ -32,9 +31,14 @@ type RedisConfig struct {
 	Database int    `json:"database"`
 }
 
+type UserSrvConfig struct {
+	Name string `json:"name"`
+}
+
 type ServerConfig struct {
-	Host       string       `json:"host"`
-	MysqlInfo  MysqlConfig  `json:"mysql"`
-	ConsulInfo ConsulConfig `json:"consul"`
-	RedisInfo  RedisConfig  `json:"redis"`
+	Host        string        `json:"host"`
+	MysqlInfo   MysqlConfig   `json:"mysql"`
+	ConsulInfo  ConsulConfig  `json:"consul"`
+	RedisInfo   RedisConfig   `json:"redis"`
+	UserSrvInfo UserSrvConfig `json:"userSrvInfo"`
 }
