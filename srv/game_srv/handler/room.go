@@ -499,5 +499,5 @@ func (s *GameServer) BackRoom(ctx context.Context, in *game.RoomIDInfo) (*emptyp
 }
 
 func NameRoom(roomID uint32) string {
-	return fmt.Sprintf("Game:roomID%d", roomID)
+	return fmt.Sprintf("Game:roomID:%d", roomID)
 }

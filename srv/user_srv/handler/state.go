@@ -65,5 +65,5 @@ func (s *UserServer) UpdateUserState(ctx context.Context, req *user.UpdateUserSt
 }
 
 func NameState(state uint32) string {
-	return fmt.Sprintf("User:userState%d", state)
+	return fmt.Sprintf("User:userState:%d", state)
 }

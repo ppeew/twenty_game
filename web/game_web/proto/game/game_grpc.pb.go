@@ -20,7 +20,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameClient interface {
-	// 道具
+	// 获得排行榜信息
+	GetRanks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RanksResponse, error)
+	// 更新排行榜
+	UpdateRanks(ctx context.Context, in *UpdateRanksInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 新建用户道具表
 	CreateUserItems(ctx context.Context, in *UserItemsInfo, opts ...grpc.CallOption) (*UserItemsInfoResponse, error)
 	// 查询用户的金币钻石及道具
 	GetUserItemsInfo(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserItemsInfoResponse, error)
@@ -36,10 +40,13 @@ type GameClient interface {
 	UseDiamond(ctx context.Context, in *UseDiamondInfo, opts ...grpc.CallOption) (*IsOK, error)
 	// 使用道具(道具类型应该区别)
 	UseItem(ctx context.Context, in *UseItemInfo, opts ...grpc.CallOption) (*IsOK, error)
-	// 房间
+	// 查询所有房间
 	SearchAllRoom(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllRoomInfo, error)
+	// 创建房间
 	CreateRoom(ctx context.Context, in *RoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 查询房间
 	SearchRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*RoomInfo, error)
+	// 删除房间
 	DeleteRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 进入房间
 	UserIntoRoom(ctx context.Context, in *UserIntoRoomInfo, opts ...grpc.CallOption) (*IntoRoomRsp, error)
@@ -61,6 +68,24 @@ type gameClient struct {
 
 func NewGameClient(cc grpc.ClientConnInterface) GameClient {
 	return &gameClient{cc}
+}
+
+func (c *gameClient) GetRanks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RanksResponse, error) {
+	out := new(RanksResponse)
+	err := c.cc.Invoke(ctx, "/game.Game/GetRanks", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) UpdateRanks(ctx context.Context, in *UpdateRanksInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/game.Game/UpdateRanks", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gameClient) CreateUserItems(ctx context.Context, in *UserItemsInfo, opts ...grpc.CallOption) (*UserItemsInfoResponse, error) {
@@ -229,7 +254,11 @@ func (c *gameClient) BackRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.
 // All implementations must embed UnimplementedGameServer
 // for forward compatibility
 type GameServer interface {
-	// 道具
+	// 获得排行榜信息
+	GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error)
+	// 更新排行榜
+	UpdateRanks(context.Context, *UpdateRanksInfo) (*emptypb.Empty, error)
+	// 新建用户道具表
 	CreateUserItems(context.Context, *UserItemsInfo) (*UserItemsInfoResponse, error)
 	// 查询用户的金币钻石及道具
 	GetUserItemsInfo(context.Context, *UserIDInfo) (*UserItemsInfoResponse, error)
@@ -245,10 +274,13 @@ type GameServer interface {
 	UseDiamond(context.Context, *UseDiamondInfo) (*IsOK, error)
 	// 使用道具(道具类型应该区别)
 	UseItem(context.Context, *UseItemInfo) (*IsOK, error)
-	// 房间
+	// 查询所有房间
 	SearchAllRoom(context.Context, *emptypb.Empty) (*AllRoomInfo, error)
+	// 创建房间
 	CreateRoom(context.Context, *RoomInfo) (*emptypb.Empty, error)
+	// 查询房间
 	SearchRoom(context.Context, *RoomIDInfo) (*RoomInfo, error)
+	// 删除房间
 	DeleteRoom(context.Context, *RoomIDInfo) (*emptypb.Empty, error)
 	// 进入房间
 	UserIntoRoom(context.Context, *UserIntoRoomInfo) (*IntoRoomRsp, error)
@@ -269,6 +301,12 @@ type GameServer interface {
 type UnimplementedGameServer struct {
 }
 
+func (UnimplementedGameServer) GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRanks not implemented")
+}
+func (UnimplementedGameServer) UpdateRanks(context.Context, *UpdateRanksInfo) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRanks not implemented")
+}
 func (UnimplementedGameServer) CreateUserItems(context.Context, *UserItemsInfo) (*UserItemsInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUserItems not implemented")
 }
@@ -334,6 +372,42 @@ type UnsafeGameServer interface {
 
 func RegisterGameServer(s grpc.ServiceRegistrar, srv GameServer) {
 	s.RegisterService(&Game_ServiceDesc, srv)
+}
+
+func _Game_GetRanks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).GetRanks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/game.Game/GetRanks",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).GetRanks(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_UpdateRanks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRanksInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).UpdateRanks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/game.Game/UpdateRanks",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).UpdateRanks(ctx, req.(*UpdateRanksInfo))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Game_CreateUserItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -667,6 +741,14 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "game.Game",
 	HandlerType: (*GameServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetRanks",
+			Handler:    _Game_GetRanks_Handler,
+		},
+		{
+			MethodName: "UpdateRanks",
+			Handler:    _Game_UpdateRanks_Handler,
+		},
 		{
 			MethodName: "CreateUserItems",
 			Handler:    _Game_CreateUserItems_Handler,

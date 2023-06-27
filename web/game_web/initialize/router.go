@@ -20,5 +20,6 @@ func InitRouters() *gin.Engine {
 	router.InitCommonRouter(versionGroup)
 	router.InitRoomRouter(versionGroup)
 	router.InitGameRouter(versionGroup)
+	router.InitRanksRouter(versionGroup)
 	return engine
 }

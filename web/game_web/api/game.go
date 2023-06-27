@@ -132,7 +132,16 @@ func (game *Game) DoEndGame() {
 		MsgType: response.ScoreRankResponseType,
 		Ranks:   ranks,
 	})
-	// 分别给第一名和其他名次玩家发放奖励(第一名发放钻石，第一第二名，发放物品，全部玩家名发放金币) TODO
+	// 分别给第一名和其他名次玩家发放奖励(第一名发放钻石，第一第二名，发放物品，全部玩家名发放金币),计算排行榜 TODO
+	go func() {
+		for i, u := range ranks {
+			global.GameSrvClient.UpdateRanks(context.Background(), &game_proto.UpdateRanksInfo{
+				UserID:       u.UserID,
+				AddScore:     game.UserNumber - uint32(i),
+				AddGametimes: 1,
+			})
+		}
+	}()
 }
 
 func (game *Game) BackToRoom() {
