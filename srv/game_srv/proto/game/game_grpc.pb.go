@@ -19,6 +19,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameClient interface {
+	// 获得重连的服务器信息
+	GetReconnInfo(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*ReconnResponse, error)
 	// 获得排行榜信息
 	GetRanks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RanksResponse, error)
 	// 更新排行榜
@@ -67,6 +69,15 @@ type gameClient struct {
 
 func NewGameClient(cc grpc.ClientConnInterface) GameClient {
 	return &gameClient{cc}
+}
+
+func (c *gameClient) GetReconnInfo(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*ReconnResponse, error) {
+	out := new(ReconnResponse)
+	err := c.cc.Invoke(ctx, "/game.Game/GetReconnInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gameClient) GetRanks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RanksResponse, error) {
@@ -253,6 +264,8 @@ func (c *gameClient) BackRoom(ctx context.Context, in *RoomIDInfo, opts ...grpc.
 // All implementations must embed UnimplementedGameServer
 // for forward compatibility
 type GameServer interface {
+	// 获得重连的服务器信息
+	GetReconnInfo(context.Context, *UserIDInfo) (*ReconnResponse, error)
 	// 获得排行榜信息
 	GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error)
 	// 更新排行榜
@@ -300,6 +313,9 @@ type GameServer interface {
 type UnimplementedGameServer struct {
 }
 
+func (UnimplementedGameServer) GetReconnInfo(context.Context, *UserIDInfo) (*ReconnResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetReconnInfo not implemented")
+}
 func (UnimplementedGameServer) GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRanks not implemented")
 }
@@ -371,6 +387,24 @@ type UnsafeGameServer interface {
 
 func RegisterGameServer(s grpc.ServiceRegistrar, srv GameServer) {
 	s.RegisterService(&Game_ServiceDesc, srv)
+}
+
+func _Game_GetReconnInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserIDInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).GetReconnInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/game.Game/GetReconnInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).GetReconnInfo(ctx, req.(*UserIDInfo))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Game_GetRanks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -740,6 +774,10 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "game.Game",
 	HandlerType: (*GameServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetReconnInfo",
+			Handler:    _Game_GetReconnInfo_Handler,
+		},
 		{
 			MethodName: "GetRanks",
 			Handler:    _Game_GetRanks_Handler,

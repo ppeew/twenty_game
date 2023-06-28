@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"game_srv/global"
 	"game_srv/handler"
 	"game_srv/initialize"
 	"game_srv/proto/game"
@@ -25,6 +26,7 @@ func main() {
 	game.RegisterGameServer(server, &handler.GameServer{})
 
 	port, err := utils.GetFreePort()
+	global.ServerConfig.Port = port
 	if err != nil {
 		zap.S().Fatalf("无法找到适用的端口号:%s", err)
 	}

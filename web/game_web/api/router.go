@@ -125,6 +125,20 @@ func UserIntoRoom(ctx *gin.Context) {
 
 }
 
+// 获得重连服务器信息
+func GetReconnInfo(ctx *gin.Context) {
+	claims, _ := ctx.Get("claims")
+	userID := claims.(*model.CustomClaims).ID
+	info, err := global.GameSrvClient.GetReconnInfo(context.Background(), &game_proto.UserIDInfo{Id: userID})
+	if err != nil {
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"serverInfo": info.ServerInfo,
+	})
+}
+
 // Reconnect 重连游戏服务器
 func Reconnect(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
@@ -159,20 +173,6 @@ func Reconnect(ctx *gin.Context) {
 	UsersState[userID] = model.InitWebSocket(conn, userID)
 	utils.SendMsgToUser(UsersState[userID], "重连服务器成功")
 }
-
-// SelectUserState 查询用户此时状态-->在房间还是游戏还是没进入房间）
-//func SelectUserState(ctx *gin.Context) {
-//	claims, _ := ctx.Get("claims")
-//	userID := claims.(*model.CustomClaims).ID
-//	state, err := global.UserSrvClient.GetUserState(context.Background(), &user_proto.UserIDInfo{Id: userID})
-//	if err != nil {
-//		zap.S().Warnf("[SelectUserState]:%s", err)
-//	}
-//	ctx.JSON(http.StatusOK, gin.H{
-//		"data": state.State,
-//		"err":  "",
-//	})
-//}
 
 // GetRoomInfo 房间信息
 func GetRoomInfo(ctx *gin.Context) {

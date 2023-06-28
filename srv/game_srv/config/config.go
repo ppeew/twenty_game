@@ -37,6 +37,7 @@ type UserSrvConfig struct {
 
 type ServerConfig struct {
 	Host        string        `json:"host"`
+	Port        int           `json:"port"`
 	MysqlInfo   MysqlConfig   `json:"mysql"`
 	ConsulInfo  ConsulConfig  `json:"consul"`
 	RedisInfo   RedisConfig   `json:"redis"`

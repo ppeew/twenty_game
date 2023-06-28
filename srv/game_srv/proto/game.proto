@@ -3,23 +3,11 @@ import "google/protobuf/empty.proto";
 option go_package = "./game;game";
 package game;
 
-message UserRankInfo{
-  uint32 id=1;
-  uint64 score=2;
-  uint64 gametimes=3;
-}
-
-message RanksResponse{
-  repeated UserRankInfo info=1;
-}
-
-message UpdateRanksInfo{
-  uint32 userID=1;
-  uint32 addScore=2;
-  uint32 addGametimes=3;
-}
 
 service Game{
+  //获得重连的服务器信息
+  rpc GetReconnInfo(UserIDInfo)returns(ReconnResponse);
+
   //获得排行榜信息
   rpc GetRanks(google.protobuf.Empty)returns(RanksResponse);
   //更新排行榜
@@ -62,6 +50,26 @@ service Game{
   rpc BeginGame(BeginGameInfo)returns(BeginGameRsp);
   // 回到房间
   rpc BackRoom(RoomIDInfo)returns(google.protobuf.Empty);
+}
+
+message UserRankInfo{
+  uint32 id=1;
+  uint64 score=2;
+  uint64 gametimes=3;
+}
+
+message RanksResponse{
+  repeated UserRankInfo info=1;
+}
+
+message UpdateRanksInfo{
+  uint32 userID=1;
+  uint32 addScore=2;
+  uint32 addGametimes=3;
+}
+
+message ReconnResponse{
+  string serverInfo=1;
 }
 
 message IntoRoomRsp{

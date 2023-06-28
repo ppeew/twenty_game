@@ -3,8 +3,17 @@ import "google/protobuf/empty.proto";
 option go_package = "./game;game";
 package game;
 
+
 service Game{
-  //道具
+  //获得重连的服务器信息
+  rpc GetReconnInfo(UserIDInfo)returns(ReconnResponse);
+
+  //获得排行榜信息
+  rpc GetRanks(google.protobuf.Empty)returns(RanksResponse);
+  //更新排行榜
+  rpc UpdateRanks(UpdateRanksInfo)returns(google.protobuf.Empty);
+
+  //新建用户道具表
   rpc CreateUserItems(UserItemsInfo)returns(UserItemsInfoResponse);
   //查询用户的金币钻石及道具
   rpc GetUserItemsInfo(UserIDInfo) returns(UserItemsInfoResponse);
@@ -21,12 +30,14 @@ service Game{
   //使用道具(道具类型应该区别)
   rpc UseItem(UseItemInfo) returns(IsOK);
 
-  //房间
+  //查询所有房间
   rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);
+  //创建房间
   rpc CreateRoom(RoomInfo)returns (google.protobuf.Empty);
+  //查询房间
   rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
-  // srv层应该提供完成数据库连续操作的加工，web层是不做数据库的处理加工的
-
+  //删除房间
+  rpc DeleteRoom(RoomIDInfo)returns (google.protobuf.Empty);
   // 进入房间
   rpc UserIntoRoom(UserIntoRoomInfo) returns (IntoRoomRsp);
   // 退出房间
@@ -39,6 +50,26 @@ service Game{
   rpc BeginGame(BeginGameInfo)returns(BeginGameRsp);
   // 回到房间
   rpc BackRoom(RoomIDInfo)returns(google.protobuf.Empty);
+}
+
+message UserRankInfo{
+  uint32 id=1;
+  uint64 score=2;
+  uint64 gametimes=3;
+}
+
+message RanksResponse{
+  repeated UserRankInfo info=1;
+}
+
+message UpdateRanksInfo{
+  uint32 userID=1;
+  uint32 addScore=2;
+  uint32 addGametimes=3;
+}
+
+message ReconnResponse{
+  string serverInfo=1;
 }
 
 message IntoRoomRsp{

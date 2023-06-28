@@ -187,6 +187,8 @@ func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo
 			Ready: u.Ready,
 		})
 	}
+	//新建连接的redis服务器信息
+	global.RedisDB.Set(ctx, NameUserReconnInfo(in.UserID), fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port), 0)
 	return &game.IntoRoomRsp{RoomInfo: ret}, nil
 }
 
@@ -219,6 +221,7 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 		//更改全体用户状态
 		for _, info := range room.Users {
 			_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: info.ID, State: OutSide})
+			global.RedisDB.Del(ctx, NameUserReconnInfo(info.ID))
 		}
 		ret := &game.RoomInfo{
 			RoomID:        room.RoomID,
@@ -248,7 +251,9 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 		if set.Err() != nil {
 			return nil, set.Err()
 		}
-		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: in.UserID, State: OutSide})
+		global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: in.UserID, State: OutSide})
+		global.RedisDB.Del(ctx, NameUserReconnInfo(in.UserID))
+
 		ret := &game.RoomInfo{
 			RoomID:        room.RoomID,
 			MaxUserNumber: room.MaxUserNumber,
@@ -304,10 +309,13 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *game.UpdateRoomInfo) (*
 			//不能t自己
 			return nil, errors.New("不可T自己")
 		}
-		for i, user := range room.Users {
-			if user.ID == in.Kicker {
+		for i, u := range room.Users {
+			if u.ID == in.Kicker {
 				room.Users = append(room.Users[:i], room.Users[i+1:]...)
 				room.UserNumber--
+
+				global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: in.Kicker, State: OutSide})
+				global.RedisDB.Del(ctx, NameUserReconnInfo(in.Kicker))
 			}
 		}
 	}
@@ -324,10 +332,10 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *game.UpdateRoomInfo) (*
 		RoomOwner:     room.RoomOwner,
 		RoomWait:      room.RoomWait,
 	}
-	for _, user := range room.Users {
+	for _, u := range room.Users {
 		ret.Users = append(ret.Users, &game.RoomUser{
-			ID:    user.ID,
-			Ready: user.Ready,
+			ID:    u.ID,
+			Ready: u.Ready,
 		})
 	}
 	return ret, nil
@@ -457,10 +465,8 @@ func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*empt
 		return &emptypb.Empty{}, errors.New("没有该房间")
 	}
 	for _, info := range room.Users {
-		_, err := global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: info.ID, State: OutSide})
-		if err != nil {
-			zap.S().Infof("[ReleaseResource]:%s", err)
-		}
+		global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: info.ID, State: OutSide})
+		global.RedisDB.Del(ctx, NameUserReconnInfo(info.ID))
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -500,4 +506,8 @@ func (s *GameServer) BackRoom(ctx context.Context, in *game.RoomIDInfo) (*emptyp
 
 func NameRoom(roomID uint32) string {
 	return fmt.Sprintf("Game:roomID:%d", roomID)
+}
+
+func NameUserReconnInfo(id uint32) string {
+	return fmt.Sprintf("User:reconnInfo:%d", id)
 }
