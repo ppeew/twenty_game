@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 	"user_web/global"
 	"user_web/models"
@@ -24,7 +25,11 @@ func UploadImage(ctx *gin.Context) {
 		return
 	}
 	filePathByte, _ := time.Now().MarshalText()
-	filePath := string(filePathByte) + "." + formFile.Filename
+	filePath := string(filePathByte)
+	filePath = strings.Split(filePath, ".")[0]
+	filePath = strings.Replace(filePath, "T", "/", 1) + "-" + formFile.Filename
+	println(filePath)
+
 	err = ctx.SaveUploadedFile(formFile, filePath)
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError)
