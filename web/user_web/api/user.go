@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -37,49 +36,6 @@ func GetRandomUsername(ctx *gin.Context) {
 	})
 }
 
-func UploadImage(ctx *gin.Context) {
-	claims, _ := ctx.Get("claims")
-	currentUser := claims.(*models.CustomClaims)
-	id := currentUser.ID
-	formFile, err := ctx.FormFile("image")
-	if err != nil {
-		zap.S().Infof("[UploadImage]:%s", err)
-		ctx.Status(http.StatusBadRequest)
-		return
-	}
-	file, err := formFile.Open()
-	if err != nil {
-		zap.S().Infof("[UploadImage]:%s", err)
-		ctx.Status(http.StatusBadRequest)
-		return
-	}
-	data, _ := ioutil.ReadAll(file)
-	_, err = global.UserSrvClient.UploadImage(context.Background(), &user.UploadInfo{File: data, Id: id})
-	if err != nil {
-		zap.S().Infof("[UploadImage]:%s", err)
-		ctx.Status(http.StatusBadRequest)
-		return
-	}
-	ctx.Status(http.StatusOK)
-}
-
-func DownloadImage(ctx *gin.Context) {
-	idStr := ctx.DefaultQuery("id", "0")
-	id, _ := strconv.Atoi(idStr)
-	if id == 0 {
-		ctx.Status(http.StatusBadRequest)
-		return
-	}
-	image, err := global.UserSrvClient.DownLoadImage(context.Background(), &user.DownloadInfo{Id: uint32(id)})
-	if err != nil {
-		ctx.Status(http.StatusBadRequest)
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": image,
-	})
-}
-
 // 查询用户信息,通过id查询
 func GetUserInfo(ctx *gin.Context) {
 	queryID, _ := strconv.Atoi(ctx.Query("id"))
@@ -103,6 +59,7 @@ func UserRegister(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": err.Error(),
 		})
+		return
 	}
 	var info *user.UserInfoResponse
 	var err error
