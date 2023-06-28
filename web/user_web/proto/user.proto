@@ -16,7 +16,7 @@ service User{
   rpc UpdateUser(UpdateUserInfo)returns (google.protobuf.Empty);
 
   //上传头像文件
-  rpc UploadImage(UploadInfo)returns (google.protobuf.Empty);
+  rpc UploadImage(UploadInfo)returns (UploadResponse);
   //下载文件
   rpc DownLoadImage(DownloadInfo)returns (DownloadResponse);
 
@@ -28,7 +28,11 @@ service User{
 
 message UploadInfo{
   uint32 id=1;
-  string file=2;
+  string  path=2;
+}
+
+message UploadResponse{
+  string path=1;
 }
 
 message DownloadInfo{
@@ -36,7 +40,7 @@ message DownloadInfo{
 }
 
 message DownloadResponse{
-  string file=1;
+  string path=1;
 }
 
 message UserStateResponse{

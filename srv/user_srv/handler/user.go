@@ -1,14 +1,10 @@
 package handler
 
 import (
-	"bufio"
 	"context"
 	"crypto/sha512"
 	"fmt"
-	"io"
-	"os"
 	"strings"
-	"time"
 	"user_srv/global"
 	"user_srv/model"
 	"user_srv/proto/game"
@@ -26,83 +22,6 @@ import (
 
 type UserServer struct {
 	user.UnimplementedUserServer
-}
-
-// 上传头像文件
-func (s *UserServer) UploadImage(ctx context.Context, in *user.UploadInfo) (*emptypb.Empty, error) {
-	//先查询用户是否有了头像
-	u := model.User{}
-	first := global.MysqlDB.First(&u, in.Id)
-	if first.RowsAffected != 1 {
-		zap.S().Warnf("[UploadImage]:%s", first.Error)
-		return &emptypb.Empty{}, first.Error
-	}
-	var filePath string
-	if u.Image == "/" {
-		//路径存储到数据库(没头像路径情况下)
-		filePathByte, _ := time.Now().MarshalText()
-		tx := global.MysqlDB.Model(&model.User{}).Where("id=?", in.Id).Update("image", filePathByte)
-		if tx.Error != nil || tx.RowsAffected == 0 {
-			zap.S().Warnf("[UploadImage]:%s", tx.Error)
-			return &emptypb.Empty{}, tx.Error
-		}
-		filePath = "/usr/game_images/" + string(filePathByte)
-	} else {
-		//找到了头像，不需要修改数据库，将磁盘文件更改
-		filePath = "/usr/game_images/" + u.Image
-	}
-
-	//写入服务器磁盘
-	_ = os.MkdirAll("/usr/game_images/", 0666)
-	openFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR, 0666)
-	defer openFile.Close()
-	if err != nil {
-		zap.S().Warnf("[UploadImage]:%s", err)
-		return &emptypb.Empty{}, err
-	}
-	writer := bufio.NewWriter(openFile)
-	_, err = writer.Write(in.File)
-	_ = writer.Flush()
-	return &emptypb.Empty{}, nil
-}
-
-// 下载头像文件
-func (s *UserServer) DownLoadImage(ctx context.Context, in *user.DownloadInfo) (*user.DownloadResponse, error) {
-	//先查询用户是否有了头像
-	u := model.User{}
-	first := global.MysqlDB.First(&u, in.Id)
-	if first.RowsAffected != 1 {
-		zap.S().Warnf("[UploadImage]:%s", first.Error)
-		return &user.DownloadResponse{}, first.Error
-	}
-	_ = os.MkdirAll("/usr/game_images/", 0666)
-	filePath := "/usr/game_images/" + u.Image
-	if u.Image == "/" {
-		//没头像，用默认的
-		filePath = "/usr/game_images/default.jpg"
-	}
-	file, err := os.OpenFile(filePath, os.O_RDONLY, 0666)
-	defer file.Close()
-	if err != nil {
-		zap.S().Warnf("[DownLoadImage]:%s", err)
-		return &user.DownloadResponse{}, err
-	}
-	reader := bufio.NewReader(file)
-	var ret []byte
-	for true {
-		p := make([]byte, 4096)
-		n, err := reader.Read(p)
-		if err != nil {
-			if err == io.EOF {
-				//读到结尾
-				break
-			} else {
-				return &user.DownloadResponse{}, err
-			}
-		}
-		ret = append(ret, p[:n]...)
-	}
-	return &user.DownloadResponse{File: ret}, nil
 }
 
 // 用户注册

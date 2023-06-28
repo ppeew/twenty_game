@@ -2,9 +2,9 @@ package api
 
 import (
 	"context"
-	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 	"user_web/global"
 	"user_web/models"
 	"user_web/proto/user"
@@ -23,14 +23,14 @@ func UploadImage(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	file, err := formFile.Open()
+	filePathByte, _ := time.Now().MarshalText()
+	filePath := string(filePathByte) + "." + formFile.Filename
+	err = ctx.SaveUploadedFile(formFile, filePath)
 	if err != nil {
-		zap.S().Infof("[UploadImage]:%s", err)
-		ctx.Status(http.StatusBadRequest)
+		ctx.Status(http.StatusInternalServerError)
 		return
 	}
-	data, _ := ioutil.ReadAll(file)
-	_, err = global.UserSrvClient.UploadImage(context.Background(), &user.UploadInfo{File: data, Id: id})
+	_, err = global.UserSrvClient.UploadImage(context.Background(), &user.UploadInfo{Id: id, Path: filePath})
 	if err != nil {
 		zap.S().Infof("[UploadImage]:%s", err)
 		ctx.Status(http.StatusBadRequest)
@@ -51,5 +51,5 @@ func DownloadImage(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	ctx.JSON(http.StatusOK, image.File)
+	ctx.JSON(http.StatusOK, image.Path)
 }

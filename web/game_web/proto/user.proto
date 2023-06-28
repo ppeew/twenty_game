@@ -15,10 +15,32 @@ service User{
   //更改用户信息
   rpc UpdateUser(UpdateUserInfo)returns (google.protobuf.Empty);
 
+  //上传头像文件
+  rpc UploadImage(UploadInfo)returns (UploadResponse);
+  //下载文件
+  rpc DownLoadImage(DownloadInfo)returns (DownloadResponse);
+
   //查询用户状态
   rpc GetUserState(UserIDInfo)returns(UserStateResponse);
   //修改用户状态
   rpc UpdateUserState(UpdateUserStateInfo)returns(google.protobuf.Empty);
+}
+
+message UploadInfo{
+  uint32 id=1;
+  string  path=2;
+}
+
+message UploadResponse{
+  string path=1;
+}
+
+message DownloadInfo{
+  uint32 id=1;
+}
+
+message DownloadResponse{
+  string path=1;
 }
 
 message UserStateResponse{

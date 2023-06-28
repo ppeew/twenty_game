@@ -4,7 +4,6 @@ package user
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -31,7 +30,7 @@ type UserClient interface {
 	// 更改用户信息
 	UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 上传头像文件
-	UploadImage(ctx context.Context, in *UploadInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UploadImage(ctx context.Context, in *UploadInfo, opts ...grpc.CallOption) (*UploadResponse, error)
 	// 下载文件
 	DownLoadImage(ctx context.Context, in *DownloadInfo, opts ...grpc.CallOption) (*DownloadResponse, error)
 	// 查询用户状态
@@ -93,8 +92,8 @@ func (c *userClient) UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ..
 	return out, nil
 }
 
-func (c *userClient) UploadImage(ctx context.Context, in *UploadInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *userClient) UploadImage(ctx context.Context, in *UploadInfo, opts ...grpc.CallOption) (*UploadResponse, error) {
+	out := new(UploadResponse)
 	err := c.cc.Invoke(ctx, "/user.User/UploadImage", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -144,7 +143,7 @@ type UserServer interface {
 	// 更改用户信息
 	UpdateUser(context.Context, *UpdateUserInfo) (*emptypb.Empty, error)
 	// 上传头像文件
-	UploadImage(context.Context, *UploadInfo) (*emptypb.Empty, error)
+	UploadImage(context.Context, *UploadInfo) (*UploadResponse, error)
 	// 下载文件
 	DownLoadImage(context.Context, *DownloadInfo) (*DownloadResponse, error)
 	// 查询用户状态
@@ -173,7 +172,7 @@ func (UnimplementedUserServer) GetUserByUsername(context.Context, *UserNameInfo)
 func (UnimplementedUserServer) UpdateUser(context.Context, *UpdateUserInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
-func (UnimplementedUserServer) UploadImage(context.Context, *UploadInfo) (*emptypb.Empty, error) {
+func (UnimplementedUserServer) UploadImage(context.Context, *UploadInfo) (*UploadResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadImage not implemented")
 }
 func (UnimplementedUserServer) DownLoadImage(context.Context, *DownloadInfo) (*DownloadResponse, error) {
