@@ -1,6 +1,6 @@
 package model
 
-// 用户发送websocket通讯的消息体,前端通过传Type字段，服务器知道消息是什么类型，做什么处理
+// 前端发送websocket通讯的消息体,前端通过传Type字段，服务器知道消息是什么类型，做什么处理
 type Message struct {
 	//通用
 	Type        uint32      `json:"type"`

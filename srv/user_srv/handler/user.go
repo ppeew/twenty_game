@@ -163,6 +163,8 @@ func ModelToResponse(u *model.User) *user.UserInfoResponse {
 		UserName: u.UserName,
 		Password: u.Password,
 		Id:       u.ID,
+		Image:    u.Image,
+		State:    u.UserState,
 	}
 	return userInfoRep
 }

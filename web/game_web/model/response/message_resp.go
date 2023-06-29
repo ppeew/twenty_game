@@ -23,16 +23,16 @@ const (
 	ErrMsg
 )
 
-type ErrData struct {
-	MsgType uint32 `json:"msgType"`
-	Error   error  `json:"error"`
-}
-
 // 返回的聊天信息（通用）
 type ChatResponse struct {
 	MsgType     uint32            `json:"msgType"`
 	UserID      uint32            `json:"userID"`
 	ChatMsgData model.ChatMsgData `json:"chatMsgData"`
+}
+
+type ErrData struct {
+	MsgType uint32 `json:"msgType"`
+	Error   error  `json:"error"`
 }
 
 type CheckHealthResponse struct {

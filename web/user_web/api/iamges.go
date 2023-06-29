@@ -41,7 +41,9 @@ func UploadImage(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": "OK",
+	})
 }
 
 func DownloadImage(ctx *gin.Context) {
@@ -56,5 +58,7 @@ func DownloadImage(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	ctx.JSON(http.StatusOK, image.Path)
+	ctx.JSON(http.StatusOK, gin.H{
+		"path": image.Path,
+	})
 }
