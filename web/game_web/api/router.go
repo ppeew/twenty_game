@@ -109,7 +109,6 @@ func UserIntoRoom(ctx *gin.Context) {
 		return
 	}
 	UsersState[userID] = model.InitWebSocket(conn, userID)
-	//_, err = global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: userID, State: RoomIn})
 	if err != nil {
 		zap.S().Warnf("[UserIntoRoom]:%s", err)
 		return

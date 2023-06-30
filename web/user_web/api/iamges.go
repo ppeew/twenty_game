@@ -28,9 +28,8 @@ func UploadImage(ctx *gin.Context) {
 	filePath := string(filePathByte)
 	filePath = strings.Split(filePath, ".")[0]
 	filePath = strings.Replace(filePath, "T", "/", 1) + "-" + formFile.Filename
-	println(filePath)
-
-	err = ctx.SaveUploadedFile(formFile, filePath)
+	prePath := "/opt/images/"
+	err = ctx.SaveUploadedFile(formFile, prePath+filePath)
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError)
 		return

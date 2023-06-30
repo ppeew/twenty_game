@@ -52,7 +52,6 @@ func (ws *WSConn) writeMsgLoop() {
 		err := ws.conn.WriteMessage(websocket.TextMessage, data)
 		if err != nil {
 			//发生错误,关闭连接，停止协程
-			//zap.S().Info("[writeMsgLoop]:用户websocket断开")
 			ws.CloseConn()
 			break
 		}
