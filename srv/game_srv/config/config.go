@@ -41,5 +41,5 @@ type ServerConfig struct {
 	MysqlInfo   MysqlConfig   `json:"mysql"`
 	ConsulInfo  ConsulConfig  `json:"consul"`
 	RedisInfo   RedisConfig   `json:"redis"`
-	UserSrvInfo UserSrvConfig `json:"userSrvInfo"`
+	UserSrvInfo UserSrvConfig `json:"user_srv"`
 }

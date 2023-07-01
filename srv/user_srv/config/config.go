@@ -39,6 +39,6 @@ type ServerConfig struct {
 	Host        string        `json:"host"`
 	MysqlInfo   MysqlConfig   `json:"mysql"`
 	ConsulInfo  ConsulConfig  `json:"consul"`
-	GameSrvInfo GameSrvConfig `json:"gameSrvInfo"`
+	GameSrvInfo GameSrvConfig `json:"game_srv"`
 	RedisInfo   RedisConfig   `json:"redis"`
 }

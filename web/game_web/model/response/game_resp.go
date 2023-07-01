@@ -7,7 +7,6 @@ import (
 
 // 游戏状态信息(玩家卡牌堆，分数信息)
 type GameStateResponse struct {
-	MsgType      uint32                 `json:"msgType"`
 	GameCount    uint32                 `json:"gameCount"` //游戏总回合数
 	GameCurCount uint32                 `json:"gameCurCount"`
 	Users        []UserGameInfoResponse `json:"users"`
@@ -24,7 +23,6 @@ type UserGameInfoResponse struct {
 
 // 使用特殊卡状态信息
 type UseSpecialCardResponse struct {
-	MsgType         uint32               `json:"msgType"`
 	SpecialCardType uint32               `json:"specialCardType"` //使用特殊卡类型
 	UserID          uint32               `json:"userID"`          //使用道具的玩家
 	ChangeCardData  model.ChangeCardData `json:"changeCardData"`
@@ -42,7 +40,6 @@ const (
 
 // 游戏玩家使用道具信息
 type UseItemResponse struct {
-	MsgType     uint32            `json:"msgType"`
 	ItemMsgData model.ItemMsgData `json:"itemMsgData"`
 }
 
@@ -51,24 +48,21 @@ type Info struct {
 	Score  uint32
 }
 
+// 游戏结束分数排行信息
 type ScoreRankResponse struct {
-	MsgType uint32 `json:"msgType"`
-	Ranks   []Info `json:"rank"`
+	Ranks []Info `json:"rank"`
 }
 
 // 游戏结束返回消息体
 type GameOverResponse struct {
-	MsgType uint32 `json:"msgType"`
 }
 
 // 游戏开始抢卡信息体
-type BeginListenDistributeCardResponse struct {
-	MsgType  uint32        `json:"msgType"`
+type GrabCardRoundResponse struct {
 	Duration time.Duration `json:"duration"`
 }
 
 // 游戏开始特殊卡处理信息体
-type BeginHandleSpecialCardResponse struct {
-	MsgType  uint32        `json:"msgType"`
+type SpecialCardRoundResponse struct {
 	Duration time.Duration `json:"duration"`
 }

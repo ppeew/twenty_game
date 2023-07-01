@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="On explicit save action" serverName="11" deleteMissingItems="true" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false" confirmBeforeDeletion="false">
+  <component name="PublishConfigData" autoUpload="On explicit save action" serverName="server1" deleteMissingItems="true" createEmptyFolders="true" confirmBeforeUploading="false" confirmBeforeDeletion="false">
     <option name="confirmBeforeDeletion" value="false" />
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
-      <paths name="11">
+      <paths name="server1">
         <serverdata>
           <mappings>
-            <mapping deploy="/root/twenty_game" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/twenty_game" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

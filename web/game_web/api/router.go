@@ -9,7 +9,6 @@ import (
 	"game_web/model/response"
 	game_proto "game_web/proto/game"
 	user_proto "game_web/proto/user"
-	"game_web/utils"
 	"net/http"
 	"strconv"
 
@@ -42,7 +41,7 @@ var upgrade = websocket.Upgrader{
 }
 
 // UsersState 用户ID -> 用户连接
-var UsersState = make(map[uint32]*model.WSConn)
+var UsersState = make(map[uint32]*WSConn)
 
 // CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息
 func CreateRoom(ctx *gin.Context) {
@@ -74,7 +73,6 @@ func CreateRoom(ctx *gin.Context) {
 	go startRoomThread(uint32(form.RoomID))
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "创建成功",
-		"err":  "",
 	})
 }
 
@@ -108,7 +106,7 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	UsersState[userID] = model.InitWebSocket(conn, userID)
+	UsersState[userID] = InitWebSocket(conn, userID)
 	if err != nil {
 		zap.S().Warnf("[UserIntoRoom]:%s", err)
 		return
@@ -116,12 +114,14 @@ func UserIntoRoom(ctx *gin.Context) {
 	// 告知房间主函数，要创建协程来读取用户信息
 	CHAN[uint32(roomID)] <- userID
 	// 因为房间更新，给所有订阅者发送房间信息
-	BroadcastToAllRoomUsers(room.RoomInfo, GrpcModelToResponse(room.RoomInfo))
-	BroadcastToAllRoomUsers(room.RoomInfo, response.RoomMsgResponse{
-		MsgType: response.RoomMsgResponseType,
-		MsgData: fmt.Sprintf("ID:%d玩家进入房间", userID),
+	BroadcastToAllRoomUsers(room.RoomInfo, response.MessageResponse{
+		MsgType:  response.RoomInfoResponseType,
+		RoomInfo: GrpcModelToResponse(room.RoomInfo),
 	})
-
+	BroadcastToAllRoomUsers(room.RoomInfo, response.MessageResponse{
+		MsgType: response.MsgResponseType,
+		MsgInfo: response.MsgResponse{MsgData: fmt.Sprintf("ID:%d玩家进入房间", userID)},
+	})
 }
 
 // 获得重连服务器信息
@@ -157,7 +157,7 @@ func Reconnect(ctx *gin.Context) {
 		return
 	}
 	if state.State == OutSide {
-		ctx.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"data": "不需要重连",
 		})
 		return
@@ -169,8 +169,11 @@ func Reconnect(ctx *gin.Context) {
 		})
 		return
 	}
-	UsersState[userID] = model.InitWebSocket(conn, userID)
-	utils.SendMsgToUser(UsersState[userID], "重连服务器成功")
+	UsersState[userID] = InitWebSocket(conn, userID)
+	SendMsgToUser(UsersState[userID], response.MessageResponse{
+		MsgType: response.MsgResponseType,
+		MsgInfo: response.MsgResponse{MsgData: "重连服务器成功"},
+	})
 }
 
 // GetRoomInfo 房间信息
@@ -178,7 +181,7 @@ func GetRoomInfo(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"err": err,
 		})
 		return
@@ -186,7 +189,6 @@ func GetRoomInfo(ctx *gin.Context) {
 	resp := GrpcModelToResponse(room)
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": resp,
-		"err":  "",
 	})
 }
 
@@ -206,7 +208,6 @@ func GetRoomList(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": resp,
-		"err":  "",
 	})
 }
 
@@ -223,6 +224,5 @@ func SelectItems(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": info,
-		"err":  "",
 	})
 }

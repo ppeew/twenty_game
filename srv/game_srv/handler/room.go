@@ -97,6 +97,7 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptyp
 		if get.Err() != redis.Nil {
 			return &emptypb.Empty{}, get.Err()
 		}
+		//房间不存在，允许创房
 	}
 	//查看用户状态
 	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: in.RoomOwner})
@@ -105,7 +106,7 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptyp
 		return &emptypb.Empty{}, err
 	}
 	if state.State != OutSide {
-		return &emptypb.Empty{}, err
+		return &emptypb.Empty{}, errors.New("请先退出原先房间或者结束游戏后创房")
 	}
 	if in.RoomID == 0 {
 		return &emptypb.Empty{}, errors.New("无0房间")

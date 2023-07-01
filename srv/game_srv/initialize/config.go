@@ -34,6 +34,8 @@ func InitConfig() {
 	//读取yaml文件，去nacos配置中心找配置文件
 	clientConfig := constant.ClientConfig{
 		NamespaceId: global.NacosConfig.Namespace,
+		Username:    global.NacosConfig.User,
+		Password:    global.NacosConfig.Password,
 	}
 	serverConfigs := []constant.ServerConfig{
 		{
