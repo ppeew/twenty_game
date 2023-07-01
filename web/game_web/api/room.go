@@ -260,8 +260,8 @@ func (roomInfo *Room) ChatProcess(message model.Message) {
 
 func (roomInfo *Room) CheckHealth(message model.Message) {
 	SendMsgToUser(UsersState[message.UserID], response.MessageResponse{
-		MsgType:    response.CheckHealthResponseType,
-		HealthInfo: response.HealthResponse{},
+		MsgType:         response.CheckHealthType,
+		HealthCheckInfo: response.HealthCheck{},
 	})
 }
 

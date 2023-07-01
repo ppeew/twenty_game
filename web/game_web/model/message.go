@@ -20,18 +20,18 @@ type Message struct {
 
 const (
 	// 通用的消息
-	CheckHealthMsg = 1 << iota
-	ChatMsg
+	CheckHealthMsg = 1 << iota //健康检查消息 1
+	ChatMsg                    //聊天消息 2
 	// 房间相关的消息
-	QuitRoomMsg
-	UpdateRoomMsg
-	GetRoomMsg
-	UserReadyStateMsg
-	RoomBeginGameMsg
+	QuitRoomMsg       //用户退出房间消息 4
+	UpdateRoomMsg     //更新房间信息 8
+	GetRoomMsg        //获得房间信息消息 16
+	UserReadyStateMsg //用户准备消息 32
+	RoomBeginGameMsg  //房主开始游戏消息 64
 	// 游戏相关的消息
-	ItemMsg
-	ListenHandleCardMsg
-	UseSpecialCardMsg
+	ItemMsg           //使用游戏道具消息 128
+	GrabCardMsg       //抢卡消息 256
+	UseSpecialCardMsg //使用特殊卡消息 512
 )
 
 type UseSpecialData struct {

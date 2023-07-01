@@ -35,7 +35,7 @@ type Game struct {
 func NewGame(roomID uint32) *Game {
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
 	if err != nil {
-		zap.S().Panic("[RunGame]无法查找到房间信息")
+		zap.S().Warnf("[RunGame]无法查找到房间信息")
 	}
 	rand.Seed(time.Now().Unix())
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -69,6 +69,18 @@ func NewGame(roomID uint32) *Game {
 		go game.ReadGameUserMsg(ctx, roomUser.ID)
 		game.wg.Add(1)
 	}
+	go func(ctx context.Context) {
+		for true {
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.Tick(time.Second * 10):
+				//定时给用户发送心脏包检查
+				BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.CheckHealthType})
+			}
+		}
+	}(ctx)
+	game.wg.Add(1)
 	//等待用户页面初始化完成
 	time.Sleep(time.Second)
 	return game
@@ -244,7 +256,7 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 			//zap.S().Infof("[DoListenDistributeCard]:%+v", msg)
 			switch msg.Type {
 			//只有这类型的消息才处理
-			case model.ListenHandleCardMsg:
+			case model.GrabCardMsg:
 				//每一局用户最多只能抢一张卡，检查
 				if game.Users[msg.UserID].IsGetCard {
 					SendMsgToUser(userInfo, response.MessageResponse{
@@ -345,8 +357,8 @@ func (game *Game) ProcessHealthMsg(todo context.Context) {
 			return
 		case msg := <-game.HealthChan:
 			SendMsgToUser(UsersState[msg.UserID], response.MessageResponse{
-				MsgType:    response.CheckHealthResponseType,
-				HealthInfo: response.HealthResponse{},
+				MsgType:         response.CheckHealthType,
+				HealthCheckInfo: response.HealthCheck{},
 			})
 		}
 	}
@@ -414,7 +426,6 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 	for true {
 		select {
 		case <-ctx.Done():
-			zap.S().Info("[ReadGameUserMsg]退出")
 			game.wg.Done()
 			return
 		case message := <-UsersState[userID].InChanRead():
@@ -427,10 +438,10 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 				//物品信息发到物品管道
 				message.ItemMsgData.UserID = userID
 				game.ItemChan <- message.ItemMsgData
-			case model.CheckHealthMsg:
-				//心脏包
-				message.UserID = userID
-				game.HealthChan <- message
+			//case model.CheckHealthMsg:
+			//	//心脏包
+			//	message.UserID = userID
+			//	game.HealthChan <- message
 			default:
 				//其他信息是通用信息
 				message.UserID = userID
@@ -484,7 +495,7 @@ func (game *Game) HandleChangeCard(msg model.Message) {
 			TargetCard:   msg.UseSpecialData.ChangeCardData.TargetCard,
 		},
 	}
-	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardInfoType, UseSpecialCardInfo: rsp})
+	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: rsp})
 
 }
 
@@ -513,7 +524,7 @@ func (game *Game) HandleUpdateCard(msg model.Message) {
 			UpdateNumber: msg.UseSpecialData.UpdateCardData.UpdateNumber,
 		},
 	}
-	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardInfoType, UseSpecialCardInfo: rsp})
+	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: rsp})
 
 }
 
@@ -546,7 +557,7 @@ func (game *Game) HandleDeleteCard(msg model.Message) {
 			CardID:       msg.UseSpecialData.DeleteCardData.CardID,
 		},
 	}
-	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardInfoType, UseSpecialCardInfo: rsp})
+	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: rsp})
 }
 
 func (game *Game) HandleAddCard(msg model.Message) {
@@ -564,7 +575,7 @@ func (game *Game) HandleAddCard(msg model.Message) {
 			NeedNumber: msg.UseSpecialData.AddCardData.NeedNumber,
 		},
 	}
-	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardInfoType, UseSpecialCardInfo: rsp})
+	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: rsp})
 }
 
 func (game *Game) DropSpecialCard(userID uint32, specialID uint32) {
