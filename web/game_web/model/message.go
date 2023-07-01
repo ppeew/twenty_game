@@ -78,7 +78,6 @@ type GetCardData struct {
 
 // 删除房间结构体
 type QuitRoomData struct {
-	//RoomID uint32 `json:"roomID"`
 }
 
 // 更新房间结构体
@@ -91,7 +90,6 @@ type UpdateData struct {
 
 // 查询房间数据结构体
 type RoomData struct {
-	//RoomID uint32 `json:"roomID"`
 }
 
 // 更新装备状态结构体
@@ -101,5 +99,4 @@ type ReadyStateData struct {
 
 // 开始游戏结构体
 type BeginGameData struct {
-	//RoomID uint32 `json:"roomID"`
 }

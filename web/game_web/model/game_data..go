@@ -17,14 +17,14 @@ type Game struct {
 }
 
 type ChatMsgData struct {
-	UserID uint32
-	Data   []byte //聊天信息
+	UserID uint32 `json:"userID,omitempty"`
+	Data   string `json:"data,omitempty"` //聊天信息
 }
 
 type ItemMsgData struct {
-	UserID       uint32
-	Item         uint32 //使用的物品
-	TargetUserID uint32
+	UserID       uint32 `json:"userID,omitempty"`
+	Item         uint32 `json:"item,omitempty"` //使用的物品
+	TargetUserID uint32 `json:"targetUserID,omitempty"`
 }
 
 type Card struct {
@@ -58,8 +58,8 @@ type BaseCard struct {
 }
 
 type UserGameInfo struct {
-	BaseCards    []BaseCard    //普通卡
-	SpecialCards []SpecialCard //特殊卡
-	IsGetCard    bool          //当前回合已经抢过卡了
-	Score        uint32
+	BaseCards    []BaseCard    `json:"baseCards,omitempty"`    //普通卡
+	SpecialCards []SpecialCard `json:"specialCards,omitempty"` //特殊卡
+	IsGetCard    bool          `json:"isGetCard,omitempty"`    //当前回合已经抢过卡了
+	Score        uint32        `json:"score,omitempty"`
 }

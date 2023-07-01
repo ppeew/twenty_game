@@ -5,8 +5,10 @@ package game;
 
 
 service Game{
-  //获得重连的服务器信息
-  rpc GetReconnInfo(UserIDInfo)returns(ReconnResponse);
+  //获得连接的服务器信息
+  rpc GetConnData(UserIDInfo)returns(ConnResponse);
+  //记录连接的服务器信息
+  rpc RecordConnData(RecordConnInfo)returns(google.protobuf.Empty);
 
   //获得排行榜信息
   rpc GetRanks(google.protobuf.Empty)returns(RanksResponse);
@@ -34,12 +36,12 @@ service Game{
   rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);
   //创建房间
   rpc CreateRoom(RoomInfo)returns (google.protobuf.Empty);
+  // 进入房间
+  rpc UserIntoRoom(UserIntoRoomInfo) returns (IntoRoomRsp);
   //查询房间
   rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
   //删除房间
   rpc DeleteRoom(RoomIDInfo)returns (google.protobuf.Empty);
-  // 进入房间
-  rpc UserIntoRoom(UserIntoRoomInfo) returns (IntoRoomRsp);
   // 退出房间
   rpc QuitRoom(QuitRoomInfo)returns (QuitRsp);
   // 房主更新房间信息
@@ -50,6 +52,15 @@ service Game{
   rpc BeginGame(BeginGameInfo)returns(BeginGameRsp);
   // 回到房间
   rpc BackRoom(RoomIDInfo)returns(google.protobuf.Empty);
+}
+
+message ConnResponse{
+  string serverInfo=1;
+}
+
+message RecordConnInfo{
+  string serverInfo=1;
+  uint32 id=2;
 }
 
 message UserRankInfo{
@@ -66,10 +77,6 @@ message UpdateRanksInfo{
   uint32 userID=1;
   uint32 addScore=2;
   uint32 addGametimes=3;
-}
-
-message ReconnResponse{
-  string serverInfo=1;
 }
 
 message IntoRoomRsp{

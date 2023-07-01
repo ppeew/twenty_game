@@ -11,6 +11,7 @@ import (
 	user_proto "game_web/proto/user"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"google.golang.org/grpc"
 
@@ -43,6 +44,28 @@ var upgrade = websocket.Upgrader{
 // UsersState 用户ID -> 用户连接
 var UsersState = make(map[uint32]*WSConn)
 
+// 建立长连接
+func ConnSocket(ctx *gin.Context) {
+	roomID, _ := strconv.Atoi(ctx.DefaultQuery("room_id", "0"))
+	if roomID == 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "传入room_id不能为0",
+		})
+	}
+	claims, _ := ctx.Get("claims")
+	userID := claims.(*model.CustomClaims).ID
+	// 建立websocket连接
+	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "无法连接房间服务器",
+		})
+		return
+	}
+	UsersState[userID] = InitWebSocket(conn, userID)
+	CHAN[uint32(roomID)] <- userID
+}
+
 // CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息
 func CreateRoom(ctx *gin.Context) {
 	form := forms.CreateRoomForm{}
@@ -58,7 +81,7 @@ func CreateRoom(ctx *gin.Context) {
 		RoomID:        uint32(form.RoomID),
 		MaxUserNumber: uint32(form.MaxUserNumber),
 		GameCount:     uint32(form.GameCount),
-		UserNumber:    0,
+		UserNumber:    1,
 		RoomOwner:     userID,
 		RoomWait:      true,
 		RoomName:      form.RoomName,
@@ -69,8 +92,20 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
+	_, err = global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, form.RoomID),
+		Id:         userID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
 	//启动房间协程
+	CHAN[uint32(form.RoomID)] = make(chan uint32, 10)
 	go startRoomThread(uint32(form.RoomID))
+	//CHAN[uint32(form.RoomID)] <- userID
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "创建成功",
 	})
@@ -98,47 +133,40 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	// 允许进入房间,建立websocket连接
-	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
+	_, err = global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
+		Id:         userID,
+	})
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "无法连接房间服务器",
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"err": err.Error(),
 		})
 		return
 	}
-	UsersState[userID] = InitWebSocket(conn, userID)
-	if err != nil {
-		zap.S().Warnf("[UserIntoRoom]:%s", err)
-		return
-	}
-	// 告知房间主函数，要创建协程来读取用户信息
-	CHAN[uint32(roomID)] <- userID
-	// 因为房间更新，给所有订阅者发送房间信息
-	BroadcastToAllRoomUsers(room.RoomInfo, response.MessageResponse{
-		MsgType:  response.RoomInfoResponseType,
-		RoomInfo: GrpcModelToResponse(room.RoomInfo),
-	})
-	BroadcastToAllRoomUsers(room.RoomInfo, response.MessageResponse{
-		MsgType: response.MsgResponseType,
-		MsgInfo: response.MsgResponse{MsgData: fmt.Sprintf("ID:%d玩家进入房间", userID)},
-	})
+	// 允许进入房间 告知房间主函数，要创建协程来读取用户信息
+	//if CHAN[uint32(roomID)] == nil {
+	//	CHAN[uint32(roomID)] = make(chan uint32, 10)
+	//}
+	//CHAN[uint32(roomID)] <- userID
 }
 
 // 获得重连服务器信息
-func GetReconnInfo(ctx *gin.Context) {
+func GetConnInfo(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	info, err := global.GameSrvClient.GetReconnInfo(context.Background(), &game_proto.UserIDInfo{Id: userID})
+	info, err := global.GameSrvClient.GetConnData(context.Background(), &game_proto.UserIDInfo{Id: userID})
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
+	split := strings.Split(info.ServerInfo, "?")
 	ctx.JSON(http.StatusOK, gin.H{
-		"serverInfo": info.ServerInfo,
+		"serverInfo": split[0],
+		"roomID":     split[1],
 	})
 }
 
-// Reconnect 重连游戏服务器
+// 重连游戏服务器
 func Reconnect(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
@@ -172,7 +200,7 @@ func Reconnect(ctx *gin.Context) {
 	UsersState[userID] = InitWebSocket(conn, userID)
 	SendMsgToUser(UsersState[userID], response.MessageResponse{
 		MsgType: response.MsgResponseType,
-		MsgInfo: response.MsgResponse{MsgData: "重连服务器成功"},
+		MsgInfo: &response.MsgResponse{MsgData: "重连服务器成功"},
 	})
 }
 

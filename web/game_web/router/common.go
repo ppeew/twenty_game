@@ -8,6 +8,6 @@ import (
 )
 
 func InitCommonRouter(group *gin.RouterGroup) {
-	group.GET("reconnect", middlewares.JWTAuthInParam(), api.Reconnect, middlewares.FlowEnd())
-	group.GET("getReconnInfo", middlewares.JWTAuth(), api.GetReconnInfo, middlewares.FlowEnd())
+	group.GET("connectSocket", middlewares.JWTAuthInParam(), api.ConnSocket, middlewares.FlowEnd())
+	group.GET("getConnInfo", middlewares.JWTAuth(), api.GetConnInfo, middlewares.FlowEnd())
 }

@@ -27,7 +27,6 @@ func NewRoom(roomID uint32) *Room {
 		ExitChan: make(chan int, 3),
 		wg:       sync.WaitGroup{},
 	}
-	CHAN[roomID] = make(chan uint32, 10)
 	return room
 }
 
@@ -37,44 +36,47 @@ func startRoomThread(roomID uint32) {
 	room := NewRoom(roomID)
 	dealFunc := NewDealFunc(room)
 	ctx, cancel := context.WithCancel(context.Background())
-	searchRoom, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
-	if err != nil {
-		//zap.S().Infof("[startRoomThread]:%s", err)
-		cancel()
-		return
-	}
-	//BroadcastToAllRoomUsers(searchRoom, GrpcModelToResponse(searchRoom))
-	for _, info := range searchRoom.Users {
-		go room.ReadRoomUserMsg(ctx, info.ID)
-		room.wg.Add(1)
-	}
 	go func(ctx context.Context) {
 		room.wg.Add(1)
 		for true {
 			select {
 			case userID := <-CHAN[roomID]:
-				go room.ReadRoomUserMsg(ctx, userID)
 				room.wg.Add(1)
+				go room.ReadRoomUserMsg(ctx, userID)
 			case <-ctx.Done():
 				room.wg.Done()
 				return
 			}
 		}
 	}(ctx)
+	//TODO bug:用户没进房就给其发送信息 nil指针
+	//go func(ctx context.Context) {
+	//	room.wg.Add(1)
+	//	for true {
+	//		select {
+	//		case <-ctx.Done():
+	//			return
+	//		case <-time.Tick(time.Second * 5):
+	//			//定时给用户发送心脏包检查
+	//			room, _ := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
+	//			for _, info := range room.Users {
+	//				_ = UsersState[info.ID].OutChanWrite(response.MessageResponse{MsgType: response.CheckHealthType})
+	//			}
+	//		}
+	//	}
+	//}(ctx)
 	for {
 		select {
 		case msg := <-room.MsgChan:
-			//zap.S().Infof("收到%+v", msg)
-			if msg.Type >= model.QuitRoomMsg && msg.Type <= model.RoomBeginGameMsg {
-				//只有这类消息才处理
+			fmt.Println(msg)
+			if dealFunc[msg.Type] != nil {
 				dealFunc[msg.Type](msg)
 			}
 		case msg := <-room.ExitChan:
 			// 停止信号，关闭主函数及读取用户通道函数，优雅退出
 			cancel()
-			//zap.S().Info("[startRoomThread]]:wg正在等待其他协程结束")
 			room.wg.Wait()
-			//zap.S().Info("[startRoomThread]]:其他协程已关闭")
+			zap.S().Info("[startRoomThread]]:其他协程已关闭")
 			if msg == model.RoomQuit {
 				return
 			} else if msg == model.GameStart {
@@ -88,21 +90,23 @@ func startRoomThread(roomID uint32) {
 // ReadRoomUserMsg 读取发送到房间的信息入管道
 func (roomInfo *Room) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 	for true {
+		//fmt.Printf("[ReadRoomUserMsg] %+v,%+v,%+v\n", UsersState, userID, UsersState[userID])
 		select {
 		case <-ctx.Done():
 			roomInfo.wg.Done()
 			return
 		case message := <-UsersState[userID].InChanRead():
+			//println("[ReadRoomUserMsg] ", message)
 			message.UserID = userID //添加标识，能够识别用户
 			roomInfo.MsgChan <- message
 		case <-UsersState[userID].IsDisConn():
 			//如果与用户的websocket断开，退出读取协程,并且将该玩家从房间剔除
 			zap.S().Infof("[ReadRoomUserMsg]:%d用户掉线了", userID)
 			roomInfo.wg.Done()
-			roomInfo.MsgChan <- model.Message{
-				Type:   model.QuitRoomMsg,
-				UserID: userID,
-			}
+			//roomInfo.MsgChan <- model.Message{
+			//	Type:   model.QuitRoomMsg,
+			//	UserID: userID,
+			//}
 			return
 		}
 	}
@@ -110,15 +114,17 @@ func (roomInfo *Room) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 
 // RoomInfo 房间信息
 func (roomInfo *Room) RoomInfo(message model.Message) {
+	fmt.Println("[RoomInfo]")
 	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomInfo.RoomID})
 	if err != nil {
 		zap.S().Error("[RoomInfo]:%s", err)
 		return
 	}
+	zap.S().Info("[RoomInfo]:收到信息，正在回传")
 	resp := GrpcModelToResponse(room)
 	SendMsgToUser(UsersState[message.UserID], response.MessageResponse{
 		MsgType:  response.RoomInfoResponseType,
-		RoomInfo: resp,
+		RoomInfo: &resp,
 	})
 }
 
@@ -136,12 +142,12 @@ func (roomInfo *Room) QuitRoom(message model.Message) {
 		// 房主退出会销毁房间
 		SendMsgToUser(UsersState[message.UserID], response.MessageResponse{
 			MsgType: response.MsgResponseType,
-			MsgInfo: response.MsgResponse{
+			MsgInfo: &response.MsgResponse{
 				MsgData: "房主退出房间成功",
 			}})
 		BroadcastToAllRoomUsers(info.RoomInfo, response.MessageResponse{
 			MsgType: response.MsgResponseType,
-			MsgInfo: response.MsgResponse{
+			MsgInfo: &response.MsgResponse{
 				MsgData: "房主退出房间，房间将关闭",
 			},
 		})
@@ -158,7 +164,7 @@ func (roomInfo *Room) QuitRoom(message model.Message) {
 		resp := GrpcModelToResponse(info.RoomInfo)
 		BroadcastToAllRoomUsers(info.RoomInfo, response.MessageResponse{
 			MsgType:  response.RoomInfoResponseType,
-			RoomInfo: resp,
+			RoomInfo: &resp,
 		})
 	}
 }
@@ -179,7 +185,7 @@ func (roomInfo *Room) UpdateRoom(message model.Message) {
 	if message.UpdateData.Kicker != 0 {
 		//发送给被t的玩家
 		SendMsgToUser(UsersState[message.UpdateData.Kicker], response.MessageResponse{
-			MsgType: response.KickerResponseType, KickerInfo: response.KickerResponse{},
+			MsgType: response.KickerResponseType, KickerInfo: &response.KickerResponse{},
 		})
 		//t人了还需要关闭房间里面的连接(等待一段时间再关闭连接，为了被t的玩家已经收到被t信息了)
 		time.Sleep(1 * time.Second)
@@ -187,7 +193,7 @@ func (roomInfo *Room) UpdateRoom(message model.Message) {
 	}
 	SendMsgToUser(UsersState[message.UserID], response.MessageResponse{
 		MsgType: response.MsgResponseType,
-		MsgInfo: response.MsgResponse{
+		MsgInfo: &response.MsgResponse{
 			MsgData: "更新房间成功",
 		},
 	})
@@ -195,7 +201,7 @@ func (roomInfo *Room) UpdateRoom(message model.Message) {
 	resp := GrpcModelToResponse(room)
 	BroadcastToAllRoomUsers(room, response.MessageResponse{
 		MsgType:  response.RoomInfoResponseType,
-		RoomInfo: resp,
+		RoomInfo: &resp,
 	})
 }
 
@@ -212,14 +218,14 @@ func (roomInfo *Room) UpdateUserReadyState(message model.Message) {
 	}
 	SendMsgToUser(UsersState[message.UserID], response.MessageResponse{
 		MsgType: response.MsgResponseType,
-		MsgInfo: response.MsgResponse{
+		MsgInfo: &response.MsgResponse{
 			MsgData: fmt.Sprintf("玩家%d准备状态更新", message.UserID),
 		},
 	})
 	resp := GrpcModelToResponse(room)
 	BroadcastToAllRoomUsers(room, response.MessageResponse{
 		MsgType:  response.RoomInfoResponseType,
-		RoomInfo: resp,
+		RoomInfo: &resp,
 	})
 }
 
@@ -236,7 +242,7 @@ func (roomInfo *Room) BeginGame(message model.Message) {
 	if room.ErrorMsg != "" {
 		SendMsgToUser(UsersState[message.UserID], response.MessageResponse{
 			MsgType: response.MsgResponseType,
-			MsgInfo: response.MsgResponse{
+			MsgInfo: &response.MsgResponse{
 				MsgData: room.ErrorMsg,
 			},
 		})
@@ -252,7 +258,7 @@ func (roomInfo *Room) ChatProcess(message model.Message) {
 	}
 	BroadcastToAllRoomUsers(room, response.MessageResponse{
 		MsgType: response.MsgResponseType,
-		MsgInfo: response.MsgResponse{
+		MsgInfo: &response.MsgResponse{
 			MsgData: fmt.Sprintf("用户%d说：%s", message.UserID, string(message.ChatMsgData.Data)),
 		},
 	})
@@ -261,7 +267,7 @@ func (roomInfo *Room) ChatProcess(message model.Message) {
 func (roomInfo *Room) CheckHealth(message model.Message) {
 	SendMsgToUser(UsersState[message.UserID], response.MessageResponse{
 		MsgType:         response.CheckHealthType,
-		HealthCheckInfo: response.HealthCheck{},
+		HealthCheckInfo: &response.HealthCheck{},
 	})
 }
 

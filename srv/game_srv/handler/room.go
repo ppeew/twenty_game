@@ -112,6 +112,7 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptyp
 		return &emptypb.Empty{}, errors.New("无0房间")
 	}
 	var users []*model.User
+	users = append(users, &model.User{ID: in.RoomOwner, Ready: false})
 	room := model.Room{
 		RoomID:        in.RoomID,
 		MaxUserNumber: in.MaxUserNumber,
@@ -127,6 +128,9 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptyp
 	if set.Err() != nil {
 		return &emptypb.Empty{}, set.Err()
 	}
+	_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: in.RoomOwner, State: RoomIn})
+	//新建连接的redis服务器信息
+	global.RedisDB.Set(ctx, NameUserReconnInfo(in.RoomOwner), fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port), 0)
 	return &emptypb.Empty{}, nil
 }
 

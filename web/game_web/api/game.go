@@ -74,7 +74,7 @@ func NewGame(roomID uint32) *Game {
 			select {
 			case <-ctx.Done():
 				return
-			case <-time.Tick(time.Second * 10):
+			case <-time.Tick(time.Second * 3):
 				//定时给用户发送心脏包检查
 				BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.CheckHealthType})
 			}
@@ -140,7 +140,7 @@ func (game *Game) DoEndGame() {
 	})
 	BroadcastToAllGameUsers(game, response.MessageResponse{
 		MsgType: response.ScoreRankResponseType,
-		ScoreRankInfo: response.ScoreRankResponse{
+		ScoreRankInfo: &response.ScoreRankResponse{
 			Ranks: ranks,
 		},
 	})
@@ -161,7 +161,7 @@ func (game *Game) BackToRoom() {
 	global.GameSrvClient.BackRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: game.RoomID})
 	BroadcastToAllGameUsers(game, response.MessageResponse{
 		MsgType:      response.GameOverResponseType,
-		GameOverInfo: response.GameOverResponse{},
+		GameOverInfo: &response.GameOverResponse{},
 	})
 	//完成所有环境，退出游戏协程，创建房间协程，回到房间协程来
 	game.exitCancel() //关闭子协程
@@ -201,7 +201,7 @@ func (game *Game) DoHandleSpecialCard(min, max int) {
 	duration := time.Duration(rand.Intn(max-min)+min) * time.Second
 	BroadcastToAllGameUsers(game, response.MessageResponse{
 		MsgType: response.SpecialCardRoundResponseType,
-		SpecialCardRoundInfo: response.SpecialCardRoundResponse{
+		SpecialCardRoundInfo: &response.SpecialCardRoundResponse{
 			Duration: duration,
 		},
 	})
@@ -245,7 +245,7 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 	after := time.After(duration)
 	BroadcastToAllGameUsers(game, response.MessageResponse{
 		MsgType: response.GrabCardRoundResponseType,
-		GrabCardRoundInfo: response.GrabCardRoundResponse{
+		GrabCardRoundInfo: &response.GrabCardRoundResponse{
 			Duration: duration,
 		},
 	})
@@ -261,7 +261,7 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 				if game.Users[msg.UserID].IsGetCard {
 					SendMsgToUser(userInfo, response.MessageResponse{
 						MsgType: response.MsgResponseType,
-						MsgInfo: response.MsgResponse{MsgData: "一回合最多抢一次卡噢！"},
+						MsgInfo: &response.MsgResponse{MsgData: "一回合最多抢一次卡噢！"},
 					})
 				} else {
 					data := msg.GetCardData
@@ -283,14 +283,14 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 					if isOK {
 						SendMsgToUser(userInfo, response.MessageResponse{
 							MsgType: response.MsgResponseType,
-							MsgInfo: response.MsgResponse{MsgData: "抢到卡了！"},
+							MsgInfo: &response.MsgResponse{MsgData: "抢到卡了！"},
 						})
 						resp := CardModelToResponse(game)
 						BroadcastToAllGameUsers(game, resp)
 					} else {
 						SendMsgToUser(userInfo, response.MessageResponse{
 							MsgType: response.MsgResponseType,
-							MsgInfo: response.MsgResponse{MsgData: "没抢到卡~~~"},
+							MsgInfo: &response.MsgResponse{MsgData: "没抢到卡~~~"},
 						})
 					}
 				}
@@ -358,7 +358,7 @@ func (game *Game) ProcessHealthMsg(todo context.Context) {
 		case msg := <-game.HealthChan:
 			SendMsgToUser(UsersState[msg.UserID], response.MessageResponse{
 				MsgType:         response.CheckHealthType,
-				HealthCheckInfo: response.HealthCheck{},
+				HealthCheckInfo: &response.HealthCheck{},
 			})
 		}
 	}
@@ -395,7 +395,7 @@ func (game *Game) ProcessItemMsg(todo context.Context) {
 					TargetUserID: item.TargetUserID,
 				},
 			}
-			BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseItemResponseType, UseItemInfo: rsp})
+			BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseItemResponseType, UseItemInfo: &rsp})
 		}
 	}
 }
@@ -416,7 +416,7 @@ func (game *Game) ProcessChatMsg(todo context.Context) {
 					Data:   chat.Data,
 				},
 			}
-			BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.ChatResponseType, ChatInfo: rsp})
+			BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.ChatResponseType, ChatInfo: &rsp})
 		}
 	}
 }
@@ -495,7 +495,7 @@ func (game *Game) HandleChangeCard(msg model.Message) {
 			TargetCard:   msg.UseSpecialData.ChangeCardData.TargetCard,
 		},
 	}
-	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: rsp})
+	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: &rsp})
 
 }
 
@@ -524,7 +524,7 @@ func (game *Game) HandleUpdateCard(msg model.Message) {
 			UpdateNumber: msg.UseSpecialData.UpdateCardData.UpdateNumber,
 		},
 	}
-	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: rsp})
+	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: &rsp})
 
 }
 
@@ -557,7 +557,7 @@ func (game *Game) HandleDeleteCard(msg model.Message) {
 			CardID:       msg.UseSpecialData.DeleteCardData.CardID,
 		},
 	}
-	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: rsp})
+	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: &rsp})
 }
 
 func (game *Game) HandleAddCard(msg model.Message) {
@@ -575,7 +575,7 @@ func (game *Game) HandleAddCard(msg model.Message) {
 			NeedNumber: msg.UseSpecialData.AddCardData.NeedNumber,
 		},
 	}
-	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: rsp})
+	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: &rsp})
 }
 
 func (game *Game) DropSpecialCard(userID uint32, specialID uint32) {
@@ -625,7 +625,7 @@ func CardModelToResponse(game *Game) response.MessageResponse {
 		Users:        users,
 		RandCard:     game.RandCard,
 	}
-	return response.MessageResponse{MsgType: response.GameStateResponseType, GameStateInfo: info}
+	return response.MessageResponse{MsgType: response.GameStateResponseType, GameStateInfo: &info}
 }
 
 type HandlerCard func(model.Message)

@@ -6,22 +6,22 @@ import "game_web/model"
 type MessageResponse struct {
 	MsgType uint32 `json:"msgType"`
 	//通用信息
-	HealthCheckInfo HealthCheck  `json:"healthCheckInfo"`
-	ChatInfo        ChatResponse `json:"chatInfo"`
-	ErrInfo         ErrResponse  `json:"errInfo"`
-	MsgInfo         MsgResponse  `json:"msgInfo"`
+	HealthCheckInfo *HealthCheck  `json:"healthCheckInfo,omitempty"`
+	ChatInfo        *ChatResponse `json:"chatInfo,omitempty"`
+	ErrInfo         *ErrResponse  `json:"errInfo,omitempty"`
+	MsgInfo         *MsgResponse  `json:"msgInfo,omitempty"`
 	//游戏信息
-	GameStateInfo        GameStateResponse        `json:"gameStateInfo"`
-	UserGameInfo         UserGameInfoResponse     `json:"userGameInfo"`
-	UseSpecialCardInfo   UseSpecialCardResponse   `json:"useSpecialCardInfo"`
-	UseItemInfo          UseItemResponse          `json:"useItemInfo"`
-	ScoreRankInfo        ScoreRankResponse        `json:"scoreRankInfo"`
-	GameOverInfo         GameOverResponse         `json:"gameOverInfo"`
-	GrabCardRoundInfo    GrabCardRoundResponse    `json:"grabCardRoundInfo"`
-	SpecialCardRoundInfo SpecialCardRoundResponse `json:"specialCardRoundInfo"`
+	GameStateInfo        *GameStateResponse        `json:"gameStateInfo,omitempty"`
+	UserGameInfo         *UserGameInfoResponse     `json:"userGameInfo,omitempty"`
+	UseSpecialCardInfo   *UseSpecialCardResponse   `json:"useSpecialCardInfo,omitempty"`
+	UseItemInfo          *UseItemResponse          `json:"useItemInfo,omitempty"`
+	ScoreRankInfo        *ScoreRankResponse        `json:"scoreRankInfo,omitempty"`
+	GameOverInfo         *GameOverResponse         `json:"gameOverInfo,omitempty"`
+	GrabCardRoundInfo    *GrabCardRoundResponse    `json:"grabCardRoundInfo,omitempty"`
+	SpecialCardRoundInfo *SpecialCardRoundResponse `json:"specialCardRoundInfo,omitempty"`
 	//房间信息
-	RoomInfo   RoomResponse   `json:"roomInfo"`
-	KickerInfo KickerResponse `json:"kickerInfo"`
+	RoomInfo   *RoomResponse   `json:"roomInfo,omitempty"`
+	KickerInfo *KickerResponse `json:"kickerInfo,omitempty"`
 }
 
 const (

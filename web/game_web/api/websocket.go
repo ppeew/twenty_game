@@ -7,6 +7,8 @@ import (
 	"game_web/model/response"
 	"sync"
 
+	"go.uber.org/zap"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -38,13 +40,16 @@ func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 // 协程接受客户端msg
 func (ws *WSConn) readMsgLoop() {
 	for true {
+		println("[readMsgLoop]")
 		data := model.Message{}
 		err := ws.conn.ReadJSON(&data)
 		if err != nil {
+			zap.S().Warnf("[readMsgLoop]:%s", err)
 			//发生错误,关闭连接，停止协程
 			ws.CloseConn()
 			break
 		}
+		zap.S().Infof("[readMsgLoop]读到:%v", data)
 		ws.inChan <- data
 	}
 }
@@ -94,7 +99,7 @@ func SendErrToUser(ws *WSConn, handlerFunc string, error error) {
 	if error != nil {
 		errRsp := response.MessageResponse{
 			MsgType: response.ErrResponseMsgType,
-			ErrInfo: response.ErrResponse{Error: errors.New(fmt.Sprintf("[%s]:%s", handlerFunc, error))},
+			ErrInfo: &response.ErrResponse{Error: errors.New(fmt.Sprintf("[%s]:%s", handlerFunc, error))},
 		}
 		_ = ws.OutChanWrite(errRsp)
 	}
