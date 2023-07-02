@@ -1,12 +1,10 @@
 package model
 
 type ChatMsgData struct {
-	UserID uint32 `json:"userID,omitempty"`
-	Data   string `json:"data,omitempty"` //聊天信息
+	Data string `json:"data,omitempty"` //聊天信息
 }
 
 type ItemMsgData struct {
-	UserID       uint32 `json:"userID,omitempty"`
 	Item         uint32 `json:"item,omitempty"` //使用的物品
 	TargetUserID uint32 `json:"targetUserID,omitempty"`
 }

@@ -94,7 +94,9 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 	//TODO 检查用户是否已经有创房的服务器链接了
 
 	var users []*model.User
-	users = append(users, &model.User{ID: in.RoomOwner, Ready: false})
+	for _, user := range in.Users {
+		users = append(users, &model.User{ID: user.ID, Ready: user.Ready})
+	}
 	room := model.Room{
 		RoomID:        in.RoomID,
 		MaxUserNumber: in.MaxUserNumber,

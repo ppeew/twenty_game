@@ -17,15 +17,15 @@ import (
 
 type GameStruct struct {
 	Users        map[uint32]*model.UserGameInfo
-	CurrentCount uint32                 //当前是第几回合
-	CommonChan   chan model.Message     //游戏逻辑管道
-	ChatChan     chan model.ChatMsgData //聊天管道
-	ItemChan     chan model.ItemMsgData //使用物品管道
-	HealthChan   chan model.Message     //心脏包管道
-	MakeCardID   uint32                 //依次生成卡的id
-	RandCard     []model.Card           //卡id->卡信息(包含特殊和普通卡)
-	exitCancel   context.CancelFunc     //负责退出
-	wg           sync.WaitGroup         //等待其他协程退出
+	CurrentCount uint32             //当前是第几回合
+	CommonChan   chan model.Message //游戏逻辑管道
+	ChatChan     chan model.Message //聊天管道
+	ItemChan     chan model.Message //使用物品管道
+	HealthChan   chan model.Message //心脏包管道
+	MakeCardID   uint32             //依次生成卡的id
+	RandCard     []model.Card       //卡id->卡信息(包含特殊和普通卡)
+	exitCancel   context.CancelFunc //负责退出
+	wg           sync.WaitGroup     //等待其他协程退出
 
 	GameData GameData
 }
@@ -78,8 +78,8 @@ func NewGame(data GameData) *GameStruct {
 		Users:        make(map[uint32]*model.UserGameInfo),
 		CurrentCount: 0,
 		CommonChan:   make(chan model.Message, 1024),
-		ChatChan:     make(chan model.ChatMsgData, 1024),
-		ItemChan:     make(chan model.ItemMsgData, 1024),
+		ChatChan:     make(chan model.Message, 1024),
+		ItemChan:     make(chan model.Message, 1024),
 		HealthChan:   make(chan model.Message, 1024),
 		exitCancel:   cancelFunc,
 		wg:           sync.WaitGroup{},
@@ -367,17 +367,17 @@ func (game *GameStruct) ProcessItemMsg(todo context.Context) {
 			//zap.S().Info("[ProcessItemMsg]退出")
 			game.wg.Done()
 			return
-		case item := <-game.ItemChan:
-			userInfo := UsersConn[item.UserID]
+		case msg := <-game.ItemChan:
+			userInfo := UsersConn[msg.UserID]
 			items := make([]uint32, 2)
-			switch game_proto.Type(item.Item) {
+			switch game_proto.Type(msg.ItemMsgData.Item) {
 			case game_proto.Type_Apple:
 				items[game_proto.Type_Apple] = 1
 			case game_proto.Type_Banana:
 				items[game_proto.Type_Banana] = 1
 			}
 			isOk, err := global.GameSrvClient.UseItem(context.Background(), &game_proto.UseItemInfo{
-				Id:    item.UserID,
+				Id:    msg.UserID,
 				Items: items,
 			})
 			if isOk.IsOK == false {
@@ -386,9 +386,8 @@ func (game *GameStruct) ProcessItemMsg(todo context.Context) {
 			//处理用户的物品使用,广播所有用户
 			rsp := response.UseItemResponse{
 				ItemMsgData: model.ItemMsgData{
-					UserID:       item.UserID,
-					Item:         item.Item,
-					TargetUserID: item.TargetUserID,
+					Item:         msg.ItemMsgData.Item,
+					TargetUserID: msg.ItemMsgData.TargetUserID,
 				},
 			}
 			BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseItemResponseType, UseItemInfo: &rsp})
@@ -403,13 +402,12 @@ func (game *GameStruct) ProcessChatMsg(todo context.Context) {
 			//zap.S().Info("[ProcessChatMsg]退出")
 			game.wg.Done()
 			return
-		case chat := <-game.ChatChan:
+		case msg := <-game.ChatChan:
 			//处理用户的聊天消息,广播所有用户
 			rsp := response.ChatResponse{
-				UserID: chat.UserID,
+				UserID: msg.UserID,
 				ChatMsgData: model.ChatMsgData{
-					UserID: chat.UserID,
-					Data:   chat.Data,
+					Data: msg.ChatMsgData.Data,
 				},
 			}
 			BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.ChatResponseType, ChatInfo: &rsp})
@@ -428,12 +426,12 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 			switch message.Type {
 			case model.ChatMsg:
 				//聊天信息发到聊天管道
-				message.ChatMsgData.UserID = userID
-				game.ChatChan <- message.ChatMsgData
+				message.UserID = userID
+				game.ChatChan <- message
 			case model.ItemMsg:
 				//物品信息发到物品管道
-				message.ItemMsgData.UserID = userID
-				game.ItemChan <- message.ItemMsgData
+				message.UserID = userID
+				game.ItemChan <- message
 			//case model.CheckHealthMsg:
 			//	//心脏包
 			//	message.UserID = userID
