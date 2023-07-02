@@ -6,7 +6,7 @@ import "game_web/model"
 type MessageResponse struct {
 	MsgType uint32 `json:"msgType"`
 	//通用信息
-	HealthCheckInfo *HealthCheck  `json:"healthCheckInfo,omitempty"`
+	HealthCheckInfo *HealthCheck  `json:"healthCheckInfo,omitempty"` //服务器发送的健康检查包
 	ChatInfo        *ChatResponse `json:"chatInfo,omitempty"`
 	ErrInfo         *ErrResponse  `json:"errInfo,omitempty"`
 	MsgInfo         *MsgResponse  `json:"msgInfo,omitempty"`

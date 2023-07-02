@@ -3,17 +3,17 @@ package model
 // 前端发送websocket通讯的消息体,前端通过传Type字段，服务器知道消息是什么类型，做什么处理
 type Message struct {
 	//通用
-	Type        uint32      `json:"type"`
-	UserID      uint32      `json:"userID"`
-	ChatMsgData ChatMsgData `json:"chatMsgInfo"`
+	Type        uint32      `json:"type,omitempty"`
+	UserID      uint32      `json:"userID,omitempty"`
+	ChatMsgData ChatMsgData `json:"chatMsgData"`
 	//房间
-	QuitRoomData   QuitRoomData   `json:"deleteData"`
+	QuitRoomData   QuitRoomData   `json:"quitRoomData"`
 	UpdateData     UpdateData     `json:"updateData"`
 	RoomData       RoomData       `json:"roomData"`
-	ReadyStateData ReadyStateData `json:"readyState"`
-	BeginGameData  BeginGameData  `json:"beginGame"`
+	ReadyStateData ReadyStateData `json:"readyStateData"`
+	BeginGameData  BeginGameData  `json:"beginGameData"`
 	//游戏
-	ItemMsgData    ItemMsgData    `json:"itemMsgInfo"`
+	ItemMsgData    ItemMsgData    `json:"itemMsgData"`
 	GetCardData    GetCardData    `json:"getCardData"`
 	UseSpecialData UseSpecialData `json:"useSpecialData"`
 

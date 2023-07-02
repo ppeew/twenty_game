@@ -48,7 +48,7 @@ func startRoomThread(data RoomData) {
 	//用于用户进房
 	go room.ForUserIntoRoom(ctx)
 	//定时检查房间用户是否占用房间不退出（看socket是否断开了）
-	//go room.CheckClientHealth(ctx)
+	go room.CheckClientHealth(ctx)
 	//定时发送到redis，更新房间列表信息，为大厅外查询更新数据
 	go room.UpdateRedisRoom(ctx)
 	for {

@@ -8,6 +8,8 @@ import (
 	"game_web/model/response"
 	game_proto "game_web/proto/game"
 	"math/rand"
+
+	"go.uber.org/zap"
 )
 
 type dealFunc func(message model.Message)
@@ -59,6 +61,7 @@ func (roomInfo *RoomStruct) RoomInfo(message model.Message) {
 func (roomInfo *RoomStruct) QuitRoom(message model.Message) {
 	delete(roomInfo.RoomData.Users, message.UserID)
 	roomInfo.RoomData.UserNumber--
+	zap.S().Infof("[QuitRoom]:%d", roomInfo.RoomData.UserNumber)
 	if roomInfo.RoomData.UserNumber == 0 {
 		//没人了，销毁房间
 		roomInfo.ExitChan <- RoomQuit
@@ -224,8 +227,14 @@ func (roomInfo *RoomStruct) CheckHealth(message model.Message) {
 
 // 仅服务器使用的
 func (roomInfo *RoomStruct) UserInto(message model.Message) {
-	if _, ok := roomInfo.RoomData.Users[message.UserIntoData.UserID]; !ok {
+	//zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
+	//for u, _ := range roomInfo.RoomData.Users {
+	//zap.S().Infof("User包括：%d", u)
+	//}
+	if _, exist := roomInfo.RoomData.Users[message.UserIntoData.UserID]; !exist {
+		//zap.S().Infof("[UserInto]:用户%d进房", message.UserIntoData.UserID)
 		roomInfo.RoomData.UserNumber++
+		//zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
 		roomInfo.RoomData.Users[message.UserIntoData.UserID] = response.UserData{
 			ID:    message.UserIntoData.UserID,
 			Ready: false,
