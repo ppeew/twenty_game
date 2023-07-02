@@ -14,14 +14,14 @@ type dealFunc func(message model.Message)
 
 func NewDealFunc(room *RoomStruct) map[uint32]dealFunc {
 	var dealFun = make(map[uint32]dealFunc)
-	dealFun[model.CheckHealthMsg] = room.CheckHealth
+	//dealFun[model.CheckHealthMsg] = room.CheckHealth
 	dealFun[model.QuitRoomMsg] = room.QuitRoom
 	dealFun[model.GetRoomMsg] = room.RoomInfo
 	dealFun[model.RoomBeginGameMsg] = room.BeginGame
 	dealFun[model.UserReadyStateMsg] = room.UpdateUserReadyState
 	dealFun[model.UpdateRoomMsg] = room.UpdateRoom
 	dealFun[model.ChatMsg] = room.ChatProcess
-	dealFun[model.UserIntoMsg] = room.UserInto
+	dealFun[model.UserIntoMsg] = room.UserInto //仅服务器用
 	return dealFun
 }
 

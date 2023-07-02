@@ -133,7 +133,7 @@ func (roomInfo *RoomStruct) ForUserIntoRoom(ctx context.Context) {
 		select {
 		case userID := <-CHAN[roomInfo.RoomData.RoomID]:
 			//TODO 可能会出现并发问题 因此采用单线程处理
-			roomInfo.MsgChan <- model.Message{Type: model.UserIntoMsg, UserIntoData: model.UserIntoData{UserID: userID}}
+			roomInfo.MsgChan <- model.Message{Type: model.UserIntoMsg, UserID: userID, UserIntoData: model.UserIntoData{UserID: userID}}
 			go roomInfo.ReadRoomUserMsg(ctx, userID)
 		case <-ctx.Done():
 			return
