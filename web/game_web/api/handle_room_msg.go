@@ -21,10 +21,18 @@ func NewDealFunc(room *RoomStruct) map[uint32]dealFunc {
 	dealFun[model.UserReadyStateMsg] = room.UpdateUserReadyState
 	dealFun[model.UpdateRoomMsg] = room.UpdateRoom
 	dealFun[model.ChatMsg] = room.ChatProcess
+	dealFun[model.UserIntoMsg] = room.UserInto
 	return dealFun
 }
 
 func (roomInfo *RoomStruct) MakeRoomResponse() *response.RoomResponse {
+	var users []response.UserData
+	for _, data := range roomInfo.RoomData.Users {
+		users = append(users, response.UserData{
+			ID:    data.ID,
+			Ready: data.Ready,
+		})
+	}
 	roomResponse := &response.RoomResponse{
 		RoomID:        roomInfo.RoomData.RoomID,
 		MaxUserNumber: roomInfo.RoomData.MaxUserNumber,
@@ -33,7 +41,7 @@ func (roomInfo *RoomStruct) MakeRoomResponse() *response.RoomResponse {
 		RoomOwner:     roomInfo.RoomData.RoomOwner,
 		RoomWait:      roomInfo.RoomData.RoomWait,
 		RoomName:      roomInfo.RoomData.RoomName,
-		Users:         roomInfo.RoomData.Users,
+		Users:         users,
 	}
 	return roomResponse
 }
@@ -208,4 +216,15 @@ func (roomInfo *RoomStruct) CheckHealth(message model.Message) {
 	//	MsgType:         response.CheckHealthType,
 	//	HealthCheckInfo: &response.HealthCheck{},
 	//})
+}
+
+// 仅服务器使用的
+func (roomInfo *RoomStruct) UserInto(message model.Message) {
+	if _, ok := roomInfo.RoomData.Users[message.UserIntoData.UserID]; !ok {
+		roomInfo.RoomData.UserNumber++
+		roomInfo.RoomData.Users[message.UserIntoData.UserID] = response.UserData{
+			ID:    message.UserIntoData.UserID,
+			Ready: false,
+		}
+	}
 }

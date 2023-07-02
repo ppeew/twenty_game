@@ -65,20 +65,33 @@ func CreateRoom(ctx *gin.Context) {
 	}
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
-		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, form.RoomID),
-		Id:         userID,
+
+	var users []*game_proto.RoomUser
+	users = append(users, &game_proto.RoomUser{ID: userID, Ready: false})
+	_, err := global.GameSrvClient.SetGlobalRoom(context.Background(), &game_proto.RoomInfo{
+		RoomID:        uint32(form.RoomID),
+		MaxUserNumber: uint32(form.MaxUserNumber),
+		GameCount:     uint32(form.GameCount),
+		UserNumber:    1,
+		RoomOwner:     userID,
+		RoomWait:      true,
+		Users:         users,
+		RoomName:      form.RoomName,
 	})
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": err.Error(),
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "房间存在",
 		})
 		return
 	}
+	global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, form.RoomID),
+		Id:         userID,
+	})
 	//启动房间协程
 	CHAN[uint32(form.RoomID)] = make(chan uint32, 10)
-	users := make(map[uint32]response.UserData)
-	users[userID] = response.UserData{
+	u := make(map[uint32]response.UserData)
+	u[userID] = response.UserData{
 		ID:    userID,
 		Ready: false,
 	}
@@ -87,9 +100,9 @@ func CreateRoom(ctx *gin.Context) {
 		MaxUserNumber: uint32(form.MaxUserNumber),
 		GameCount:     uint32(form.GameCount),
 		UserNumber:    1,
-		RoomOwner:     uint32(int(userID)),
+		RoomOwner:     userID,
 		RoomWait:      true,
-		Users:         users,
+		Users:         u,
 		RoomName:      form.RoomName,
 	})
 	ctx.JSON(http.StatusOK, gin.H{
@@ -102,16 +115,12 @@ func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+	global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
 		Id:         userID,
 	})
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": err.Error(),
-		})
-		return
-	}
+	//告知协程
+	CHAN[uint32(roomID)] <- userID
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "ok",
 	})
@@ -134,20 +143,20 @@ func GetConnInfo(ctx *gin.Context) {
 }
 
 // GetRoomInfo 房间信息
-func GetRoomInfo(ctx *gin.Context) {
-	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
-	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": err,
-		})
-		return
-	}
-	resp := GrpcModelToResponse(room)
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": resp,
-	})
-}
+//func GetRoomInfo(ctx *gin.Context) {
+//	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
+//	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
+//	if err != nil {
+//		ctx.JSON(http.StatusInternalServerError, gin.H{
+//			"err": err,
+//		})
+//		return
+//	}
+//	resp := GrpcModelToResponse(room)
+//	ctx.JSON(http.StatusOK, gin.H{
+//		"data": resp,
+//	})
+//}
 
 // GetRoomList 获取所有的房间
 func GetRoomList(ctx *gin.Context) {
@@ -158,14 +167,25 @@ func GetRoomList(ctx *gin.Context) {
 		})
 		return
 	}
-	var resp []response.RoomResponse
+	var resp []map[string]interface{}
 	for _, room := range allRoom.AllRoomInfo {
-		r := GrpcModelToResponse(room)
-		resp = append(resp, r)
+		var user []uint32
+		for _, roomUser := range room.Users {
+			user = append(user, roomUser.ID)
+		}
+		resp = append(resp, map[string]interface{}{
+			"RoomID":        room.RoomID,
+			"MaxUserNumber": room.MaxUserNumber,
+			"GameCount":     room.GameCount,
+			"UserNumber":    room.UserNumber,
+			"RoomOwner":     room.RoomOwner,
+			"RoomWait":      true,
+			"RoomName":      room.RoomName,
+			"Users":         user,
+		})
+		//fmt.Println(user)
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": resp,
-	})
+	ctx.JSON(http.StatusOK, resp)
 }
 
 // SelectItems 查询个人的物品信息
@@ -182,24 +202,4 @@ func SelectItems(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": info,
 	})
-}
-
-func GrpcModelToResponse(roomInfo *game_proto.RoomInfo) response.RoomResponse {
-	resp := response.RoomResponse{
-		RoomID:        roomInfo.RoomID,
-		MaxUserNumber: roomInfo.MaxUserNumber,
-		GameCount:     roomInfo.GameCount,
-		UserNumber:    roomInfo.UserNumber,
-		RoomOwner:     roomInfo.RoomOwner,
-		RoomWait:      roomInfo.RoomWait,
-		RoomName:      roomInfo.RoomName,
-		Users:         make(map[uint32]response.UserData),
-	}
-	for _, roomUser := range roomInfo.Users {
-		resp.Users[roomUser.ID] = response.UserData{
-			ID:    roomUser.ID,
-			Ready: roomUser.Ready,
-		}
-	}
-	return resp
 }

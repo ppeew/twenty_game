@@ -16,6 +16,9 @@ type Message struct {
 	ItemMsgData    ItemMsgData    `json:"itemMsgInfo"`
 	GetCardData    GetCardData    `json:"getCardData"`
 	UseSpecialData UseSpecialData `json:"useSpecialData"`
+
+	//仅服务器使用，客户端不要传
+	UserIntoData UserIntoData `json:"userIntoData"`
 }
 
 const (
@@ -32,6 +35,8 @@ const (
 	ItemMsg           //使用游戏道具消息 128
 	GrabCardMsg       //抢卡消息 256
 	UseSpecialCardMsg //使用特殊卡消息 512
+
+	UserIntoMsg //仅服务器使用，客户端不要传
 )
 
 type UseSpecialData struct {
@@ -76,7 +81,7 @@ type GetCardData struct {
 	GetCardID uint32 `json:"getCardID"`
 }
 
-// 删除房间结构体
+// 退出房间结构体
 type QuitRoomData struct {
 }
 
@@ -99,4 +104,9 @@ type ReadyStateData struct {
 
 // 开始游戏结构体
 type BeginGameData struct {
+}
+
+// 仅服务器使用！！！！！
+type UserIntoData struct {
+	UserID uint32 `json:"userID"`
 }

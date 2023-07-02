@@ -81,6 +81,9 @@ func (s *GameServer) SearchRoom(ctx context.Context, in *game.RoomIDInfo) (*game
 
 // 创建房间
 func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emptypb.Empty, error) {
+	if in.RoomID <= 0 {
+		return &emptypb.Empty{}, errors.New("房间号不能小于0")
+	}
 	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
 	if get.Err() != nil {
 		if get.Err() != redis.Nil {
@@ -89,9 +92,7 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 		//房间不存在，允许创房
 	}
 	//TODO 检查用户是否已经有创房的服务器链接了
-	if in.RoomID <= 0 {
-		return &emptypb.Empty{}, errors.New("房间号不能小于0")
-	}
+
 	var users []*model.User
 	users = append(users, &model.User{ID: in.RoomOwner, Ready: false})
 	room := model.Room{

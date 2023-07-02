@@ -54,7 +54,6 @@ func startRoomThread(data RoomData) {
 	for {
 		select {
 		case msg := <-room.MsgChan:
-			//fmt.Println(msg)
 			if dealFunc[msg.Type] != nil {
 				dealFunc[msg.Type](msg)
 			}
@@ -133,12 +132,8 @@ func (roomInfo *RoomStruct) ForUserIntoRoom(ctx context.Context) {
 	for true {
 		select {
 		case userID := <-CHAN[roomInfo.RoomData.RoomID]:
-			//TODO 可能会出现并发问题
-			roomInfo.RoomData.UserNumber++
-			roomInfo.RoomData.Users[userID] = response.UserData{
-				ID:    userID,
-				Ready: false,
-			}
+			//TODO 可能会出现并发问题 因此采用单线程处理
+			roomInfo.MsgChan <- model.Message{Type: model.UserIntoMsg, UserIntoData: model.UserIntoData{UserID: userID}}
 			go roomInfo.ReadRoomUserMsg(ctx, userID)
 		case <-ctx.Done():
 			return
