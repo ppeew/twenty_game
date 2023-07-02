@@ -75,6 +75,10 @@ func (roomInfo *RoomStruct) QuitRoom(message model.Message) {
 		for _, data := range roomInfo.RoomData.Users {
 			if num <= 0 {
 				roomInfo.RoomData.RoomOwner = data.ID
+				SendMsgToUser(UsersConn[data.ID], response.MessageResponse{
+					MsgType: response.MsgResponseType,
+					MsgInfo: &response.MsgResponse{MsgData: "房主是你的了"},
+				})
 				break
 			}
 			num--
