@@ -21,5 +21,5 @@ type User struct {
 	Gender   bool
 	Image    string `gorm:"not null;default: /"` //路径存储
 	//用户状态，经常修改，不设置索引
-	UserState uint32
+	//UserState uint32
 }

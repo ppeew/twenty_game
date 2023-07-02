@@ -8,25 +8,15 @@ import (
 	"game_web/model"
 	"game_web/model/response"
 	game_proto "game_web/proto/game"
-	user_proto "game_web/proto/user"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"google.golang.org/grpc"
 
 	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/types/known/emptypb"
-)
-
-// 0->大厅 1->房间 2->游戏
-const (
-	OutSide = iota
-	RoomIn
-	GameIn
 )
 
 // CHAN 房间号对应创建读取协程的管道
@@ -41,19 +31,19 @@ var upgrade = websocket.Upgrader{
 	},
 }
 
-// UsersState 用户ID -> 用户连接
-var UsersState = make(map[uint32]*WSConn)
+// UsersConn 用户ID -> 用户连接
+var UsersConn = make(map[uint32]*WSConn)
 
 // 建立长连接
 func ConnSocket(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.DefaultQuery("room_id", "0"))
-	if roomID == 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "传入room_id不能为0",
-		})
-	}
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
+	if CHAN[uint32(roomID)] == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "传入room_id错误",
+		})
+	}
 	// 建立websocket连接
 	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
@@ -62,7 +52,7 @@ func ConnSocket(ctx *gin.Context) {
 		})
 		return
 	}
-	UsersState[userID] = InitWebSocket(conn, userID)
+	UsersConn[userID] = InitWebSocket(conn, userID)
 	CHAN[uint32(roomID)] <- userID
 }
 
@@ -105,7 +95,6 @@ func CreateRoom(ctx *gin.Context) {
 	//启动房间协程
 	CHAN[uint32(form.RoomID)] = make(chan uint32, 10)
 	go startRoomThread(uint32(form.RoomID))
-	//CHAN[uint32(form.RoomID)] <- userID
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "创建成功",
 	})
@@ -143,11 +132,9 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	// 允许进入房间 告知房间主函数，要创建协程来读取用户信息
-	//if CHAN[uint32(roomID)] == nil {
-	//	CHAN[uint32(roomID)] = make(chan uint32, 10)
-	//}
-	//CHAN[uint32(roomID)] <- userID
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": "ok",
+	})
 }
 
 // 获得重连服务器信息
@@ -163,44 +150,6 @@ func GetConnInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"serverInfo": split[0],
 		"roomID":     split[1],
-	})
-}
-
-// 重连游戏服务器
-func Reconnect(ctx *gin.Context) {
-	claims, _ := ctx.Get("claims")
-	userID := claims.(*model.CustomClaims).ID
-	userConn, err := grpc.Dial(
-		fmt.Sprintf("consul://%s:%d/%s?wait=14s", global.ServerConfig.ConsulInfo.Host, global.ServerConfig.ConsulInfo.Port, global.ServerConfig.UserSrvInfo.Name),
-		grpc.WithInsecure(),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-	)
-	if err != nil {
-		zap.S().Fatal("[InitSrvConn] 连接 【用户服务失败】")
-	}
-	userSrvClient := user_proto.NewUserClient(userConn)
-	state, err := userSrvClient.GetUserState(context.Background(), &user_proto.UserIDInfo{Id: userID})
-	if err != nil {
-		zap.S().Warnf("[CreateRoom]:%s", err)
-		return
-	}
-	if state.State == OutSide {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"data": "不需要重连",
-		})
-		return
-	}
-	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "无法连接房间服务器",
-		})
-		return
-	}
-	UsersState[userID] = InitWebSocket(conn, userID)
-	SendMsgToUser(UsersState[userID], response.MessageResponse{
-		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{MsgData: "重连服务器成功"},
 	})
 }
 

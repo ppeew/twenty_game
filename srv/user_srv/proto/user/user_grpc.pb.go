@@ -33,10 +33,6 @@ type UserClient interface {
 	UploadImage(ctx context.Context, in *UploadInfo, opts ...grpc.CallOption) (*UploadResponse, error)
 	// 下载文件
 	DownLoadImage(ctx context.Context, in *DownloadInfo, opts ...grpc.CallOption) (*DownloadResponse, error)
-	// 查询用户状态
-	GetUserState(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserStateResponse, error)
-	// 修改用户状态
-	UpdateUserState(ctx context.Context, in *UpdateUserStateInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userClient struct {
@@ -110,24 +106,6 @@ func (c *userClient) DownLoadImage(ctx context.Context, in *DownloadInfo, opts .
 	return out, nil
 }
 
-func (c *userClient) GetUserState(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserStateResponse, error) {
-	out := new(UserStateResponse)
-	err := c.cc.Invoke(ctx, "/user.User/GetUserState", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userClient) UpdateUserState(ctx context.Context, in *UpdateUserStateInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/user.User/UpdateUserState", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -146,10 +124,6 @@ type UserServer interface {
 	UploadImage(context.Context, *UploadInfo) (*UploadResponse, error)
 	// 下载文件
 	DownLoadImage(context.Context, *DownloadInfo) (*DownloadResponse, error)
-	// 查询用户状态
-	GetUserState(context.Context, *UserIDInfo) (*UserStateResponse, error)
-	// 修改用户状态
-	UpdateUserState(context.Context, *UpdateUserStateInfo) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -177,12 +151,6 @@ func (UnimplementedUserServer) UploadImage(context.Context, *UploadInfo) (*Uploa
 }
 func (UnimplementedUserServer) DownLoadImage(context.Context, *DownloadInfo) (*DownloadResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DownLoadImage not implemented")
-}
-func (UnimplementedUserServer) GetUserState(context.Context, *UserIDInfo) (*UserStateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserState not implemented")
-}
-func (UnimplementedUserServer) UpdateUserState(context.Context, *UpdateUserStateInfo) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserState not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -323,42 +291,6 @@ func _User_DownLoadImage_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetUserState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserIDInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).GetUserState(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.User/GetUserState",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetUserState(ctx, req.(*UserIDInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _User_UpdateUserState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserStateInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).UpdateUserState(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.User/UpdateUserState",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UpdateUserState(ctx, req.(*UpdateUserStateInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -393,14 +325,6 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DownLoadImage",
 			Handler:    _User_DownLoadImage_Handler,
-		},
-		{
-			MethodName: "GetUserState",
-			Handler:    _User_GetUserState_Handler,
-		},
-		{
-			MethodName: "UpdateUserState",
-			Handler:    _User_UpdateUserState_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

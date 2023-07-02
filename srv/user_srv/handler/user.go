@@ -164,7 +164,7 @@ func ModelToResponse(u *model.User) *user.UserInfoResponse {
 		Password: u.Password,
 		Id:       u.ID,
 		Image:    u.Image,
-		State:    u.UserState,
+		//State:    u.UserState,
 	}
 	return userInfoRep
 }

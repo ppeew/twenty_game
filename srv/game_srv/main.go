@@ -20,7 +20,7 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitDB()
-	initialize.InitSrvConn()
+	//initialize.InitSrvConn()
 
 	server := grpc.NewServer()
 	game.RegisterGameServer(server, &handler.GameServer{})

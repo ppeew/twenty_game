@@ -8,7 +8,6 @@ import (
 	"game_srv/global"
 	"game_srv/model"
 	"game_srv/proto/game"
-	"game_srv/proto/user"
 	"game_srv/utils"
 
 	"github.com/redis/go-redis/v9"
@@ -16,13 +15,6 @@ import (
 	"github.com/go-redsync/redsync/v4"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
-)
-
-// 0->大厅 1->房间 2->游戏
-const (
-	OutSide = iota
-	RoomIn
-	GameIn
 )
 
 // 查询所有房间
@@ -99,15 +91,7 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptyp
 		}
 		//房间不存在，允许创房
 	}
-	//查看用户状态
-	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: in.RoomOwner})
-	if err != nil {
-		zap.S().Warnf("[CreateRoom]:%s", err)
-		return &emptypb.Empty{}, err
-	}
-	if state.State != OutSide {
-		return &emptypb.Empty{}, errors.New("请先退出原先房间或者结束游戏后创房")
-	}
+	//TODO 检查用户是否已经有创房的服务器链接了
 	if in.RoomID == 0 {
 		return &emptypb.Empty{}, errors.New("无0房间")
 	}
@@ -124,13 +108,9 @@ func (s *GameServer) CreateRoom(ctx context.Context, in *game.RoomInfo) (*emptyp
 		RoomName:      in.RoomName,
 	}
 	marshal, _ := json.Marshal(room)
-	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
-	if set.Err() != nil {
-		return &emptypb.Empty{}, set.Err()
-	}
-	_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: in.RoomOwner, State: RoomIn})
+	global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	//新建连接的redis服务器信息
-	global.RedisDB.Set(ctx, NameUserReconnInfo(in.RoomOwner), fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port), 0)
+	//global.RedisDB.Set(ctx, NameUserConnInfo(in.RoomOwner), fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port), 0)
 	return &emptypb.Empty{}, nil
 }
 
@@ -155,17 +135,7 @@ func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo
 	if room.MaxUserNumber == room.UserNumber {
 		return &game.IntoRoomRsp{ErrorMsg: "房间满人了"}, nil
 	}
-	state, err := global.UserSrvClient.GetUserState(context.Background(), &user.UserIDInfo{Id: in.UserID})
-	if err != nil {
-		zap.S().Warnf("[UserIntoRoom]:%s", err)
-		return &game.IntoRoomRsp{}, err
-	}
-	switch state.State {
-	case RoomIn:
-		return &game.IntoRoomRsp{ErrorMsg: "请先退出之前的房间,再进入房间"}, nil
-	case GameIn:
-		return &game.IntoRoomRsp{ErrorMsg: "正在游戏中，请不要进房"}, nil
-	}
+	//TODO 检查用户是否已经有创房的服务器链接了
 	//处理加入房间逻辑
 	room.Users = append(room.Users, &model.User{
 		ID:    in.UserID,
@@ -173,11 +143,7 @@ func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo
 	})
 	room.UserNumber++
 	marshal, _ := json.Marshal(room)
-	set := global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
-	if set.Err() != nil {
-		return nil, set.Err()
-	}
-	_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: in.UserID, State: RoomIn})
+	global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	ret := &game.RoomInfo{
 		RoomID:        room.RoomID,
 		MaxUserNumber: room.MaxUserNumber,
@@ -193,7 +159,7 @@ func (s *GameServer) UserIntoRoom(ctx context.Context, in *game.UserIntoRoomInfo
 		})
 	}
 	//新建连接的redis服务器信息
-	global.RedisDB.Set(ctx, NameUserReconnInfo(in.UserID), fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port), 0)
+	//global.RedisDB.Set(ctx, NameUserConnInfo(in.UserID), fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port), 0)
 	return &game.IntoRoomRsp{RoomInfo: ret}, nil
 }
 
@@ -225,8 +191,7 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 		}
 		//更改全体用户状态
 		for _, info := range room.Users {
-			_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: info.ID, State: OutSide})
-			global.RedisDB.Del(ctx, NameUserReconnInfo(info.ID))
+			global.RedisDB.Del(ctx, NameUserConnInfo(info.ID))
 		}
 		ret := &game.RoomInfo{
 			RoomID:        room.RoomID,
@@ -256,8 +221,8 @@ func (s *GameServer) QuitRoom(ctx context.Context, in *game.QuitRoomInfo) (*game
 		if set.Err() != nil {
 			return nil, set.Err()
 		}
-		global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: in.UserID, State: OutSide})
-		global.RedisDB.Del(ctx, NameUserReconnInfo(in.UserID))
+		// 删除连接信息
+		global.RedisDB.Del(ctx, NameUserConnInfo(in.UserID))
 
 		ret := &game.RoomInfo{
 			RoomID:        room.RoomID,
@@ -319,8 +284,7 @@ func (s *GameServer) UpdateRoom(ctx context.Context, in *game.UpdateRoomInfo) (*
 				room.Users = append(room.Users[:i], room.Users[i+1:]...)
 				room.UserNumber--
 
-				global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: in.Kicker, State: OutSide})
-				global.RedisDB.Del(ctx, NameUserReconnInfo(in.Kicker))
+				global.RedisDB.Del(ctx, NameUserConnInfo(in.Kicker))
 			}
 		}
 	}
@@ -447,9 +411,6 @@ func (s *GameServer) BeginGame(ctx context.Context, in *game.BeginGameInfo) (*ga
 			Ready: u.Ready,
 		})
 	}
-	for _, info := range room.Users {
-		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: info.ID, State: GameIn})
-	}
 	return &game.BeginGameRsp{RoomInfo: ret}, nil
 }
 
@@ -470,8 +431,7 @@ func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*empt
 		return &emptypb.Empty{}, errors.New("没有该房间")
 	}
 	for _, info := range room.Users {
-		global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: info.ID, State: OutSide})
-		global.RedisDB.Del(ctx, NameUserReconnInfo(info.ID))
+		global.RedisDB.Del(ctx, NameUserConnInfo(info.ID))
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -503,9 +463,6 @@ func (s *GameServer) BackRoom(ctx context.Context, in *game.RoomIDInfo) (*emptyp
 	if set.Err() != nil {
 		return nil, set.Err()
 	}
-	for _, u := range room.Users {
-		_, _ = global.UserSrvClient.UpdateUserState(context.Background(), &user.UpdateUserStateInfo{Id: u.ID, State: RoomIn})
-	}
 	return &emptypb.Empty{}, nil
 }
 
@@ -513,6 +470,6 @@ func NameRoom(roomID uint32) string {
 	return fmt.Sprintf("Game:roomID:%d", roomID)
 }
 
-func NameUserReconnInfo(id uint32) string {
+func NameUserConnInfo(id uint32) string {
 	return fmt.Sprintf("User:reconnInfo:%d", id)
 }

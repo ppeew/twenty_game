@@ -16,5 +16,4 @@ func InitUserRouter(group *gin.RouterGroup) {
 	//group.GET("getUsername", api.GetRandomUsername, middlewares.FlowEnd())
 	group.POST("uploadImage", middlewares.JWTAuth(), api.UploadImage)
 	group.GET("downloadImage", middlewares.JWTAuth(), api.DownloadImage)
-	group.GET("selectUserState", middlewares.JWTAuth(), api.SelectUserState)
 }

@@ -19,11 +19,6 @@ service User{
   rpc UploadImage(UploadInfo)returns (UploadResponse);
   //下载文件
   rpc DownLoadImage(DownloadInfo)returns (DownloadResponse);
-
-  //查询用户状态
-  rpc GetUserState(UserIDInfo)returns(UserStateResponse);
-  //修改用户状态
-  rpc UpdateUserState(UpdateUserStateInfo)returns(google.protobuf.Empty);
 }
 
 message UploadInfo{
@@ -41,15 +36,6 @@ message DownloadInfo{
 
 message DownloadResponse{
   string path=1;
-}
-
-message UserStateResponse{
-  uint32 state=1;
-}
-
-message UpdateUserStateInfo{
-  uint32 id=1;
-  uint32 state=2;
 }
 
 message CreateUserInfo{

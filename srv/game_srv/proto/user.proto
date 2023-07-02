@@ -16,19 +16,18 @@ service User{
   rpc UpdateUser(UpdateUserInfo)returns (google.protobuf.Empty);
 
   //上传头像文件
-  rpc UploadImage(UploadInfo)returns (google.protobuf.Empty);
+  rpc UploadImage(UploadInfo)returns (UploadResponse);
   //下载文件
   rpc DownLoadImage(DownloadInfo)returns (DownloadResponse);
-
-  //查询用户状态
-  rpc GetUserState(UserIDInfo)returns(UserStateResponse);
-  //修改用户状态
-  rpc UpdateUserState(UpdateUserStateInfo)returns(google.protobuf.Empty);
 }
 
 message UploadInfo{
   uint32 id=1;
-  bytes file=2;
+  string  path=2;
+}
+
+message UploadResponse{
+  string path=1;
 }
 
 message DownloadInfo{
@@ -36,16 +35,7 @@ message DownloadInfo{
 }
 
 message DownloadResponse{
-  bytes file=1;
-}
-
-message UserStateResponse{
-  uint32 state=1;
-}
-
-message UpdateUserStateInfo{
-  uint32 id=1;
-  uint32 state=2;
+  string path=1;
 }
 
 message CreateUserInfo{
@@ -61,6 +51,8 @@ message UserInfoResponse{
   string userName=3;
   string password=4;
   uint32 id=5;
+  string image=6;
+  uint32 state=7;
 }
 
 message CheckPasswordInfo{

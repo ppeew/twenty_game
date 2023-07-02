@@ -6,5 +6,5 @@ type UserResponse struct {
 	Gender   bool   `json:"gender"`
 	Username string `json:"username"`
 	Image    string `json:"image"`
-	State    uint32 `json:"state"`
+	State    uint32 `json:"&response.MsgResponse{"`
 }

@@ -58,7 +58,7 @@ func main() {
 		}
 	}
 	//释放用户状态
-	//for userID, _ := range api.UsersState {
+	//for userID, _ := range api.UsersConn {
 	//	_, err := global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: userID, State: api.OutSide})
 	//	if err != nil {
 	//		zap.S().Infof("[ReleaseResource]:%s", err)

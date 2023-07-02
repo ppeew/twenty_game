@@ -211,7 +211,7 @@ func (game *Game) DoHandleSpecialCard(min, max int) {
 	for true {
 		select {
 		case msg := <-game.CommonChan:
-			userInfo := UsersState[msg.UserID]
+			userInfo := UsersConn[msg.UserID]
 			switch msg.Type {
 			case model.UseSpecialCardMsg:
 				//只有这类型的消息才处理
@@ -252,7 +252,7 @@ func (game *Game) DoListenDistributeCard(min, max int) {
 	for true {
 		select {
 		case msg := <-game.CommonChan:
-			userInfo := UsersState[msg.UserID]
+			userInfo := UsersConn[msg.UserID]
 			//zap.S().Infof("[DoListenDistributeCard]:%+v", msg)
 			switch msg.Type {
 			//只有这类型的消息才处理
@@ -356,7 +356,7 @@ func (game *Game) ProcessHealthMsg(todo context.Context) {
 			game.wg.Done()
 			return
 		case msg := <-game.HealthChan:
-			SendMsgToUser(UsersState[msg.UserID], response.MessageResponse{
+			SendMsgToUser(UsersConn[msg.UserID], response.MessageResponse{
 				MsgType:         response.CheckHealthType,
 				HealthCheckInfo: &response.HealthCheck{},
 			})
@@ -372,7 +372,7 @@ func (game *Game) ProcessItemMsg(todo context.Context) {
 			game.wg.Done()
 			return
 		case item := <-game.ItemChan:
-			userInfo := UsersState[item.UserID]
+			userInfo := UsersConn[item.UserID]
 			items := make([]uint32, 2)
 			switch game_proto.Type(item.Item) {
 			case game_proto.Type_Apple:
@@ -428,7 +428,7 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 		case <-ctx.Done():
 			game.wg.Done()
 			return
-		case message := <-UsersState[userID].InChanRead():
+		case message := <-UsersConn[userID].InChanRead():
 			switch message.Type {
 			case model.ChatMsg:
 				//聊天信息发到聊天管道
@@ -452,7 +452,7 @@ func (game *Game) ReadGameUserMsg(ctx context.Context, userID uint32) {
 }
 
 func (game *Game) HandleChangeCard(msg model.Message) {
-	ws := UsersState[msg.UserID]
+	ws := UsersConn[msg.UserID]
 	data := msg.UseSpecialData.ChangeCardData
 	//先找到两卡
 	findUserCard := false
@@ -500,7 +500,7 @@ func (game *Game) HandleChangeCard(msg model.Message) {
 }
 
 func (game *Game) HandleUpdateCard(msg model.Message) {
-	ws := UsersState[msg.UserID]
+	ws := UsersConn[msg.UserID]
 	data := msg.UseSpecialData.UpdateCardData
 	findUpdateCard := false
 	for _, card := range game.Users[data.TargetUserID].BaseCards {
@@ -529,7 +529,7 @@ func (game *Game) HandleUpdateCard(msg model.Message) {
 }
 
 func (game *Game) HandleDeleteCard(msg model.Message) {
-	ws := UsersState[msg.UserID]
+	ws := UsersConn[msg.UserID]
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
 	for i, card := range game.Users[data.TargetUserID].BaseCards {
@@ -599,10 +599,10 @@ func (game *Game) DropSpecialCard(userID uint32, specialID uint32) {
 func BroadcastToAllGameUsers(game *Game, msg response.MessageResponse) {
 	for userID := range game.Users {
 		zap.S().Infof("[BroadcastToAllGameUsers]:正在向用户%d发送信息,消息为:%v", userID, msg)
-		err := UsersState[userID].OutChanWrite(msg)
+		err := UsersConn[userID].OutChanWrite(msg)
 		if err != nil {
 			zap.S().Infof("[BroadcastToAllGameUsers]:%d用户关闭了连接", userID)
-			UsersState[userID].CloseConn()
+			UsersConn[userID].CloseConn()
 		}
 	}
 }
