@@ -38,7 +38,7 @@ func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 // 协程接受客户端msg
 func (ws *WSConn) readMsgLoop() {
 	for true {
-		//println("[readMsgLoop]")
+		//zap.S().Infof("[readMsgLoop]读到:%v", data)
 		data := model.Message{}
 		err := ws.conn.ReadJSON(&data)
 		if err != nil {
@@ -47,7 +47,6 @@ func (ws *WSConn) readMsgLoop() {
 			//ws.CloseConn()
 			//break
 		}
-		//zap.S().Infof("[readMsgLoop]读到:%v", data)
 		ws.inChan <- data
 	}
 }

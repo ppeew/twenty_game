@@ -41,6 +41,7 @@ func ConnSocket(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "传入room_id错误",
 		})
+		return
 	}
 	// 建立websocket连接
 	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
@@ -49,6 +50,9 @@ func ConnSocket(ctx *gin.Context) {
 			"err": "无法连接房间服务器",
 		})
 		return
+	}
+	if UsersConn[userID] != nil {
+		UsersConn[userID].CloseConn()
 	}
 	UsersConn[userID] = InitWebSocket(conn, userID)
 	CHAN[uint32(roomID)] <- userID

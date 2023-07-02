@@ -149,6 +149,13 @@ func (roomInfo *RoomStruct) UpdateRedisRoom(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-time.Tick(time.Second * 5):
+			var users []*game.RoomUser
+			for _, data := range roomInfo.RoomData.Users {
+				users = append(users, &game.RoomUser{
+					ID:    data.ID,
+					Ready: data.Ready,
+				})
+			}
 			global.GameSrvClient.SetGlobalRoom(context.Background(), &game.RoomInfo{
 				RoomID:        roomInfo.RoomData.RoomID,
 				MaxUserNumber: roomInfo.RoomData.MaxUserNumber,
@@ -156,8 +163,8 @@ func (roomInfo *RoomStruct) UpdateRedisRoom(ctx context.Context) {
 				UserNumber:    roomInfo.RoomData.UserNumber,
 				RoomOwner:     roomInfo.RoomData.RoomOwner,
 				RoomWait:      roomInfo.RoomData.RoomWait,
-				//Users:         roomInfo.RoomData.Users,
-				RoomName: roomInfo.RoomData.RoomName,
+				Users:         users,
+				RoomName:      roomInfo.RoomData.RoomName,
 			})
 
 		}
