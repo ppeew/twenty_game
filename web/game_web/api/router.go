@@ -146,22 +146,6 @@ func GetConnInfo(ctx *gin.Context) {
 	})
 }
 
-// GetRoomInfo 房间信息
-//func GetRoomInfo(ctx *gin.Context) {
-//	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
-//	room, err := global.GameSrvClient.SearchRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
-//	if err != nil {
-//		ctx.JSON(http.StatusInternalServerError, gin.H{
-//			"err": err,
-//		})
-//		return
-//	}
-//	resp := GrpcModelToResponse(room)
-//	ctx.JSON(http.StatusOK, gin.H{
-//		"data": resp,
-//	})
-//}
-
 // GetRoomList 获取所有的房间
 func GetRoomList(ctx *gin.Context) {
 	allRoom, err := global.GameSrvClient.SearchAllRoom(context.Background(), &emptypb.Empty{})
