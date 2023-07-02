@@ -57,12 +57,5 @@ func main() {
 			zap.S().Infof("[ReleaseResource]:关闭%d房间失败:%s", roomID, err.Error())
 		}
 	}
-	//释放用户状态
-	//for userID, _ := range api.UsersConn {
-	//	_, err := global.UserSrvClient.UpdateUserState(context.Background(), &user_proto.UpdateUserStateInfo{Id: userID, State: api.OutSide})
-	//	if err != nil {
-	//		zap.S().Infof("[ReleaseResource]:%s", err)
-	//	}
-	//}
 	zap.S().Info("释放资源完毕，退出")
 }

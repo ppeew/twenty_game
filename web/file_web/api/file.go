@@ -1,63 +1,63 @@
 package api
 
 import (
-	"fmt"
+	"context"
+	"file_web/global"
+	"file_web/model"
+	"file_web/proto/user"
 	"net/http"
-
-	"github.com/google/uuid"
-
-	"go.uber.org/zap"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
-func UploadFile(ctx *gin.Context) {
-	file, err := ctx.FormFile("file")
+func UploadImage(ctx *gin.Context) {
+	claims, _ := ctx.Get("claims")
+	currentUser := claims.(*model.CustomClaims)
+	id := currentUser.ID
+	formFile, err := ctx.FormFile("image")
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "文件上传错误",
-		})
+		zap.S().Infof("[UploadImage]:%s", err)
+		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	filePath := "./files/" + file.Filename
-	err = ctx.SaveUploadedFile(file, filePath)
+	filePathByte, _ := time.Now().MarshalText()
+	filePath := string(filePathByte)
+	filePath = strings.Split(filePath, ".")[0]
+	filePath = strings.Replace(filePath, "T", "/", 1) + "-" + formFile.Filename
+	prePath := "/opt/images/"
+	err = ctx.SaveUploadedFile(formFile, prePath+filePath)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "文件上传错误",
-		})
+		ctx.Status(http.StatusInternalServerError)
 		return
 	}
-	oss, err := NewOSS()
+	_, err = global.UserSrvClient.UploadImage(context.Background(), &user.UploadInfo{Id: id, Path: filePath})
 	if err != nil {
-		zap.S().Warnf("[UploadFile]:%s", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": "文件上传错误",
-		})
+		zap.S().Infof("[UploadImage]:%s", err)
+		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	objectKey := uuid.New().String()
-	oss.UploadFile(objectKey, filePath)
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": fmt.Sprintf("%s文件上传成功", file.Filename),
+		"data": "OK",
 	})
-	//用户头像库修改objectKey
-
 }
 
-func DownloadFile(ctx *gin.Context) {
-	//从数据库找到该objectKey，在OSS服务查找
-	//claims, _ := ctx.Get("claims")
-	//userID := claims.(*model.CustomClaims).ID
-	objectKey := ""
-
-	oss, err := NewOSS()
-	if err != nil {
-		zap.S().Warnf("[UploadFile]:%s", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": "文件下载错误",
-		})
+func DownloadImage(ctx *gin.Context) {
+	idStr := ctx.DefaultQuery("id", "0")
+	id, _ := strconv.Atoi(idStr)
+	if id == 0 {
+		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	oss.DownloadFile(objectKey, "")
-	ctx.File("")
+	image, err := global.UserSrvClient.DownLoadImage(context.Background(), &user.DownloadInfo{Id: uint32(id)})
+	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"path": image.Path,
+	})
 }

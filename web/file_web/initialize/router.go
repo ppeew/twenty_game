@@ -12,6 +12,7 @@ func InitRouters() *gin.Engine {
 	//中间件
 	engine.Use(middlewares.Cors())
 	versionGroup := engine.Group("/v1")
-	router.InitOssRouter(versionGroup)
+	//router.InitOssRouter(versionGroup)
+	router.InitFileRouter(versionGroup)
 	return engine
 }

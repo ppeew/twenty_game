@@ -101,10 +101,14 @@ func SendErrToUser(ws *WSConn, handlerFunc string, error error) {
 			MsgType: response.ErrResponseMsgType,
 			ErrInfo: &response.ErrResponse{Error: errors.New(fmt.Sprintf("[%s]:%s", handlerFunc, error))},
 		}
-		_ = ws.OutChanWrite(errRsp)
+		if ws != nil {
+			_ = ws.OutChanWrite(errRsp)
+		}
 	}
 }
 
 func SendMsgToUser(ws *WSConn, data response.MessageResponse) {
-	_ = ws.OutChanWrite(data)
+	if ws != nil {
+		_ = ws.OutChanWrite(data)
+	}
 }

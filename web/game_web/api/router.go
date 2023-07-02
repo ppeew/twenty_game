@@ -12,8 +12,6 @@ import (
 	"strconv"
 	"strings"
 
-	"go.uber.org/zap"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -67,22 +65,7 @@ func CreateRoom(ctx *gin.Context) {
 	}
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	_, err := global.GameSrvClient.CreateRoom(context.Background(), &game_proto.RoomInfo{
-		RoomID:        uint32(form.RoomID),
-		MaxUserNumber: uint32(form.MaxUserNumber),
-		GameCount:     uint32(form.GameCount),
-		UserNumber:    1,
-		RoomOwner:     userID,
-		RoomWait:      true,
-		RoomName:      form.RoomName,
-	})
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": err.Error(),
-		})
-		return
-	}
-	_, err = global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, form.RoomID),
 		Id:         userID,
 	})
@@ -94,7 +77,21 @@ func CreateRoom(ctx *gin.Context) {
 	}
 	//启动房间协程
 	CHAN[uint32(form.RoomID)] = make(chan uint32, 10)
-	go startRoomThread(uint32(form.RoomID))
+	users := make(map[uint32]response.UserData)
+	users[userID] = response.UserData{
+		ID:    userID,
+		Ready: false,
+	}
+	go startRoomThread(RoomData{
+		RoomID:        uint32(form.RoomID),
+		MaxUserNumber: uint32(form.MaxUserNumber),
+		GameCount:     uint32(form.GameCount),
+		UserNumber:    1,
+		RoomOwner:     uint32(int(userID)),
+		RoomWait:      true,
+		Users:         users,
+		RoomName:      form.RoomName,
+	})
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "创建成功",
 	})
@@ -105,24 +102,7 @@ func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	room, err := global.GameSrvClient.UserIntoRoom(context.Background(), &game_proto.UserIntoRoomInfo{
-		RoomID: uint32(roomID),
-		UserID: userID,
-	})
-	if err != nil {
-		zap.S().Infof("[UserIntoRoom]:%s", err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": err,
-		})
-		return
-	}
-	if room.ErrorMsg != "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": room.ErrorMsg,
-		})
-		return
-	}
-	_, err = global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
 		Id:         userID,
 	})
@@ -202,4 +182,24 @@ func SelectItems(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": info,
 	})
+}
+
+func GrpcModelToResponse(roomInfo *game_proto.RoomInfo) response.RoomResponse {
+	resp := response.RoomResponse{
+		RoomID:        roomInfo.RoomID,
+		MaxUserNumber: roomInfo.MaxUserNumber,
+		GameCount:     roomInfo.GameCount,
+		UserNumber:    roomInfo.UserNumber,
+		RoomOwner:     roomInfo.RoomOwner,
+		RoomWait:      roomInfo.RoomWait,
+		RoomName:      roomInfo.RoomName,
+		Users:         make(map[uint32]response.UserData),
+	}
+	for _, roomUser := range roomInfo.Users {
+		resp.Users[roomUser.ID] = response.UserData{
+			ID:    roomUser.ID,
+			Ready: roomUser.Ready,
+		}
+	}
+	return resp
 }

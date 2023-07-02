@@ -7,13 +7,20 @@ type JWTConfig struct {
 type ConsulConfig struct {
 	Host string `json:"host"`
 	Port int    `json:"port"`
+	Name string `json:"name"`
+}
+
+type UserSrvConfig struct {
+	Name string `json:"name"`
 }
 
 type ServerConfig struct {
-	Port       int          `json:"port"`
-	JWTInfo    JWTConfig    `json:"jwt"`
-	ConsulInfo ConsulConfig `json:"consul"`
-	OssInfo    OssConfig    `json:"ossInfo"`
+	Host        string        `json:"host"`
+	Port        int           `json:"port"`
+	JWTInfo     JWTConfig     `json:"jwt"`
+	ConsulInfo  ConsulConfig  `json:"consul"`
+	UserSrvInfo UserSrvConfig `json:"user_srv"`
+	//OssInfo    OssConfig    `json:"ossInfo"`
 }
 
 type OssConfig struct {

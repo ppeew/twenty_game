@@ -25,8 +25,9 @@ func RegistAndHealthCheck() (*api.Client, string) {
 	if !global.DEBUG {
 		reg.Check = &api.AgentServiceCheck{
 			HTTP:                           fmt.Sprintf("http://%s:%d/health", global.ServerConfig.Host, global.ServerConfig.Port),
-			DeregisterCriticalServiceAfter: "30s",
-			Interval:                       "10s",
+			Status:                         api.HealthPassing,
+			DeregisterCriticalServiceAfter: "100s",
+			Interval:                       "30s",
 		}
 	}
 	err = client.Agent().ServiceRegister(reg)

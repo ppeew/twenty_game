@@ -1,9 +1,9 @@
 package initialize
 
 import (
+	"file_web/global"
+	"file_web/proto/user"
 	"fmt"
-	"user_web/global"
-	"user_web/proto/user"
 
 	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"go.uber.org/zap"

@@ -3,11 +3,11 @@ package main
 import (
 	"file_web/global"
 	"file_web/initialize"
+	"file_web/utils"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"go.uber.org/zap"
 )
@@ -15,9 +15,16 @@ import (
 func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
+	initialize.InitSrvConn()
 
 	routers := initialize.InitRouters()
-	time.Sleep(2 * time.Second)
+	//自动找可用端口
+	port, err := utils.GetFreePort()
+	if err != nil {
+		panic(err)
+	}
+	global.ServerConfig.Port = port
+
 	go func() {
 		if err := routers.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
 			zap.S().Panic("启动失败:", err.Error())

@@ -27,3 +27,11 @@ func (s *GameServer) RecordConnData(ctx context.Context, in *game.RecordConnInfo
 	}
 	return &emptypb.Empty{}, nil
 }
+
+func (s *GameServer) DelConnData(ctx context.Context, in *game.DelConnInfo) (*emptypb.Empty, error) {
+	del := global.RedisDB.Del(ctx, NameUserConnInfo(in.Id))
+	if del.Err() != nil {
+		return &emptypb.Empty{}, del.Err()
+	}
+	return &emptypb.Empty{}, nil
+}
