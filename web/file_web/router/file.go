@@ -8,8 +8,7 @@ import (
 )
 
 func InitFileRouter(r *gin.RouterGroup) {
-	group := r.Group("file")
-	group.Use(middlewares.JWTAuth())
-	group.POST("uploadImage", api.UploadImage)
-	group.GET("downloadImage", api.DownloadImage)
+	r.Use(middlewares.JWTAuth())
+	r.POST("uploadImage", api.UploadImage)
+	r.GET("downloadImage", api.DownloadImage)
 }

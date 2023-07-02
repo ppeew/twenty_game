@@ -44,7 +44,7 @@ func (ws *WSConn) readMsgLoop() {
 		if err != nil {
 			//zap.S().Warnf("[readMsgLoop]:%s", err)
 			//发生错误,关闭连接，停止协程
-			//ws.CloseConn()
+			//ws.CloseConn() //TODO 目前测试，暂时不开放
 			//break
 		}
 		ws.inChan <- data

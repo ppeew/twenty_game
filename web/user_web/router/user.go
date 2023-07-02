@@ -14,6 +14,6 @@ func InitUserRouter(group *gin.RouterGroup) {
 	group.GET("search", middlewares.JWTAuth(), api.GetUserInfo, middlewares.FlowEnd())
 	group.GET("getNickname", api.GetRandomNickName, middlewares.FlowEnd())
 	//group.GET("getUsername", api.GetRandomUsername, middlewares.FlowEnd())
-	group.POST("uploadImage", middlewares.JWTAuth(), api.UploadImage)
-	group.GET("downloadImage", middlewares.JWTAuth(), api.DownloadImage)
+	//group.POST("uploadImage", middlewares.JWTAuth(), api.UploadImage)
+	//group.GET("downloadImage", middlewares.JWTAuth(), api.DownloadImage)
 }
