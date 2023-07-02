@@ -3,12 +3,13 @@ import "google/protobuf/empty.proto";
 option go_package = "./game;game";
 package game;
 
-
 service Game{
   //获得连接的服务器信息
   rpc GetConnData(UserIDInfo)returns(ConnResponse);
   //记录连接的服务器信息
   rpc RecordConnData(RecordConnInfo)returns(google.protobuf.Empty);
+  //删除用户连接服务器信息
+  rpc DelConnData(DelConnInfo)returns(google.protobuf.Empty);
 
   //获得排行榜信息
   rpc GetRanks(google.protobuf.Empty)returns(RanksResponse);
@@ -17,6 +18,7 @@ service Game{
 
   //新建用户道具表
   rpc CreateUserItems(UserItemsInfo)returns(UserItemsInfoResponse);
+
   //查询用户的金币钻石及道具
   rpc GetUserItemsInfo(UserIDInfo) returns(UserItemsInfoResponse);
   //增加金币
@@ -34,24 +36,16 @@ service Game{
 
   //查询所有房间
   rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);
-  //创建房间
-  rpc CreateRoom(RoomInfo)returns (google.protobuf.Empty);
-  // 进入房间
-  rpc UserIntoRoom(UserIntoRoomInfo) returns (IntoRoomRsp);
-  //查询房间
-  rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
+  //设置全局房间
+  rpc SetGlobalRoom(RoomInfo)returns (google.protobuf.Empty);
   //删除房间
   rpc DeleteRoom(RoomIDInfo)returns (google.protobuf.Empty);
-  // 退出房间
-  rpc QuitRoom(QuitRoomInfo)returns (QuitRsp);
-  // 房主更新房间信息
-  rpc UpdateRoom(UpdateRoomInfo)returns (RoomInfo);
-  // 更新用户准备状态
-  rpc UpdateUserReadyState(ReadyStateInfo)returns (RoomInfo);
-  // 房主开始游戏
-  rpc BeginGame(BeginGameInfo)returns(BeginGameRsp);
-  // 回到房间
-  rpc BackRoom(RoomIDInfo)returns(google.protobuf.Empty);
+  //查询房间
+  rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
+}
+
+message DelConnInfo{
+  uint32 id=1;
 }
 
 message ConnResponse{
@@ -77,51 +71,6 @@ message UpdateRanksInfo{
   uint32 userID=1;
   uint32 addScore=2;
   uint32 addGametimes=3;
-}
-
-message IntoRoomRsp{
-  RoomInfo roomInfo=1;
-  string errorMsg=2;
-}
-
-message BeginGameRsp{
-  RoomInfo roomInfo=1;
-  string errorMsg=2;
-}
-
-message BeginGameInfo{
-  uint32 roomID=1;
-  uint32 userID=2;
-}
-
-message QuitRsp{
-  RoomInfo roomInfo=1;
-  bool isOwnerQuit=2;
-}
-
-message ReadyStateInfo{
-  uint32 roomID=1;
-  uint32 userID=2;
-  bool isReady=3;
-}
-
-message UpdateRoomInfo{
-  uint32 roomID=1;
-  uint32 userID=2;
-  uint32 maxUserNumber=3;
-  uint32 gameCount=4;
-  uint32 owner=5;
-  uint32 kicker=6;
-}
-
-message QuitRoomInfo{
-  uint32 roomID=1;
-  uint32 userID=2;
-}
-
-message UserIntoRoomInfo{
-  uint32 roomID=1;
-  uint32 userID=2;
 }
 
 message IsOK{
