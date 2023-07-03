@@ -10,6 +10,6 @@ import (
 func InitRoomRouter(group *gin.RouterGroup) {
 	//房间相关接口
 	group.GET("getRoomList", middlewares.JWTAuth(), api.GetRoomList, middlewares.FlowEnd())
-	group.POST("createRoom", middlewares.JWTAuth(), api.CreateRoom, middlewares.FlowEnd())
 	group.PUT("userIntoRoom", middlewares.JWTAuth(), api.UserIntoRoom, middlewares.FlowEnd())
+	group.GET("selectRoomServer", middlewares.JWTAuth(), api.SelectRoomServer, middlewares.FlowEnd())
 }

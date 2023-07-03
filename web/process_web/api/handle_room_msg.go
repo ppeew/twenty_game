@@ -214,7 +214,7 @@ func (roomInfo *RoomStruct) ChatProcess(message model.Message) {
 		MsgType: response.ChatResponseType,
 		ChatInfo: &response.ChatResponse{
 			UserID:      message.UserID,
-			ChatMsgData: model.ChatMsgData{Data: message.ChatMsgData.Data},
+			ChatMsgData: message.ChatMsgData.Data,
 		},
 	})
 }

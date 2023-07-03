@@ -7,8 +7,7 @@ import (
 
 var (
 	DEBUG         bool
-	NacosConfig   *config.NacosConfig  = &config.NacosConfig{}
-	ServerConfig  *config.ServerConfig = &config.ServerConfig{}
+	NacosConfig   = &config.NacosConfig{}
+	ServerConfig  = &config.ServerConfig{}
 	GameSrvClient game_proto.GameClient
-	//UserSrvClient user_proto.UserClient
 )

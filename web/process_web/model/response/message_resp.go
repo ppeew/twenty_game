@@ -1,7 +1,5 @@
 package response
 
-import "process_web/model"
-
 // 服务器返回前端结构体类型,前端通过MsgType字段知道消息是什么类型，做什么处理
 type MessageResponse struct {
 	MsgType uint32 `json:"msgType"`
@@ -45,8 +43,8 @@ const (
 
 // 返回的聊天信息（通用）
 type ChatResponse struct {
-	UserID      uint32            `json:"userID"`
-	ChatMsgData model.ChatMsgData `json:"chatMsgData"`
+	UserID      uint32 `json:"userID"`
+	ChatMsgData string `json:"chatMsgData"`
 }
 
 type ErrResponse struct {
