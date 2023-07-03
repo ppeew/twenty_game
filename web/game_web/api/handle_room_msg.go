@@ -211,9 +211,10 @@ func (roomInfo *RoomStruct) BeginGame(message model.Message) {
 
 func (roomInfo *RoomStruct) ChatProcess(message model.Message) {
 	BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
-		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{
-			MsgData: fmt.Sprintf("用户%d说：%s", message.UserID, message.ChatMsgData.Data),
+		MsgType: response.ChatResponseType,
+		ChatInfo: &response.ChatResponse{
+			UserID:      message.UserID,
+			ChatMsgData: model.ChatMsgData{Data: message.ChatMsgData.Data},
 		},
 	})
 }

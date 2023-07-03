@@ -162,18 +162,20 @@ func GetRoomList(ctx *gin.Context) {
 			user = append(user, roomUser.ID)
 		}
 		resp = append(resp, map[string]interface{}{
-			"RoomID":        room.RoomID,
-			"MaxUserNumber": room.MaxUserNumber,
-			"GameCount":     room.GameCount,
-			"UserNumber":    room.UserNumber,
-			"RoomOwner":     room.RoomOwner,
-			"RoomWait":      true,
-			"RoomName":      room.RoomName,
-			"Users":         user,
+			"roomID":        room.RoomID,
+			"maxUserNumber": room.MaxUserNumber,
+			"gameCount":     room.GameCount,
+			"userNumber":    room.UserNumber,
+			"roomOwner":     room.RoomOwner,
+			"roomWait":      true,
+			"roomName":      room.RoomName,
+			"users":         user,
 		})
 		//fmt.Println(user)
 	}
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": resp,
+	})
 }
 
 // SelectItems 查询个人的物品信息
