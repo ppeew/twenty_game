@@ -11,8 +11,6 @@ import (
 	game_proto "process_web/proto/game"
 	"strconv"
 
-	"go.uber.org/zap"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -55,15 +53,21 @@ func ConnSocket(ctx *gin.Context) {
 		UsersConn[userID].CloseConn()
 	}
 	UsersConn[userID] = InitWebSocket(conn, userID)
-	CHAN[uint32(roomID)] <- userID
+	//CHAN[uint32(roomID)] <- userID
 }
 
-// CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息
+// CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息 // TODO 创建房间应该先查询房间是否存在
 func CreateRoom(ctx *gin.Context) {
 	form := forms.CreateRoomForm{}
 	if err := ctx.ShouldBind(&form); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": err.Error(),
+		})
+		return
+	}
+	if form.RoomID <= 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "房间号不能小于0",
 		})
 		return
 	}
@@ -123,11 +127,11 @@ func CreateRoom(ctx *gin.Context) {
 
 var IntoRoomChan = make(chan bool, 3)
 
-// UserIntoRoom 玩家进入房间 TODO 房间满人或者其他错误不成功，应该返回错误
+// UserIntoRoom 玩家进入房间 房间满人或者其他错误不成功，应该返回错误
 func UserIntoRoom(ctx *gin.Context) {
-	zap.S().Infof("[UserIntoRoom]:我在这")
+	//zap.S().Infof("[UserIntoRoom]:我在这")
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
-	zap.S().Infof("[UserIntoRoom]:RoomID是：%d", roomID)
+	//zap.S().Infof("[UserIntoRoom]:RoomID是：%d", roomID)
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
 	// 玩家进入房间，添加该玩家的服务器连接信息
@@ -142,7 +146,7 @@ func UserIntoRoom(ctx *gin.Context) {
 		return
 	}
 	// 告知协程用户进房信息
-	zap.S().Infof("[UserIntoRoom]:我进来了")
+	//zap.S().Infof("[UserIntoRoom]:我进来了")
 	CHAN[uint32(roomID)] <- userID
 	ok := <-IntoRoomChan
 	if !ok {

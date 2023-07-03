@@ -18,3 +18,7 @@ nohup ./user_web > ../../uw.log 2>&1 &
 cd ~/twenty_game/web/file_web
 go build
 nohup ./file_web > ../../fw.log 2>&1 &
+
+cd ~/twenty_game/web/process_web
+go build
+nohup ./process_web > ../../pw.log 2>&1 &
