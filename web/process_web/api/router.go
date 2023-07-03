@@ -11,6 +11,8 @@ import (
 	game_proto "process_web/proto/game"
 	"strconv"
 
+	"go.uber.org/zap"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -70,7 +72,7 @@ func CreateRoom(ctx *gin.Context) {
 
 	var users []*game_proto.RoomUser
 	users = append(users, &game_proto.RoomUser{ID: userID, Ready: false})
-	// 1.创建房间对应服务器信息创建成功（查询之前是否已经用了该信息）
+	// 1.创建房间对应服务器信息创建成功 //TODO （查询之前是否已经用了该信息）
 	_, err := global.GameSrvClient.RecordRoomServer(context.Background(), &game_proto.RecordRoomServerInfo{
 		RoomID:     uint32(form.RoomID),
 		ServerInfo: fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port),
@@ -123,10 +125,11 @@ var IntoRoomChan = make(chan bool, 3)
 
 // UserIntoRoom 玩家进入房间 TODO 房间满人或者其他错误不成功，应该返回错误
 func UserIntoRoom(ctx *gin.Context) {
+	zap.S().Infof("[UserIntoRoom]:我在这")
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
+	zap.S().Infof("[UserIntoRoom]:RoomID是：%d", roomID)
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-
 	// 玩家进入房间，添加该玩家的服务器连接信息
 	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
@@ -139,6 +142,7 @@ func UserIntoRoom(ctx *gin.Context) {
 		return
 	}
 	// 告知协程用户进房信息
+	zap.S().Infof("[UserIntoRoom]:我进来了")
 	CHAN[uint32(roomID)] <- userID
 	ok := <-IntoRoomChan
 	if !ok {

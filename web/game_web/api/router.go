@@ -102,8 +102,8 @@ func SelectRoomServer(ctx *gin.Context) {
 	})
 }
 
-// 用户进房，做路由转发
-func UserIntoRoom(ctx *gin.Context) {
+// 创建房间，做路由转发
+func CreateRoom(ctx *gin.Context) {
 	config := api.DefaultConfig()
 	config.Address = "139.159.234.134:8500"
 	c, _ := api.NewClient(config)
@@ -115,6 +115,22 @@ func UserIntoRoom(ctx *gin.Context) {
 		return
 	}
 	num := rand.Intn(len(service))
-	ctx.Redirect(http.StatusMovedPermanently,
-		fmt.Sprintf("http://%s:%d/", service[num].ServiceAddress, service[num].ServicePort))
+
+	ctx.Redirect(http.StatusPermanentRedirect,
+		fmt.Sprintf("http://%s:%d/v1/createRoom", service[num].ServiceAddress, service[num].ServicePort))
+}
+
+// 进入房间，做路由转发
+func UserIntoRoom(ctx *gin.Context) {
+	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
+	//查询该房间对应的路由
+	server, err := global.GameSrvClient.GetRoomServer(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"err": err,
+		})
+		return
+	}
+	ctx.Redirect(http.StatusPermanentRedirect,
+		fmt.Sprintf("http://%s/v1/userIntoRoom?room_id=%d", server.ServerInfo, roomID))
 }

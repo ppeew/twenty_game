@@ -405,10 +405,8 @@ func (game *GameStruct) ProcessChatMsg(todo context.Context) {
 		case msg := <-game.ChatChan:
 			//处理用户的聊天消息,广播所有用户
 			rsp := response.ChatResponse{
-				UserID: msg.UserID,
-				ChatMsgData: model.ChatMsgData{
-					Data: msg.ChatMsgData.Data,
-				},
+				UserID:      msg.UserID,
+				ChatMsgData: msg.ChatMsgData.Data,
 			}
 			BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.ChatResponseType, ChatInfo: &rsp})
 		}
