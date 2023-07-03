@@ -19,7 +19,7 @@ func (s *GameServer) GetConnData(ctx context.Context, in *game.UserIDInfo) (*gam
 	return &game.ConnResponse{ServerInfo: get.Val()}, nil
 }
 
-// 记录连接的服务器信息
+// 记录用户连接的服务器信息
 func (s *GameServer) RecordConnData(ctx context.Context, in *game.RecordConnInfo) (*emptypb.Empty, error) {
 	set := global.RedisDB.Set(ctx, NameUserConnInfo(in.Id), in.ServerInfo, 0)
 	if set.Err() != nil {
@@ -28,6 +28,7 @@ func (s *GameServer) RecordConnData(ctx context.Context, in *game.RecordConnInfo
 	return &emptypb.Empty{}, nil
 }
 
+// 删除用户连接的服务器信息
 func (s *GameServer) DelConnData(ctx context.Context, in *game.DelConnInfo) (*emptypb.Empty, error) {
 	del := global.RedisDB.Del(ctx, NameUserConnInfo(in.Id))
 	if del.Err() != nil {

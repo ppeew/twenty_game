@@ -32,7 +32,7 @@ var upgrade = websocket.Upgrader{
 // UsersConn 用户ID -> 用户连接
 var UsersConn = make(map[uint32]*WSConn)
 
-// 建立长连接
+// ConnSocket 建立长连接 TODO 其他非玩家用户进房应该被拒绝
 func ConnSocket(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.DefaultQuery("room_id", "0"))
 	claims, _ := ctx.Get("claims")
@@ -72,7 +72,19 @@ func CreateRoom(ctx *gin.Context) {
 
 	var users []*game_proto.RoomUser
 	users = append(users, &game_proto.RoomUser{ID: userID, Ready: false})
-	_, err := global.GameSrvClient.SetGlobalRoom(context.Background(), &game_proto.RoomInfo{
+	// 1.创建房间对应服务器信息创建成功（查询之前是否已经用了该信息）
+	_, err := global.GameSrvClient.RecordRoomServer(context.Background(), &game_proto.RecordRoomServerInfo{
+		RoomID:     uint32(form.RoomID),
+		ServerInfo: fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port),
+	})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": err,
+		})
+		return
+	}
+	// 2.调用创建房间接口
+	global.GameSrvClient.SetGlobalRoom(context.Background(), &game_proto.RoomInfo{
 		RoomID:        uint32(form.RoomID),
 		MaxUserNumber: uint32(form.MaxUserNumber),
 		GameCount:     uint32(form.GameCount),
@@ -82,12 +94,7 @@ func CreateRoom(ctx *gin.Context) {
 		Users:         users,
 		RoomName:      form.RoomName,
 	})
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "房间存在",
-		})
-		return
-	}
+	// 3.然后创建用户对应服务器的连接
 	global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, form.RoomID),
 		Id:         userID,
@@ -114,17 +121,34 @@ func CreateRoom(ctx *gin.Context) {
 	})
 }
 
-// UserIntoRoom 玩家进入房间
+var IntoRoomChan = make(chan bool, 3)
+
+// UserIntoRoom 玩家进入房间 TODO 房间满人或者其他错误不成功，应该返回错误
 func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+
+	// 玩家进入房间，添加该玩家的服务器连接信息
+	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
 		Id:         userID,
 	})
-	//告知协程
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": err,
+		})
+		return
+	}
+	// 告知协程用户进房信息
 	CHAN[uint32(roomID)] <- userID
+	ok := <-IntoRoomChan
+	if !ok {
+		ctx.JSON(http.StatusForbidden, gin.H{
+			"err": "房间满了",
+		})
+		return
+	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "ok",
 	})

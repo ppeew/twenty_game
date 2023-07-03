@@ -1,0 +1,7 @@
+host: '139.159.234.134'
+port: 8848
+namespace: 'b8269140-ced0-4bae-9862-2297682d49c2'
+user: 'nacos'
+password: '518888'
+dataid: 'process-web.json'
+group: 'pro'

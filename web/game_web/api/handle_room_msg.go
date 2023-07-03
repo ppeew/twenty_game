@@ -232,13 +232,16 @@ func (roomInfo *RoomStruct) UserInto(message model.Message) {
 	//for u, _ := range roomInfo.RoomData.Users {
 	//zap.S().Infof("User包括：%d", u)
 	//}
-	if _, exist := roomInfo.RoomData.Users[message.UserIntoData.UserID]; !exist {
+	if _, exist := roomInfo.RoomData.Users[message.UserID]; !exist && roomInfo.RoomData.UserNumber < roomInfo.RoomData.MaxUserNumber {
 		//zap.S().Infof("[UserInto]:用户%d进房", message.UserIntoData.UserID)
 		roomInfo.RoomData.UserNumber++
 		//zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
-		roomInfo.RoomData.Users[message.UserIntoData.UserID] = response.UserData{
-			ID:    message.UserIntoData.UserID,
+		roomInfo.RoomData.Users[message.UserID] = response.UserData{
+			ID:    message.UserID,
 			Ready: false,
 		}
+		IntoRoomChan <- true
+	} else {
+		IntoRoomChan <- false
 	}
 }

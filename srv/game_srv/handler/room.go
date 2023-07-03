@@ -91,7 +91,6 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 		}
 		//房间不存在，允许创房
 	}
-	//TODO 检查用户是否已经有创房的服务器链接了
 
 	var users []*model.User
 	for _, user := range in.Users {
@@ -114,7 +113,7 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 	return &emptypb.Empty{}, nil
 }
 
-// 删除房间 TODO 删除该房间存在的服务器位置
+// 删除房间
 func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
 	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
 	if get.Err() == redis.Nil {
@@ -122,10 +121,10 @@ func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*empt
 	}
 	room := model.Room{}
 	_ = json.Unmarshal([]byte(get.Val()), &room)
-	global.RedisDB.Del(ctx, fmt.Sprintf("%s", NameRoom(in.RoomID)))
 	for _, info := range room.Users {
-		global.RedisDB.Del(ctx, NameUserConnInfo(info.ID))
+		global.RedisDB.Del(ctx, NameUserConnInfo(info.ID)) //删除了用户连接信息
 	}
+	global.RedisDB.Del(ctx, fmt.Sprintf("%s", NameRoom(in.RoomID)))
 	return &emptypb.Empty{}, nil
 }
 

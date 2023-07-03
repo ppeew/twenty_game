@@ -52,10 +52,12 @@ func main() {
 	}
 	//资源释放 释放房间
 	for roomID, _ := range api.CHAN {
-		_, err := global.GameSrvClient.DeleteRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
-		if err != nil {
-			zap.S().Infof("[ReleaseResource]:关闭%d房间失败:%s", roomID, err.Error())
-		}
+		// 1.删除用户对应服务器连接
+
+		// 2.删除redis房间信息
+		global.GameSrvClient.DelRoomServer(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
+		// 3.删除该房间对应的服务器信息
+		global.GameSrvClient.DeleteRoom(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
 	}
 	zap.S().Info("释放资源完毕，退出")
 }

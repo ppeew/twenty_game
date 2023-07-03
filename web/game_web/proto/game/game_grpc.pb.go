@@ -4,6 +4,7 @@ package game
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,12 +20,18 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameClient interface {
-	// 获得连接的服务器信息
+	// 获得用户连接的服务器信息
 	GetConnData(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*ConnResponse, error)
-	// 记录连接的服务器信息
+	// 创建用户连接的服务器信息
 	RecordConnData(ctx context.Context, in *RecordConnInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 删除用户连接服务器信息
 	DelConnData(ctx context.Context, in *DelConnInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 查询房间对应处理服务器信息
+	GetRoomServer(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*RoomServerInfo, error)
+	// 删除房间对应处理服务器信息
+	DelRoomServer(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 创建房间对应处理服务器信息
+	RecordRoomServer(ctx context.Context, in *RecordRoomServerInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 获得排行榜信息
 	GetRanks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RanksResponse, error)
 	// 更新排行榜
@@ -84,6 +91,33 @@ func (c *gameClient) RecordConnData(ctx context.Context, in *RecordConnInfo, opt
 func (c *gameClient) DelConnData(ctx context.Context, in *DelConnInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/game.Game/DelConnData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) GetRoomServer(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*RoomServerInfo, error) {
+	out := new(RoomServerInfo)
+	err := c.cc.Invoke(ctx, "/game.Game/GetRoomServer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) DelRoomServer(ctx context.Context, in *RoomIDInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/game.Game/DelRoomServer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) RecordRoomServer(ctx context.Context, in *RecordRoomServerInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/game.Game/RecordRoomServer", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -220,12 +254,18 @@ func (c *gameClient) SearchRoom(ctx context.Context, in *RoomIDInfo, opts ...grp
 // All implementations must embed UnimplementedGameServer
 // for forward compatibility
 type GameServer interface {
-	// 获得连接的服务器信息
+	// 获得用户连接的服务器信息
 	GetConnData(context.Context, *UserIDInfo) (*ConnResponse, error)
-	// 记录连接的服务器信息
+	// 创建用户连接的服务器信息
 	RecordConnData(context.Context, *RecordConnInfo) (*emptypb.Empty, error)
 	// 删除用户连接服务器信息
 	DelConnData(context.Context, *DelConnInfo) (*emptypb.Empty, error)
+	// 查询房间对应处理服务器信息
+	GetRoomServer(context.Context, *RoomIDInfo) (*RoomServerInfo, error)
+	// 删除房间对应处理服务器信息
+	DelRoomServer(context.Context, *RoomIDInfo) (*emptypb.Empty, error)
+	// 创建房间对应处理服务器信息
+	RecordRoomServer(context.Context, *RecordRoomServerInfo) (*emptypb.Empty, error)
 	// 获得排行榜信息
 	GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error)
 	// 更新排行榜
@@ -269,6 +309,15 @@ func (UnimplementedGameServer) RecordConnData(context.Context, *RecordConnInfo) 
 }
 func (UnimplementedGameServer) DelConnData(context.Context, *DelConnInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DelConnData not implemented")
+}
+func (UnimplementedGameServer) GetRoomServer(context.Context, *RoomIDInfo) (*RoomServerInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRoomServer not implemented")
+}
+func (UnimplementedGameServer) DelRoomServer(context.Context, *RoomIDInfo) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelRoomServer not implemented")
+}
+func (UnimplementedGameServer) RecordRoomServer(context.Context, *RecordRoomServerInfo) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RecordRoomServer not implemented")
 }
 func (UnimplementedGameServer) GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRanks not implemented")
@@ -375,6 +424,60 @@ func _Game_DelConnData_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GameServer).DelConnData(ctx, req.(*DelConnInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_GetRoomServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoomIDInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).GetRoomServer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/game.Game/GetRoomServer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).GetRoomServer(ctx, req.(*RoomIDInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_DelRoomServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoomIDInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).DelRoomServer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/game.Game/DelRoomServer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).DelRoomServer(ctx, req.(*RoomIDInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_RecordRoomServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordRoomServerInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).RecordRoomServer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/game.Game/RecordRoomServer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).RecordRoomServer(ctx, req.(*RecordRoomServerInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -649,6 +752,18 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DelConnData",
 			Handler:    _Game_DelConnData_Handler,
+		},
+		{
+			MethodName: "GetRoomServer",
+			Handler:    _Game_GetRoomServer_Handler,
+		},
+		{
+			MethodName: "DelRoomServer",
+			Handler:    _Game_DelRoomServer_Handler,
+		},
+		{
+			MethodName: "RecordRoomServer",
+			Handler:    _Game_RecordRoomServer_Handler,
 		},
 		{
 			MethodName: "GetRanks",
