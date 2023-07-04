@@ -65,6 +65,7 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
+	//fmt.Println(form.RoomID)
 	if form.RoomID <= 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "房间号不能小于0",
