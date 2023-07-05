@@ -93,7 +93,7 @@ func SelectRoomServer(ctx *gin.Context) {
 	server, err := global.GameSrvClient.GetRoomServer(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(roomID)})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": err,
+			"err": fmt.Sprintf("找不到目标服务器%s", err),
 		})
 		return
 	}

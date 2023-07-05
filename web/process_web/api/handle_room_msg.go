@@ -16,7 +16,7 @@ type dealFunc func(message model.Message)
 
 func NewDealFunc(room *RoomStruct) map[uint32]dealFunc {
 	var dealFun = make(map[uint32]dealFunc)
-	//dealFun[model.CheckHealthMsg] = room.CheckHealth
+	dealFun[model.CheckHealthMsg] = room.CheckHealth
 	dealFun[model.QuitRoomMsg] = room.QuitRoom
 	dealFun[model.GetRoomMsg] = room.RoomInfo
 	dealFun[model.RoomBeginGameMsg] = room.BeginGame
@@ -157,6 +157,7 @@ func (roomInfo *RoomStruct) UpdateRoom(message model.Message) {
 func (roomInfo *RoomStruct) UpdateUserReadyState(message model.Message) {
 	t := roomInfo.RoomData.Users[message.UserID]
 	t.Ready = message.ReadyStateData.IsReady
+	roomInfo.RoomData.Users[message.UserID] = t
 
 	SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
 		MsgType: response.MsgResponseType,
@@ -173,6 +174,12 @@ func (roomInfo *RoomStruct) UpdateUserReadyState(message model.Message) {
 // BeginGame 开始游戏
 func (roomInfo *RoomStruct) BeginGame(message model.Message) {
 	if message.UserID != roomInfo.RoomData.RoomOwner {
+		SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+			MsgType: response.MsgResponseType,
+			MsgInfo: &response.MsgResponse{
+				MsgData: fmt.Sprintf("玩家%d不是房主，不能开始游戏", message.UserID),
+			},
+		})
 		return
 	}
 	if roomInfo.RoomData.UserNumber != roomInfo.RoomData.MaxUserNumber {
@@ -220,28 +227,29 @@ func (roomInfo *RoomStruct) ChatProcess(message model.Message) {
 }
 
 func (roomInfo *RoomStruct) CheckHealth(message model.Message) {
-	//SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
-	//	MsgType:         response.CheckHealthType,
-	//	HealthCheckInfo: &response.HealthCheck{},
-	//})
+	SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+		MsgType:         response.CheckHealthType,
+		HealthCheckInfo: &response.HealthCheck{},
+	})
 }
 
 // 仅服务器使用的
 func (roomInfo *RoomStruct) UserInto(message model.Message) {
-	//zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
-	//for u, _ := range roomInfo.RoomData.Users {
-	//zap.S().Infof("User包括：%d", u)
-	//}
+	zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
+	success := false
 	if _, exist := roomInfo.RoomData.Users[message.UserID]; !exist && roomInfo.RoomData.UserNumber < roomInfo.RoomData.MaxUserNumber {
-		//zap.S().Infof("[UserInto]:用户%d进房", message.UserIntoData.UserID)
+		zap.S().Infof("[UserInto]:允许用户%d进房", message.UserID)
 		roomInfo.RoomData.UserNumber++
 		//zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
 		roomInfo.RoomData.Users[message.UserID] = response.UserData{
 			ID:    message.UserID,
-			Ready: false,
+			Ready: true,
 		}
-		IntoRoomChan <- true
-	} else {
-		IntoRoomChan <- false
+		success = true
 	}
+	//zap.S().Infof("[UserInto]:room_id%d", roomInfo.RoomData.RoomID)
+	if IntoRoomRspCHAN[roomInfo.RoomData.RoomID] == nil {
+		IntoRoomRspCHAN[roomInfo.RoomData.RoomID] = make(chan bool)
+	}
+	IntoRoomRspCHAN[roomInfo.RoomData.RoomID] <- success
 }

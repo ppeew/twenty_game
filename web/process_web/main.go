@@ -51,7 +51,7 @@ func main() {
 		zap.S().Info("注销服务失败")
 	}
 	//资源释放 释放房间
-	for roomID, _ := range api.CHAN {
+	for roomID, _ := range api.ConnectCHAN {
 		// 1.删除用户对应服务器连接
 
 		// 2.删除redis房间信息

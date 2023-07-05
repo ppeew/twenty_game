@@ -45,6 +45,8 @@ func startRoomThread(data RoomData) {
 	for _, userData := range room.RoomData.Users {
 		go room.ReadRoomUserMsg(ctx, userData.ID)
 	}
+	//用于用户连接
+	go room.ForUserConn(ctx)
 	//用于用户进房
 	go room.ForUserIntoRoom(ctx)
 	//定时检查房间用户是否占用房间不退出（看socket是否断开了）
@@ -126,14 +128,13 @@ func (roomInfo *RoomStruct) CheckClientHealth(ctx context.Context) {
 	}
 }
 
-func (roomInfo *RoomStruct) ForUserIntoRoom(ctx context.Context) {
+func (roomInfo *RoomStruct) ForUserConn(ctx context.Context) {
 	roomInfo.wg.Add(1)
 	defer roomInfo.wg.Done()
 	for true {
 		select {
-		case userID := <-CHAN[roomInfo.RoomData.RoomID]:
+		case userID := <-ConnectCHAN[roomInfo.RoomData.RoomID]:
 			//TODO 可能会出现并发问题 因此采用单线程处理
-			roomInfo.MsgChan <- model.Message{Type: model.UserIntoMsg, UserID: userID, UserIntoData: model.UserIntoData{}}
 			go roomInfo.ReadRoomUserMsg(ctx, userID)
 		case <-ctx.Done():
 			return
@@ -168,6 +169,25 @@ func (roomInfo *RoomStruct) UpdateRedisRoom(ctx context.Context) {
 			})
 
 		}
+	}
+}
+
+func (roomInfo *RoomStruct) ForUserIntoRoom(ctx context.Context) {
+	roomInfo.wg.Add(1)
+	defer roomInfo.wg.Done()
+	if IntoRoomCHAN[roomInfo.RoomData.RoomID] == nil {
+		IntoRoomCHAN[roomInfo.RoomData.RoomID] = make(chan uint32)
+	}
+	for true {
+		select {
+		case <-ctx.Done():
+			return
+		case userID := <-IntoRoomCHAN[roomInfo.RoomData.RoomID]:
+			//读到用户进房消息
+			zap.S().Infof("[ForUserIntoRoom]:我看到你进房了，正在处理！")
+			roomInfo.MsgChan <- model.Message{Type: model.UserIntoMsg, UserID: userID, UserIntoData: model.UserIntoData{}}
+		}
+
 	}
 }
 

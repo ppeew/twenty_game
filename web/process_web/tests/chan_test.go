@@ -36,6 +36,7 @@ func TestChan(t *testing.T) {
 
 func TestChan1(t *testing.T) {
 	c := make(chan int)
+	//var c chan int
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
 	count := 10000
@@ -60,4 +61,24 @@ func TestChan1(t *testing.T) {
 		}
 	}()
 	wg.Wait()
+}
+
+func TestChan2(t *testing.T) {
+	//var c map[uint32]chan bool
+	var c = make(chan bool)
+	//go func() {
+	//	for true {
+	//		time.Sleep(time.Second)
+	//		//fmt.Print(<-c)
+	//	}
+	//}()
+
+	go func() {
+		for true {
+			//time.Sleep(time.Second)
+			c <- true
+			//fmt.Print("111")
+		}
+	}()
+	time.Sleep(time.Second * 5)
 }
