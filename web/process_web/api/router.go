@@ -66,6 +66,11 @@ func ConnSocket(ctx *gin.Context) {
 
 // CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息 // TODO 创建房间应该先查询房间是否存在
 func CreateRoom(ctx *gin.Context) {
+	//u1 := ctx.DefaultPostForm("room_id", "默认名字")
+	//u2 := ctx.DefaultPostForm("max_user_number", "默认名字")
+	//u3 := ctx.DefaultPostForm("game_count", "默认名字")
+	//u4 := ctx.DefaultPostForm("room_name", "默认名字")
+	//fmt.Println(u1, u2, u3, u4)
 	form := forms.CreateRoomForm{}
 	if err := ctx.ShouldBind(&form); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
