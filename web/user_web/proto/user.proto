@@ -52,7 +52,7 @@ message UserInfoResponse{
   string password=4;
   uint32 id=5;
   string image=6;
-  uint32 state=7;
+//  uint32 state=7;
 }
 
 message CheckPasswordInfo{
