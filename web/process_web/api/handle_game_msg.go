@@ -71,6 +71,10 @@ func (game *GameStruct) HandleDeleteCard(msg model.Message) {
 	ws := UsersConn[msg.UserID]
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
+	if game.Users[data.TargetUserID] == nil {
+		SendErrToUser(UsersConn[msg.UserID], "[HandleDeleteCard]", errors.New("未知的玩家"))
+		return
+	}
 	for i, card := range game.Users[data.TargetUserID].BaseCards {
 		if card.CardID == data.CardID {
 			//删除

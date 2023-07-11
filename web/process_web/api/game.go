@@ -117,7 +117,7 @@ func (game *GameStruct) DoDistributeCard() {
 	//要生成userNumber+2的卡牌，其中包含普通卡和特殊卡
 	needCount := int(game.GameData.UserNumber + 10)
 	//特殊卡数量[0,1]
-	special := rand.Intn(2)
+	special := rand.Intn(5)
 	cards := make([]int, needCount)
 	used := make([]bool, needCount)
 	for i := needCount - 1; i >= needCount-special; i-- {
