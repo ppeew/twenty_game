@@ -31,8 +31,9 @@ func (game *GameStruct) HandleAddCard(msg model.Message) {
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.AddCard,
 		UserID:          msg.UserID,
-		AddCardData: model.AddCardData{
+		AddCardData: &model.AddCardData{
 			NeedNumber: msg.UseSpecialData.AddCardData.NeedNumber,
+			CardID:     game.MakeCardID,
 		},
 	}
 	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: &rsp})
@@ -57,7 +58,7 @@ func (game *GameStruct) HandleUpdateCard(msg model.Message) {
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.UpdateCard,
 		UserID:          msg.UserID,
-		UpdateCardData: model.UpdateCardData{
+		UpdateCardData: &model.UpdateCardData{
 			TargetUserID: msg.UseSpecialData.UpdateCardData.TargetUserID,
 			CardID:       msg.UseSpecialData.UpdateCardData.CardID,
 			UpdateNumber: msg.UseSpecialData.UpdateCardData.UpdateNumber,
@@ -95,7 +96,7 @@ func (game *GameStruct) HandleDeleteCard(msg model.Message) {
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.DeleteCard,
 		UserID:          msg.UserID,
-		DeleteCardData: model.DeleteCardData{
+		DeleteCardData: &model.DeleteCardData{
 			TargetUserID: msg.UseSpecialData.DeleteCardData.TargetUserID,
 			CardID:       msg.UseSpecialData.DeleteCardData.CardID,
 		},
@@ -141,7 +142,7 @@ func (game *GameStruct) HandleChangeCard(msg model.Message) {
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.ChangeCard,
 		UserID:          msg.UserID,
-		ChangeCardData: model.ChangeCardData{
+		ChangeCardData: &model.ChangeCardData{
 			CardID:       msg.UseSpecialData.ChangeCardData.CardID,
 			TargetUserID: msg.UseSpecialData.ChangeCardData.TargetUserID,
 			TargetCard:   msg.UseSpecialData.ChangeCardData.TargetCard,

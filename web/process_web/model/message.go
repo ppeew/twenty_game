@@ -90,6 +90,7 @@ type UpdateCardData struct {
 // 增加卡结构体
 type AddCardData struct {
 	NeedNumber uint32 `json:"needNumber"`
+	CardID     uint32 `json:"cardID"` //服务器返回时候，告知是生成了哪张卡ID
 }
 
 // 抢卡结构体

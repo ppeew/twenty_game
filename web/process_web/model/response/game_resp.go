@@ -23,12 +23,12 @@ type UserGameInfoResponse struct {
 
 // 使用特殊卡状态信息
 type UseSpecialCardResponse struct {
-	SpecialCardType uint32               `json:"specialCardType"` //使用特殊卡类型
-	UserID          uint32               `json:"userID"`          //使用道具的玩家
-	ChangeCardData  model.ChangeCardData `json:"changeCardData"`
-	DeleteCardData  model.DeleteCardData `json:"deleteCardData"`
-	UpdateCardData  model.UpdateCardData `json:"updateCardData"`
-	AddCardData     model.AddCardData    `json:"addCardData"`
+	SpecialCardType uint32                `json:"specialCardType"` //使用特殊卡类型
+	UserID          uint32                `json:"userID"`          //使用道具的玩家
+	ChangeCardData  *model.ChangeCardData `json:"changeCardData,omitempty"`
+	DeleteCardData  *model.DeleteCardData `json:"deleteCardData,omitempty"`
+	UpdateCardData  *model.UpdateCardData `json:"updateCardData,omitempty"`
+	AddCardData     *model.AddCardData    `json:"addCardData,omitempty"`
 }
 
 const (
