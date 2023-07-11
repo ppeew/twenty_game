@@ -1,0 +1,91 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option go_package = "./user;user";
+package user;
+
+service User{
+  //创建用户
+  rpc CreateUser(CreateUserInfo) returns (UserInfoResponse);
+  //校验密码
+  rpc CheckPassword(CheckPasswordInfo) returns(CheckPasswordResponse);
+  //通过id获取用户信息
+  rpc GetUserByID(UserIDInfo)returns(UserInfoResponse);
+  //通过用户名获取信息
+  rpc GetUserByUsername(UserNameInfo)returns(UserInfoResponse);
+  //更改用户信息
+  rpc UpdateUser(UpdateUserInfo)returns (google.protobuf.Empty);
+
+  //上传头像文件
+  rpc UploadImage(UploadInfo)returns (UploadResponse);
+  //下载文件
+  rpc DownLoadImage(DownloadInfo)returns (DownloadResponse);
+
+  //物品道具模块
+  //查询用户的金币钻石及道具
+  rpc GetUserItemsInfo(UserIDInfo) returns(UserItemsInfoResponse);
+  //增加金币
+  rpc AddGold(AddGoldRequest) returns(google.protobuf.Empty);
+  //增加钻石
+  rpc AddDiamond(AddDiamondInfo) returns(google.protobuf.Empty);
+  //使用道具(道具类型应该区别)
+  rpc UseItem(UseItemInfo) returns(IsOK);
+}
+
+message UploadInfo{
+  uint32 id=1;
+  string  path=2;
+}
+
+message UploadResponse{
+  string path=1;
+}
+
+message DownloadInfo{
+  uint32 id=1;
+}
+
+message DownloadResponse{
+  string path=1;
+}
+
+message CreateUserInfo{
+  string nickname=1;
+  bool gender=2;
+  string userName=3;
+  string password=4;
+}
+
+message UserInfoResponse{
+  string nickname=1;
+  bool gender=2;
+  string userName=3;
+  string password=4;
+  uint32 id=5;
+  string image=6;
+  uint32 state=7;
+}
+
+message CheckPasswordInfo{
+  string password=1;
+  string encodePassword=2;
+}
+
+message CheckPasswordResponse{
+  bool success=1;
+}
+
+message UserIDInfo{
+  uint32 id=1;
+}
+
+message UpdateUserInfo{
+  uint32 id=1;
+  string nickname=2;
+  bool gender=3;
+  string userName=4;
+  string password=5;
+}
+
+message UserNameInfo{
+  string userName=1;
+}

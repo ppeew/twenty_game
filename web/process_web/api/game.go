@@ -91,8 +91,8 @@ func NewGame(data GameData) *GameStruct {
 	for _, info := range game.GameData.Users {
 		//zap.S().Infof("[NewGame]初始化用户%d", info.ID)
 		game.Users[info.ID] = &model.UserGameInfo{
-			BaseCards:    make([]model.BaseCard, 0),
-			SpecialCards: make([]model.SpecialCard, 0),
+			BaseCards:    make([]*model.BaseCard, 0),
+			SpecialCards: make([]*model.SpecialCard, 0),
 			IsGetCard:    false,
 			Score:        0,
 		}
@@ -190,9 +190,9 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 					for _, card := range game.RandCard {
 						if data.GetCardID == card.CardID && !card.HasOwner {
 							if card.Type == model.BaseType {
-								game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, card.BaseCardInfo)
+								game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, &card.BaseCardInfo)
 							} else if card.Type == model.SpecialType {
-								game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards, card.SpecialCardInfo)
+								game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards, &card.SpecialCardInfo)
 							}
 							card.HasOwner = true //range的value是值拷贝！！！
 							game.Users[msg.UserID].IsGetCard = true
@@ -278,13 +278,13 @@ func (game *GameStruct) DoScoreCount() {
 			sum += card.Number
 		}
 		if sum/12 == 1 {
-			info.BaseCards = []model.BaseCard{}
+			info.BaseCards = make([]*model.BaseCard, 0)
 			if sum%12 == 0 {
 				info.Score += 5
 			} else {
 				//生成多的数字
 				game.MakeCardID++
-				info.BaseCards = append(info.BaseCards, model.BaseCard{
+				info.BaseCards = append(info.BaseCards, &model.BaseCard{
 					CardID: game.MakeCardID,
 					Number: sum % 12,
 				})

@@ -7,6 +7,8 @@ import (
 	"process_web/model"
 	"process_web/model/response"
 	game_proto "process_web/proto/game"
+
+	"go.uber.org/zap"
 )
 
 type HandlerCard func(model.Message)
@@ -23,7 +25,7 @@ func NewHandleFunc(game *GameStruct) map[uint32]HandlerCard {
 func (game *GameStruct) HandleAddCard(msg model.Message) {
 	data := msg.UseSpecialData.AddCardData
 	game.MakeCardID++
-	game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, model.BaseCard{
+	game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, &model.BaseCard{
 		CardID: game.MakeCardID,
 		Number: data.NeedNumber,
 	})
@@ -72,6 +74,8 @@ func (game *GameStruct) HandleDeleteCard(msg model.Message) {
 	ws := UsersConn[msg.UserID]
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
+	zap.S().Infof("[HandleDeleteCard]:玩家包括%v", game.Users)
+	zap.S().Infof("[HandleDeleteCard]:被删除卡的玩家是%d", data.TargetUserID)
 	if game.Users[data.TargetUserID] == nil {
 		SendErrToUser(UsersConn[msg.UserID], "[HandleDeleteCard]", errors.New("未知的玩家"))
 		return
@@ -115,8 +119,8 @@ func (game *GameStruct) HandleChangeCard(msg model.Message) {
 	for _, info := range game.Users[msg.UserID].BaseCards {
 		if info.CardID == data.CardID {
 			findUserCard = true
-			userInfo = &info
-			return
+			userInfo = info
+			break
 		}
 	}
 	if findUserCard == false {
@@ -126,8 +130,8 @@ func (game *GameStruct) HandleChangeCard(msg model.Message) {
 	for _, info := range game.Users[data.TargetUserID].BaseCards {
 		if info.CardID == data.TargetCard {
 			findTargetUserCard = true
-			targetUserInfo = &info
-			return
+			targetUserInfo = info
+			break
 		}
 	}
 	if findTargetUserCard == false {

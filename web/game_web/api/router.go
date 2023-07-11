@@ -23,8 +23,6 @@ import (
 // CHAN 房间号对应创建读取协程的管道
 var CHAN = make(map[uint32]chan uint32)
 
-var IntoRoomChan = make(chan bool, 3)
-
 // 获得重连服务器信息
 func GetConnInfo(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")

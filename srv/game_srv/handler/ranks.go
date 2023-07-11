@@ -49,12 +49,11 @@ func (s *GameServer) UpdateRanks(ctx context.Context, in *game.UpdateRanksInfo) 
 	defer mutex.Unlock()
 	//1.从redis中变更用户的信息（包含总得分+总游戏次数）
 	times := global.RedisDB.IncrBy(ctx, NameUserGametimes(in.UserID), int64(in.AddGametimes))
-	times.Val()
 	score := global.RedisDB.IncrBy(ctx, NameUserScore(in.UserID), int64(in.AddScore))
 	//2.给redis同步数据更新,且更新排行榜zset的key
 	global.RedisDB.ZAdd(ctx, ranks, redis.Z{
 		Score:  float64(score.Val()) / float64(times.Val()),
-		Member: in.UserID, //key=数字，userID
+		Member: in.UserID, //key:数字，userID
 	})
 	return &emptypb.Empty{}, nil
 }
@@ -64,5 +63,5 @@ func NameUserScore(userID uint32) string {
 }
 
 func NameUserGametimes(userID uint32) string {
-	return fmt.Sprintf("Game:gametimes:%d", userID)
+	return fmt.Sprintf("Game:userGametimes:%d", userID)
 }
