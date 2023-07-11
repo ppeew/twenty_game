@@ -17,6 +17,10 @@ type UserData struct {
 	Ready bool   `json:"Ready"`
 }
 
-// 踢人的信息体，告知被t的用户
+// 踢人的信息体，告知所有用户是谁被t了
 type KickerResponse struct {
+	ID uint32 `json:"ID"`
+}
+
+type BeginGameData struct {
 }

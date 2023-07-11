@@ -10,7 +10,7 @@ type GameStateResponse struct {
 	GameCount    uint32                 `json:"gameCount"` //游戏总回合数
 	GameCurCount uint32                 `json:"gameCurCount"`
 	Users        []UserGameInfoResponse `json:"users"`
-	RandCard     []model.Card           `json:"randCard"`
+	RandCard     []*model.Card          `json:"randCard"`
 }
 
 type UserGameInfoResponse struct {

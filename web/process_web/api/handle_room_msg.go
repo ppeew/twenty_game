@@ -119,11 +119,17 @@ func (roomInfo *RoomStruct) UpdateRoom(message model.Message) {
 		//先t人
 		if _, ok := roomInfo.RoomData.Users[data.Kicker]; ok {
 			//找到人
-			delete(roomInfo.RoomData.Users, data.Kicker) //即使找不到人也不报错
+			BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
+				MsgType: response.KickerResponseType,
+				KickerInfo: &response.KickerResponse{
+					ID: data.Kicker,
+				},
+			})
+			delete(roomInfo.RoomData.Users, data.Kicker)
 			roomInfo.RoomData.UserNumber--
-			if UsersConn[data.Kicker] != nil {
-				UsersConn[data.Kicker].CloseConn() //可能有nil错误
-			}
+			//if UsersConn[data.Kicker] != nil {
+			//	UsersConn[data.Kicker].CloseConn() //可能有nil错误
+			//}
 			global.GameSrvClient.DelConnData(context.Background(), &game_proto.DelConnInfo{
 				Id: data.Kicker,
 			})
@@ -209,14 +215,13 @@ func (roomInfo *RoomStruct) BeginGame(message model.Message) {
 	roomInfo.ExitChan <- GameStart
 
 	BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
-		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{
-			MsgData: "游戏即将开始",
-		},
+		MsgType:       response.BeginGameResponseType,
+		BeginGameInfo: &response.BeginGameData{},
 	})
 }
 
 func (roomInfo *RoomStruct) ChatProcess(message model.Message) {
+	zap.S().Infof("[ChatProcess]:%d,%s", message.UserID, message.ChatMsgData.Data)
 	BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
 		MsgType: response.ChatResponseType,
 		ChatInfo: &response.ChatResponse{
@@ -252,4 +257,12 @@ func (roomInfo *RoomStruct) UserInto(message model.Message) {
 		IntoRoomRspCHAN[roomInfo.RoomData.RoomID] = make(chan bool)
 	}
 	IntoRoomRspCHAN[roomInfo.RoomData.RoomID] <- success
+	BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
+		MsgType:  response.RoomInfoResponseType,
+		RoomInfo: roomInfo.MakeRoomResponse(),
+	})
+	BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
+		MsgType: response.MsgResponseType,
+		MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("玩家%d进入房间", message.UserID)},
+	})
 }

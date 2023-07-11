@@ -7,6 +7,8 @@ import (
 	"process_web/model/response"
 	"sync"
 
+	"go.uber.org/zap"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -41,8 +43,9 @@ func (ws *WSConn) readMsgLoop() {
 		//zap.S().Infof("[readMsgLoop]读到:%v", data)
 		data := model.Message{}
 		err := ws.conn.ReadJSON(&data)
+		//zap.S().Infof("[readMsgLoop]:Data:%+v", data)
 		if err != nil {
-			//zap.S().Warnf("[readMsgLoop]:%s", err)
+			zap.S().Warnf("[readMsgLoop]:%s", err)
 			//发生错误,关闭连接，停止协程
 			ws.CloseConn()
 			break
@@ -99,7 +102,7 @@ func SendErrToUser(ws *WSConn, handlerFunc string, error error) {
 	if error != nil {
 		errRsp := response.MessageResponse{
 			MsgType: response.ErrResponseMsgType,
-			ErrInfo: &response.ErrResponse{Error: errors.New(fmt.Sprintf("[%s]:%s", handlerFunc, error))},
+			ErrInfo: &response.ErrResponse{Error: fmt.Sprintf("[%s]:%s", handlerFunc, error)},
 		}
 		if ws != nil {
 			_ = ws.OutChanWrite(errRsp)

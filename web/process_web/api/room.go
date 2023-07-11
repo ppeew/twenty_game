@@ -56,6 +56,7 @@ func startRoomThread(data RoomData) {
 	for {
 		select {
 		case msg := <-room.MsgChan:
+			//zap.S().Infof("[startRoomThread]]:%+v", msg)
 			if dealFunc[msg.Type] != nil {
 				dealFunc[msg.Type](msg)
 			}
@@ -96,6 +97,7 @@ func NewRoom(data RoomData) *RoomStruct {
 func (roomInfo *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 	//当用户连接还没建立直接return，直到客户端调用连接
 	if UsersConn[userID] == nil {
+		zap.S().Info("[ReadRoomUserMsg]]:用户连接没建立return")
 		return
 	}
 	roomInfo.wg.Add(1)
@@ -106,10 +108,11 @@ func (roomInfo *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) 
 		case <-ctx.Done():
 			return
 		case message := <-UsersConn[userID].InChanRead():
+			zap.S().Infof("[ReadRoomUserMsg]:读到%d用户信息了", userID)
 			message.UserID = userID //添加标识，能够识别用户
 			roomInfo.MsgChan <- message
 		case <-UsersConn[userID].IsDisConn():
-			//zap.S().Infof("[ReadRoomUserMsg]:%d用户掉线了", userID)
+			zap.S().Infof("[ReadRoomUserMsg]:%d用户掉线了", userID)
 			return
 		}
 	}
@@ -196,7 +199,7 @@ func BroadcastToAllRoomUsers(roomInfo *RoomStruct, message response.MessageRespo
 		if UsersConn[info.ID] != nil {
 			err := UsersConn[info.ID].OutChanWrite(message)
 			if err != nil {
-				zap.S().Infof("ID为%d的用户掉线了", info.ID)
+				//zap.S().Infof("ID为%d的用户掉线了", info.ID)
 			}
 		}
 	}

@@ -48,7 +48,7 @@ func GetUserInfo(ctx *gin.Context) {
 		Gender:   info.Gender,
 		Username: info.UserName,
 		Image:    info.Image,
-		State:    info.State,
+		//State:    info.State,
 	}
 	ctx.JSON(http.StatusOK, resp)
 }

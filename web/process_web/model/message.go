@@ -22,21 +22,28 @@ type Message struct {
 }
 
 const (
+	UserIntoMsg = iota //仅服务器使用，客户端不要传
+)
+const (
 	// 通用的消息
-	CheckHealthMsg = 1 << iota //健康检查消息 1
-	ChatMsg                    //聊天消息 2
-	// 房间相关的消息
-	QuitRoomMsg       //用户退出房间消息 4
-	UpdateRoomMsg     //更新房间信息 8
-	GetRoomMsg        //获得房间信息消息 16
-	UserReadyStateMsg //用户准备消息 32
-	RoomBeginGameMsg  //房主开始游戏消息 64
-	// 游戏相关的消息
-	ItemMsg           //使用游戏道具消息 128
-	GrabCardMsg       //抢卡消息 256
-	UseSpecialCardMsg //使用特殊卡消息 512
+	CheckHealthMsg = 100 + iota //健康检查消息
+	ChatMsg                     //聊天消息
+)
 
-	UserIntoMsg //仅服务器使用，客户端不要传
+const (
+	// 房间相关的消息
+	QuitRoomMsg       = 200 + iota //用户退出房间消息
+	UpdateRoomMsg                  //更新房间信息
+	GetRoomMsg                     //获得房间信息消息
+	UserReadyStateMsg              //用户准备消息
+	RoomBeginGameMsg               //房主开始游戏消息
+)
+
+const (
+	// 游戏相关的消息
+	ItemMsg           = 300 + iota //使用游戏道具消息
+	GrabCardMsg                    //抢卡消息
+	UseSpecialCardMsg              //使用特殊卡消息
 )
 
 type ChatMsgData struct {
