@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"process_web/global"
 	"process_web/model"
@@ -45,18 +46,26 @@ func RunGame(data GameData) {
 		//循环初始化
 		game.DoFlush()
 		//zap.S().Info("游戏[DoFlush]完成")
-		BroadcastToAllGameUsers(game, CardModelToResponse(game))
+		BroadcastToAllGameUsers(game, response.MessageResponse{
+			MsgType: response.MsgResponseType,
+			MsgInfo: &response.MsgResponse{MsgData: "进入抢卡阶段"},
+		})
+		time.Sleep(time.Second)
 		//zap.S().Info("游戏[BroadcastToAllGameUsers]完成")
 		//发牌阶段
 		game.DoDistributeCard()
 		//zap.S().Info("游戏[DoDistributeCard]完成")
 		//抢卡阶段
 		//time.Sleep(time.Second * 2)
-		game.DoListenDistributeCard(3, 4)
+		game.DoListenDistributeCard(6, 8)
 		//zap.S().Info("游戏[DoListenDistributeCard]完成")
+		BroadcastToAllGameUsers(game, response.MessageResponse{
+			MsgType: response.MsgResponseType,
+			MsgInfo: &response.MsgResponse{MsgData: "进入出牌阶段"},
+		})
 		time.Sleep(time.Second)
 		//特殊卡处理阶段
-		game.DoHandleSpecialCard(6, 10)
+		game.DoHandleSpecialCard(8, 18)
 		//zap.S().Info("游戏[DoHandleSpecialCard]完成")
 		//分数计算阶段
 		game.DoScoreCount()
@@ -95,12 +104,17 @@ func NewGame(data GameData) *GameStruct {
 			SpecialCards: make([]*model.SpecialCard, 0),
 			IsGetCard:    false,
 			Score:        0,
+			IntoRoomTime: info.IntoRoomTime,
 		}
 		//对于每个用户开启一个协程，用于读取他的消息到游戏管道（分发消息功能）
 		go game.ReadGameUserMsg(ctx, info.ID)
 		game.wg.Add(1)
 	}
 	//等待用户页面初始化完成
+	BroadcastToAllGameUsers(game, response.MessageResponse{
+		MsgType: response.MsgResponseType,
+		MsgInfo: &response.MsgResponse{MsgData: "游戏1秒后开始！"},
+	})
 	time.Sleep(time.Second)
 	return game
 }
@@ -156,8 +170,7 @@ func (game *GameStruct) DoDistributeCard() {
 		}
 	}
 	//生成完成,通过websocket发送用户
-	resp := CardModelToResponse(game)
-	BroadcastToAllGameUsers(game, resp)
+	BroadcastToAllGameUsers(game, CardModelToResponse(game))
 }
 
 func (game *GameStruct) DoListenDistributeCard(min, max int) {
@@ -241,18 +254,11 @@ func (game *GameStruct) DoHandleSpecialCard(min, max int) {
 			switch msg.Type {
 			case model.UseSpecialCardMsg:
 				//只有这类型的消息才处理
-				findCard := false
-				for i, card := range game.Users[msg.UserID].SpecialCards {
-					if msg.UseSpecialData.SpecialCardID == card.CardID {
-						//找到卡，执行
-						findCard = true
-						game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards[:i], game.Users[msg.UserID].SpecialCards[i+1:]...)
-						handleFunc[card.Type](msg)
-					}
-				}
-				if findCard == false {
-					//找不到卡
-					SendErrToUser(userInfo, "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
+				isFind, cardType := game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
+				if isFind {
+					handleFunc[cardType](msg)
+				} else {
+					SendErrToUser(UsersConn[msg.UserID], "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
 				}
 			default:
 				//其他消息不处理,给用户返回超时
@@ -266,11 +272,15 @@ func (game *GameStruct) DoHandleSpecialCard(min, max int) {
 }
 
 func (game *GameStruct) DoScoreCount() {
-	for _, info := range game.Users {
+	for id, info := range game.Users {
 		//首先清理用户普通卡（要求：普通卡不能大于6张，大于6张则删除最先进来的卡）
 		total := len(info.BaseCards)
 		if total > 6 {
 			info.BaseCards = info.BaseCards[total-6:]
+			SendMsgToUser(UsersConn[id], response.MessageResponse{
+				MsgType: response.MsgResponseType,
+				MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("卡没了噢爆了！")},
+			})
 		}
 		//处理分数
 		sum := uint32(0)
@@ -280,7 +290,11 @@ func (game *GameStruct) DoScoreCount() {
 		if sum/12 == 1 {
 			info.BaseCards = make([]*model.BaseCard, 0)
 			if sum%12 == 0 {
-				info.Score += 5
+				info.Score += 10
+				SendMsgToUser(UsersConn[id], response.MessageResponse{
+					MsgType: response.MsgResponseType,
+					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("得分啦！")},
+				})
 			} else {
 				//生成多的数字
 				game.MakeCardID++
@@ -288,9 +302,14 @@ func (game *GameStruct) DoScoreCount() {
 					CardID: game.MakeCardID,
 					Number: sum % 12,
 				})
+				SendMsgToUser(UsersConn[id], response.MessageResponse{
+					MsgType: response.MsgResponseType,
+					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("超出12了！")},
+				})
 			}
 		}
 	}
+	time.Sleep(time.Second)
 }
 
 func (game *GameStruct) BackToRoom() {

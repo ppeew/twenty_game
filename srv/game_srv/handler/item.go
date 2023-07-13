@@ -8,7 +8,6 @@ import (
 	"game_srv/model"
 	"game_srv/proto/game"
 
-	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -33,8 +32,8 @@ func ModelToResponse(user *model.UserItem) *game.UserItemsInfoResponse {
 
 // 创建用户物品表
 func (s *GameServer) CreateUserItems(ctx context.Context, req *game.UserItemsInfo) (*game.UserItemsInfoResponse, error) {
-	zap.S().Info("用户访问CreateUserItems")
-	fmt.Println("用户访问CreateUserItems")
+	//zap.S().Info("用户访问CreateUserItems")
+	//fmt.Println("用户访问CreateUserItems")
 	item := model.UserItem{
 		UserID:  req.Id,
 		Gold:    req.Gold,

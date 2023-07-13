@@ -22,7 +22,7 @@ func (s *GameServer) GetRoomServer(ctx context.Context, in *game.RoomIDInfo) (*g
 
 // 删除房间对应处理服务器信息
 func (s *GameServer) DelRoomServer(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
-	del := global.RedisDB.Del(ctx, NameRoom(in.RoomID))
+	del := global.RedisDB.Del(ctx, NameRoomServer(in.RoomID))
 	return &emptypb.Empty{}, del.Err()
 }
 

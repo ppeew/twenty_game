@@ -8,6 +8,7 @@ import (
 	"game_srv/global"
 	"game_srv/model"
 	"game_srv/proto/game"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 
@@ -87,7 +88,7 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
 	if get.Err() != nil {
 		if get.Err() != redis.Nil {
-			return &emptypb.Empty{}, get.Err()
+			return &emptypb.Empty{}, errors.New("房间已存在了")
 		}
 		//房间不存在，允许创房
 	}
@@ -107,7 +108,7 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 		RoomName:      in.RoomName,
 	}
 	marshal, _ := json.Marshal(room)
-	global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
+	global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, time.Second*10)
 	//新建连接的redis服务器信息
 	//global.RedisDB.Set(ctx, NameUserConnInfo(in.RoomOwner), fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port), 0)
 	return &emptypb.Empty{}, nil

@@ -19,6 +19,7 @@ type UserGameInfoResponse struct {
 	SpecialCards []*model.SpecialCard `json:"specialCards"` //特殊卡
 	IsGetCard    bool                 `json:"isGetCard"`    //当前回合已经抢过卡了
 	Score        uint32               `json:"score"`
+	IntoRoomTime time.Time            `json:"-"`
 }
 
 // 使用特殊卡状态信息

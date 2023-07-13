@@ -73,7 +73,7 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	zap.S().Infof("[CreateRoom]房间ID:%d", form.RoomID)
+	//zap.S().Infof("[CreateRoom]房间ID:%d", form.RoomID)
 	if form.RoomID <= 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "房间号不能小于0",
@@ -86,7 +86,7 @@ func CreateRoom(ctx *gin.Context) {
 	var users []*game_proto.RoomUser
 	users = append(users, &game_proto.RoomUser{ID: userID, Ready: false})
 	zap.S().Infof("[CreateRoom]:注册房间主机和端口%s", fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port))
-	// 1.创建房间对应服务器信息创建成功 //TODO （查询之前是否已经用了该信息）
+	// 1.创建房间对应服务器信息 //TODO （查询之前是否已经有了该信息，有了就不允许创建）
 	_, err := global.GameSrvClient.RecordRoomServer(context.Background(), &game_proto.RecordRoomServerInfo{
 		RoomID:     uint32(form.RoomID),
 		ServerInfo: fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port),
@@ -97,22 +97,20 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	// 2.调用创建房间接口
-	global.GameSrvClient.SetGlobalRoom(context.Background(), &game_proto.RoomInfo{
-		RoomID:        uint32(form.RoomID),
-		MaxUserNumber: uint32(form.MaxUserNumber),
-		GameCount:     uint32(form.GameCount),
-		UserNumber:    1,
-		RoomOwner:     userID,
-		RoomWait:      true,
-		Users:         users,
-		RoomName:      form.RoomName,
-	})
-	// 3.然后创建用户对应服务器的连接
-	global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+	// 2.然后创建用户对应服务器的连接 TODO (可能因为用户已经再游戏中了创建失败，这个要回滚上一步操作)
+	_, err = global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, form.RoomID),
 		Id:         userID,
 	})
+	if err != nil {
+		global.GameSrvClient.DelRoomServer(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(form.RoomID)})
+		zap.S().Infof("[CreateRoom]:删除房间服务器信息")
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "请先退出原先房间",
+		})
+		return
+	}
+	zap.S().Infof("[CreateRoom]:全通过了，开启房间线程")
 	//启动房间协程
 	ConnectCHAN[uint32(form.RoomID)] = make(chan uint32, 10)
 	u := make(map[uint32]response.UserData)

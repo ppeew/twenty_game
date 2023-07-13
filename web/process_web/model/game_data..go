@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type Card struct {
 	Type            uint32      `json:"type"`
 	CardID          uint32      `json:"cardID"`
@@ -35,4 +37,5 @@ type UserGameInfo struct {
 	SpecialCards []*SpecialCard `json:"specialCards,omitempty"` //特殊卡
 	IsGetCard    bool           `json:"isGetCard,omitempty"`    //当前回合已经抢过卡了
 	Score        uint32         `json:"score,omitempty"`
+	IntoRoomTime time.Time      `json:"-"`
 }

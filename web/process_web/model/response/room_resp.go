@@ -1,5 +1,7 @@
 package response
 
+import "time"
+
 // 房间信息体
 type RoomResponse struct {
 	RoomID        uint32     `json:"roomID"`
@@ -13,8 +15,9 @@ type RoomResponse struct {
 }
 
 type UserData struct {
-	ID    uint32 `json:"ID"`
-	Ready bool   `json:"Ready"`
+	ID           uint32    `json:"ID"`
+	Ready        bool      `json:"Ready"`
+	IntoRoomTime time.Time `json:"-"` //忽略
 }
 
 // 踢人的信息体，告知所有用户是谁被t了

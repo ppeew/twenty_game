@@ -8,6 +8,8 @@ import (
 	"process_web/model"
 	"process_web/model/response"
 	game_proto "process_web/proto/game"
+	"sort"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -35,6 +37,9 @@ func (roomInfo *RoomStruct) MakeRoomResponse() *response.RoomResponse {
 			Ready: data.Ready,
 		})
 	}
+	sort.Slice(users, func(i, j int) bool {
+		return users[i].IntoRoomTime.Before(users[j].IntoRoomTime)
+	})
 	roomResponse := &response.RoomResponse{
 		RoomID:        roomInfo.RoomData.RoomID,
 		MaxUserNumber: roomInfo.RoomData.MaxUserNumber,
@@ -247,8 +252,9 @@ func (roomInfo *RoomStruct) UserInto(message model.Message) {
 		roomInfo.RoomData.UserNumber++
 		//zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
 		roomInfo.RoomData.Users[message.UserID] = response.UserData{
-			ID:    message.UserID,
-			Ready: true,
+			ID:           message.UserID,
+			Ready:        true,
+			IntoRoomTime: time.Now(),
 		}
 		success = true
 	}

@@ -67,6 +67,7 @@ func startRoomThread(data RoomData) {
 			zap.S().Info("[startRoomThread]]:其他协程已关闭")
 			if msg == RoomQuit {
 				global.GameSrvClient.DeleteRoom(context.Background(), &game.RoomIDInfo{RoomID: room.RoomData.RoomID})
+				global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: room.RoomData.RoomID})
 				return
 			} else if msg == GameStart {
 				go RunGame(GameData{

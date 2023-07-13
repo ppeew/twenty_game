@@ -7,8 +7,7 @@ import (
 	"process_web/model"
 	"process_web/model/response"
 	game_proto "process_web/proto/game"
-
-	"go.uber.org/zap"
+	"sort"
 )
 
 type HandlerCard func(model.Message)
@@ -29,7 +28,7 @@ func (game *GameStruct) HandleAddCard(msg model.Message) {
 		CardID: game.MakeCardID,
 		Number: data.NeedNumber,
 	})
-	game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
+	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.AddCard,
 		UserID:          msg.UserID,
@@ -56,7 +55,7 @@ func (game *GameStruct) HandleUpdateCard(msg model.Message) {
 		SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要更新的卡"))
 		return
 	}
-	game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
+	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.UpdateCard,
 		UserID:          msg.UserID,
@@ -74,8 +73,8 @@ func (game *GameStruct) HandleDeleteCard(msg model.Message) {
 	ws := UsersConn[msg.UserID]
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
-	zap.S().Infof("[HandleDeleteCard]:玩家包括%v", game.Users)
-	zap.S().Infof("[HandleDeleteCard]:被删除卡的玩家是%d", data.TargetUserID)
+	//zap.S().Infof("[HandleDeleteCard]:玩家包括%v", game.Users)
+	//zap.S().Infof("[HandleDeleteCard]:被删除卡的玩家是%d", data.TargetUserID)
 	if game.Users[data.TargetUserID] == nil {
 		SendErrToUser(UsersConn[msg.UserID], "[HandleDeleteCard]", errors.New("未知的玩家"))
 		return
@@ -96,7 +95,7 @@ func (game *GameStruct) HandleDeleteCard(msg model.Message) {
 		SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要删除的卡"))
 		return
 	}
-	game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
+	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.DeleteCard,
 		UserID:          msg.UserID,
@@ -142,7 +141,7 @@ func (game *GameStruct) HandleChangeCard(msg model.Message) {
 	temp := userInfo
 	userInfo = targetUserInfo
 	targetUserInfo = temp
-	game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
+	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.ChangeCard,
 		UserID:          msg.UserID,
@@ -253,22 +252,23 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 	}
 }
 
-func (game *GameStruct) DropSpecialCard(userID uint32, specialID uint32) {
-	for u, info := range game.Users {
-		if u == userID {
-			for index, specialCard := range info.SpecialCards {
-				if specialCard.CardID == specialID {
-					if index+1 >= len(info.SpecialCards) {
-						info.SpecialCards = info.SpecialCards[:index]
-					} else {
-						info.SpecialCards = append(info.SpecialCards[:index], info.SpecialCards[index+1:]...)
-					}
-					break
-				}
+func (game *GameStruct) DropSpecialCard(userID uint32, specialID uint32) (bool, uint32) {
+	isFind := false
+	var cardType uint32
+	user := game.Users[userID]
+	for index, specialCard := range user.SpecialCards {
+		if specialCard.CardID == specialID {
+			if index+1 >= len(user.SpecialCards) {
+				user.SpecialCards = user.SpecialCards[:index]
+			} else {
+				user.SpecialCards = append(user.SpecialCards[:index], user.SpecialCards[index+1:]...)
 			}
+			isFind = true
+			cardType = specialCard.Type
 			break
 		}
 	}
+	return isFind, cardType
 }
 
 func BroadcastToAllGameUsers(game *GameStruct, msg response.MessageResponse) {
@@ -291,9 +291,13 @@ func CardModelToResponse(game *GameStruct) response.MessageResponse {
 			SpecialCards: info.SpecialCards,
 			IsGetCard:    info.IsGetCard,
 			Score:        info.Score,
+			IntoRoomTime: info.IntoRoomTime,
 		}
 		users = append(users, userGameInfoResponse)
 	}
+	sort.Slice(users, func(i, j int) bool {
+		return users[i].IntoRoomTime.Before(users[j].IntoRoomTime)
+	})
 	info := response.GameStateResponse{
 		GameCount:    game.GameData.GameCount,
 		GameCurCount: game.CurrentCount,
