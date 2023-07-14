@@ -22,12 +22,18 @@ func (s *GameServer) GetRoomServer(ctx context.Context, in *game.RoomIDInfo) (*g
 
 // 删除房间对应处理服务器信息
 func (s *GameServer) DelRoomServer(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
+	mutex := global.RedSync.NewMutex(fmt.Sprintf("RoomServerLock:%d", in.RoomID))
+	mutex.Lock()
+	defer mutex.Unlock()
 	del := global.RedisDB.Del(ctx, NameRoomServer(in.RoomID))
 	return &emptypb.Empty{}, del.Err()
 }
 
 // 创建房间对应处理服务器信息
 func (s *GameServer) RecordRoomServer(ctx context.Context, in *game.RecordRoomServerInfo) (*emptypb.Empty, error) {
+	mutex := global.RedSync.NewMutex(fmt.Sprintf("RoomServerLock:%d", in.RoomID))
+	mutex.Lock()
+	defer mutex.Unlock()
 	//先查询是否有了
 	get := global.RedisDB.Get(ctx, NameRoomServer(in.RoomID))
 	if get.Err() != redis.Nil {

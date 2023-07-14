@@ -127,7 +127,20 @@ func (roomInfo *RoomStruct) CheckClientHealth(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-time.Tick(time.Second * 30):
-			BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{MsgType: response.CheckHealthType})
+			for _, info := range roomInfo.RoomData.Users {
+				if UsersConn[info.ID] != nil {
+					err := UsersConn[info.ID].OutChanWrite(response.MessageResponse{MsgType: response.CheckHealthType})
+					if err != nil {
+						//检查用户连接，断开则自动离开房间
+						roomInfo.MsgChan <- model.Message{
+							Type:         model.QuitRoomMsg,
+							UserID:       info.ID,
+							QuitRoomData: model.QuitRoomData{},
+						}
+					}
+				}
+			}
+			//BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{MsgType: response.CheckHealthType})
 		}
 	}
 }

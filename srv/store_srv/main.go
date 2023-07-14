@@ -8,10 +8,9 @@ import (
 	"store_srv/global"
 	"store_srv/handler"
 	"store_srv/initialize"
-	"store_srv/proto/game"
+	"store_srv/proto/store"
 	"store_srv/utils"
 	"syscall"
-	"time"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -21,10 +20,10 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitDB()
-	//initialize.InitSrvConn()
+	initialize.InitSrvConn()
 
 	server := grpc.NewServer()
-	game.RegisterGameServer(server, &handler.GameServer{})
+	store.RegisterStoreServer(server, &handler.StoreServer{})
 
 	port, err := utils.GetFreePort()
 	global.ServerConfig.Port = port
@@ -55,7 +54,6 @@ func main() {
 		zap.S().Info("两次ctrl+c强制退出")
 		syscall.Exit(0)
 	}()
-	time.Sleep(2 * time.Second)
 	if err := consulClient.Agent().ServiceDeregister(serverID); err != nil {
 		zap.S().Info("注销服务失败")
 	}

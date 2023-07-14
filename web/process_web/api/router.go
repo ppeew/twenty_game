@@ -49,6 +49,13 @@ func ConnSocket(ctx *gin.Context) {
 		})
 		return
 	}
+	//检查用户是否已经进房了
+	_, err := global.GameSrvClient.GetConnData(context.Background(), &game_proto.UserIDInfo{Id: userID})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"err": "不在房间内",
+		})
+	}
 	// 建立websocket连接
 	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
@@ -141,7 +148,7 @@ func UserIntoRoom(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
 	// 玩家进入房间，添加该玩家的服务器连接信息
-	zap.S().Infof("[UserIntoRoom]:用户对应的服务器信息%s", fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID))
+	//zap.S().Infof("[UserIntoRoom]:用户对应的服务器信息%s", fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID))
 	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
 		Id:         userID,

@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"game_srv/global"
 	"game_srv/model"
@@ -82,17 +81,6 @@ func (s *GameServer) SearchRoom(ctx context.Context, in *game.RoomIDInfo) (*game
 
 // 创建房间
 func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emptypb.Empty, error) {
-	if in.RoomID <= 0 {
-		return &emptypb.Empty{}, errors.New("房间号不能小于0")
-	}
-	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
-	if get.Err() != nil {
-		if get.Err() != redis.Nil {
-			return &emptypb.Empty{}, errors.New("房间已存在了")
-		}
-		//房间不存在，允许创房
-	}
-
 	var users []*model.User
 	for _, user := range in.Users {
 		users = append(users, &model.User{ID: user.ID, Ready: user.Ready})
@@ -109,8 +97,6 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 	}
 	marshal, _ := json.Marshal(room)
 	global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, time.Second*10)
-	//新建连接的redis服务器信息
-	//global.RedisDB.Set(ctx, NameUserConnInfo(in.RoomOwner), fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port), 0)
 	return &emptypb.Empty{}, nil
 }
 
