@@ -7,7 +7,6 @@ import (
 	"game_srv/global"
 	"game_srv/model"
 	"game_srv/proto/game"
-	"time"
 
 	"github.com/redis/go-redis/v9"
 
@@ -96,7 +95,7 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 		RoomName:      in.RoomName,
 	}
 	marshal, _ := json.Marshal(room)
-	global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, time.Second*10)
+	global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	return &emptypb.Empty{}, nil
 }
 
