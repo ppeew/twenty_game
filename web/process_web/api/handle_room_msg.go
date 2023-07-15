@@ -7,7 +7,7 @@ import (
 	"process_web/global"
 	"process_web/model"
 	"process_web/model/response"
-	game_proto "process_web/proto/game"
+	"process_web/proto/game"
 	"sort"
 	"time"
 
@@ -33,8 +33,9 @@ func (roomInfo *RoomStruct) MakeRoomResponse() *response.RoomResponse {
 	var users []response.UserData
 	for _, data := range roomInfo.RoomData.Users {
 		users = append(users, response.UserData{
-			ID:    data.ID,
-			Ready: data.Ready,
+			ID:           data.ID,
+			Ready:        data.Ready,
+			IntoRoomTime: data.IntoRoomTime,
 		})
 	}
 	sort.Slice(users, func(i, j int) bool {
@@ -102,7 +103,7 @@ func (roomInfo *RoomStruct) QuitRoom(message model.Message) {
 	})
 	UsersConn[message.UserID].CloseConn()
 	//玩家退出，应该从redis删除其服务器连接信息
-	global.GameSrvClient.DelConnData(context.Background(), &game_proto.DelConnInfo{
+	global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
 		Id: message.UserID,
 	})
 }
@@ -114,6 +115,9 @@ func (roomInfo *RoomStruct) UpdateRoom(message model.Message) {
 		//非房主，不可以修改房间的！
 		return
 	}
+	if data.RoomName != "" {
+		roomInfo.RoomData.RoomName = data.RoomName
+	}
 	if data.MaxUserNumber >= roomInfo.RoomData.UserNumber && data.MaxUserNumber != 0 {
 		roomInfo.RoomData.MaxUserNumber = data.MaxUserNumber
 	}
@@ -124,7 +128,7 @@ func (roomInfo *RoomStruct) UpdateRoom(message model.Message) {
 		//先t人
 		if _, ok := roomInfo.RoomData.Users[data.Kicker]; ok {
 			//找到人
-			BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
+			SendMsgToUser(UsersConn[data.Kicker], response.MessageResponse{
 				MsgType: response.KickerResponseType,
 				KickerInfo: &response.KickerResponse{
 					ID: data.Kicker,
@@ -135,7 +139,7 @@ func (roomInfo *RoomStruct) UpdateRoom(message model.Message) {
 			//if UsersConn[data.Kicker] != nil {
 			//	UsersConn[data.Kicker].CloseConn() //可能有nil错误
 			//}
-			global.GameSrvClient.DelConnData(context.Background(), &game_proto.DelConnInfo{
+			global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
 				Id: data.Kicker,
 			})
 			if roomInfo.RoomData.UserNumber <= 0 {
@@ -245,10 +249,10 @@ func (roomInfo *RoomStruct) CheckHealth(message model.Message) {
 
 // 仅服务器使用的
 func (roomInfo *RoomStruct) UserInto(message model.Message) {
-	zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
+	//zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
 	success := false
 	if _, exist := roomInfo.RoomData.Users[message.UserID]; !exist && roomInfo.RoomData.UserNumber < roomInfo.RoomData.MaxUserNumber {
-		zap.S().Infof("[UserInto]:允许用户%d进房", message.UserID)
+		//zap.S().Infof("[UserInto]:允许用户%d进房", message.UserID)
 		roomInfo.RoomData.UserNumber++
 		//zap.S().Infof("[UserInto]:房间人数%d", roomInfo.RoomData.UserNumber)
 		roomInfo.RoomData.Users[message.UserID] = response.UserData{
@@ -267,8 +271,8 @@ func (roomInfo *RoomStruct) UserInto(message model.Message) {
 		MsgType:  response.RoomInfoResponseType,
 		RoomInfo: roomInfo.MakeRoomResponse(),
 	})
-	BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
-		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("玩家%d进入房间", message.UserID)},
-	})
+	//BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
+	//	MsgType: response.MsgResponseType,
+	//	MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("玩家%d进入房间", message.UserID)},
+	//})
 }

@@ -106,6 +106,7 @@ type QuitRoomData struct {
 type UpdateData struct {
 	MaxUserNumber uint32 `json:"maxUserNumber"`
 	GameCount     uint32 `json:"gameCount"`
+	RoomName      string `json:"roomName"`
 	Owner         uint32 `json:"owner"`
 	Kicker        uint32 `json:"kicker"`
 }

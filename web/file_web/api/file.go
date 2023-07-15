@@ -34,14 +34,14 @@ func UploadImage(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
-	_, err = global.UserSrvClient.UploadImage(context.Background(), &user.UploadInfo{Id: id, Path: filePath})
+	res, err := global.UserSrvClient.UploadImage(context.Background(), &user.UploadInfo{Id: id, Path: filePath})
 	if err != nil {
 		zap.S().Infof("[UploadImage]:%s", err)
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": "OK",
+		"data": res.Path,
 	})
 }
 

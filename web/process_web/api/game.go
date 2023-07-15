@@ -50,20 +50,19 @@ func RunGame(data GameData) {
 			MsgType: response.MsgResponseType,
 			MsgInfo: &response.MsgResponse{MsgData: "进入抢卡阶段"},
 		})
-		time.Sleep(time.Second)
+		time.Sleep(time.Second * 2)
 		//zap.S().Info("游戏[BroadcastToAllGameUsers]完成")
 		//发牌阶段
 		game.DoDistributeCard()
 		//zap.S().Info("游戏[DoDistributeCard]完成")
 		//抢卡阶段
-		//time.Sleep(time.Second * 2)
 		game.DoListenDistributeCard(6, 8)
 		//zap.S().Info("游戏[DoListenDistributeCard]完成")
 		BroadcastToAllGameUsers(game, response.MessageResponse{
 			MsgType: response.MsgResponseType,
 			MsgInfo: &response.MsgResponse{MsgData: "进入出牌阶段"},
 		})
-		time.Sleep(time.Second)
+		time.Sleep(time.Second * 2)
 		//特殊卡处理阶段
 		game.DoHandleSpecialCard(8, 18)
 		//zap.S().Info("游戏[DoHandleSpecialCard]完成")
@@ -113,9 +112,9 @@ func NewGame(data GameData) *GameStruct {
 	//等待用户页面初始化完成
 	BroadcastToAllGameUsers(game, response.MessageResponse{
 		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{MsgData: "游戏1秒后开始！"},
+		MsgInfo: &response.MsgResponse{MsgData: "游戏2秒后开始！"},
 	})
-	time.Sleep(time.Second)
+	time.Sleep(time.Second * 2)
 	return game
 }
 
@@ -123,15 +122,16 @@ func (game *GameStruct) DoFlush() {
 	game.RandCard = []*model.Card{}
 	for _, info := range game.Users {
 		info.IsGetCard = false
+		info.IsGetSpecialCard = false
 	}
 	game.CurrentCount++
 }
 
 func (game *GameStruct) DoDistributeCard() {
 	//要生成userNumber+2的卡牌，其中包含普通卡和特殊卡
-	needCount := int(game.GameData.UserNumber + 2)
+	needCount := 6
 	//特殊卡数量[0,1]
-	special := rand.Intn(1)
+	special := rand.Intn(3)
 	cards := make([]int, needCount)
 	used := make([]bool, needCount)
 	for i := needCount - 1; i >= needCount-special; i-- {
@@ -187,46 +187,50 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 		select {
 		case msg := <-game.CommonChan:
 			userInfo := UsersConn[msg.UserID]
-			//zap.S().Infof("[DoListenDistributeCard]:%+v", msg)
-			switch msg.Type {
-			//只有这类型的消息才处理
-			case model.GrabCardMsg:
-				//每一局用户最多只能抢一张卡，检查
-				if game.Users[msg.UserID].IsGetCard {
+			if msg.Type == model.GrabCardMsg {
+				data := msg.GetCardData
+				isOK := false
+				for _, card := range game.RandCard {
+					if data.GetCardID == card.CardID && !card.HasOwner {
+						if card.Type == model.BaseType {
+							if game.Users[msg.UserID].IsGetCard {
+								SendMsgToUser(userInfo, response.MessageResponse{
+									MsgType: response.MsgResponseType,
+									MsgInfo: &response.MsgResponse{MsgData: "一回合最多抢一次普通卡噢！"},
+								})
+								return
+							}
+							game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, &card.BaseCardInfo)
+							game.Users[msg.UserID].IsGetCard = true
+						} else if card.Type == model.SpecialType {
+							if game.Users[msg.UserID].IsGetSpecialCard {
+								SendMsgToUser(userInfo, response.MessageResponse{
+									MsgType: response.MsgResponseType,
+									MsgInfo: &response.MsgResponse{MsgData: "一回合最多抢一次特殊卡噢！"},
+								})
+								return
+							}
+							game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards, &card.SpecialCardInfo)
+							game.Users[msg.UserID].IsGetSpecialCard = true
+						}
+						card.HasOwner = true //range的value是值拷贝！！！
+						isOK = true
+						break
+					}
+				}
+				//发送给用户信息
+				if isOK {
 					SendMsgToUser(userInfo, response.MessageResponse{
 						MsgType: response.MsgResponseType,
-						MsgInfo: &response.MsgResponse{MsgData: "一回合最多抢一次卡噢！"},
+						MsgInfo: &response.MsgResponse{MsgData: "抢到卡了！"},
 					})
+					resp := CardModelToResponse(game)
+					BroadcastToAllGameUsers(game, resp)
 				} else {
-					data := msg.GetCardData
-					isOK := false
-					for _, card := range game.RandCard {
-						if data.GetCardID == card.CardID && !card.HasOwner {
-							if card.Type == model.BaseType {
-								game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, &card.BaseCardInfo)
-							} else if card.Type == model.SpecialType {
-								game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards, &card.SpecialCardInfo)
-							}
-							card.HasOwner = true //range的value是值拷贝！！！
-							game.Users[msg.UserID].IsGetCard = true
-							isOK = true
-							break
-						}
-					}
-					//发送给用户信息
-					if isOK {
-						SendMsgToUser(userInfo, response.MessageResponse{
-							MsgType: response.MsgResponseType,
-							MsgInfo: &response.MsgResponse{MsgData: "抢到卡了！"},
-						})
-						resp := CardModelToResponse(game)
-						BroadcastToAllGameUsers(game, resp)
-					} else {
-						SendMsgToUser(userInfo, response.MessageResponse{
-							MsgType: response.MsgResponseType,
-							MsgInfo: &response.MsgResponse{MsgData: "没抢到卡~~~"},
-						})
-					}
+					SendMsgToUser(userInfo, response.MessageResponse{
+						MsgType: response.MsgResponseType,
+						MsgInfo: &response.MsgResponse{MsgData: "没抢到卡~~~"},
+					})
 				}
 			}
 		case <-after:
@@ -237,7 +241,19 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 }
 
 func (game *GameStruct) DoHandleSpecialCard(min, max int) {
+	//如果所有用户都没有特殊卡，回合加快
+	var speed = true
+	for _, data := range game.Users {
+		if len(data.SpecialCards) > 0 {
+			speed = false
+			break
+		}
+	}
+
 	duration := time.Duration(rand.Intn(max-min)+min) * time.Second
+	if speed {
+		duration = time.Second * 3
+	}
 	BroadcastToAllGameUsers(game, response.MessageResponse{
 		MsgType: response.SpecialCardRoundResponseType,
 		SpecialCardRoundInfo: &response.SpecialCardRoundResponse{
@@ -251,18 +267,14 @@ func (game *GameStruct) DoHandleSpecialCard(min, max int) {
 		select {
 		case msg := <-game.CommonChan:
 			userInfo := UsersConn[msg.UserID]
-			switch msg.Type {
-			case model.UseSpecialCardMsg:
+			if msg.Type == model.UseSpecialCardMsg {
 				//只有这类型的消息才处理
 				isFind, cardType := game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
 				if isFind {
 					handleFunc[cardType](msg)
 				} else {
-					SendErrToUser(UsersConn[msg.UserID], "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
+					SendErrToUser(userInfo, "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
 				}
-			default:
-				//其他消息不处理,给用户返回超时
-				SendErrToUser(userInfo, "[DoListenDistributeCard]", errors.New("其他信息不处理"))
 			}
 		case <-after:
 			//超时处理,超时就直接返回了
@@ -287,10 +299,10 @@ func (game *GameStruct) DoScoreCount() {
 		for _, card := range info.BaseCards {
 			sum += card.Number
 		}
-		if sum/12 == 1 {
+		if sum/20 == 1 {
 			info.BaseCards = make([]*model.BaseCard, 0)
-			if sum%12 == 0 {
-				info.Score += 10
+			if sum%20 == 0 {
+				info.Score += 6
 				SendMsgToUser(UsersConn[id], response.MessageResponse{
 					MsgType: response.MsgResponseType,
 					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("得分啦！")},
@@ -300,7 +312,7 @@ func (game *GameStruct) DoScoreCount() {
 				game.MakeCardID++
 				info.BaseCards = append(info.BaseCards, &model.BaseCard{
 					CardID: game.MakeCardID,
-					Number: sum % 12,
+					Number: sum % 20,
 				})
 				SendMsgToUser(UsersConn[id], response.MessageResponse{
 					MsgType: response.MsgResponseType,

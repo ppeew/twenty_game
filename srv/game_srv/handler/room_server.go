@@ -38,7 +38,7 @@ func (s *GameServer) RecordRoomServer(ctx context.Context, in *game.RecordRoomSe
 	//先查询是否有了
 	get := global.RedisDB.Get(ctx, NameRoomServer(in.RoomID))
 	if get.Err() != redis.Nil {
-		return &emptypb.Empty{}, errors.New("房间已存在了")
+		return &emptypb.Empty{}, errors.New("该房间已存在")
 	}
 	global.RedisDB.Set(ctx, NameRoomServer(in.RoomID), in.ServerInfo, 0)
 	return &emptypb.Empty{}, nil

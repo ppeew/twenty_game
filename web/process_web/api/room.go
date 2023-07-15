@@ -64,12 +64,30 @@ func startRoomThread(data RoomData) {
 			// 停止信号，关闭主函数及相关子协程，优雅退出
 			cancel()
 			room.wg.Wait()
-			zap.S().Info("[startRoomThread]]:其他协程已关闭")
+			//zap.S().Info("[startRoomThread]]:其他协程已关闭")
 			if msg == RoomQuit {
 				global.GameSrvClient.DeleteRoom(context.Background(), &game.RoomIDInfo{RoomID: room.RoomData.RoomID})
 				global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: room.RoomData.RoomID})
 				return
 			} else if msg == GameStart {
+				room.RoomData.RoomWait = false
+				var users []*game.RoomUser
+				for _, data := range room.RoomData.Users {
+					users = append(users, &game.RoomUser{
+						ID:    data.ID,
+						Ready: data.Ready,
+					})
+				}
+				global.GameSrvClient.SetGlobalRoom(context.Background(), &game.RoomInfo{
+					RoomID:        room.RoomData.RoomID,
+					MaxUserNumber: room.RoomData.MaxUserNumber,
+					GameCount:     room.RoomData.GameCount,
+					UserNumber:    room.RoomData.UserNumber,
+					RoomOwner:     room.RoomData.RoomOwner,
+					RoomWait:      room.RoomData.RoomWait,
+					Users:         users,
+					RoomName:      room.RoomData.RoomName,
+				})
 				go RunGame(GameData{
 					RoomID:     room.RoomData.RoomID,
 					GameCount:  room.RoomData.GameCount,
@@ -166,7 +184,7 @@ func (roomInfo *RoomStruct) UpdateRedisRoom(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.Tick(time.Second * 5):
+		case <-time.Tick(time.Second * 3):
 			var users []*game.RoomUser
 			for _, data := range roomInfo.RoomData.Users {
 				users = append(users, &game.RoomUser{
@@ -201,7 +219,7 @@ func (roomInfo *RoomStruct) ForUserIntoRoom(ctx context.Context) {
 			return
 		case userID := <-IntoRoomCHAN[roomInfo.RoomData.RoomID]:
 			//读到用户进房消息
-			zap.S().Infof("[ForUserIntoRoom]:我看到你进房了，正在处理！")
+			//zap.S().Infof("[ForUserIntoRoom]:我看到你进房了，正在处理！")
 			roomInfo.MsgChan <- model.Message{Type: model.UserIntoMsg, UserID: userID, UserIntoData: model.UserIntoData{}}
 		}
 
