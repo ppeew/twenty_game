@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"game_srv/global"
 	"game_srv/proto/game"
@@ -14,8 +15,8 @@ import (
 // 查询房间对应处理服务器信息
 func (s *GameServer) GetRoomServer(ctx context.Context, in *game.RoomIDInfo) (*game.RoomServerInfo, error) {
 	get := global.RedisDB.Get(ctx, NameRoomServer(in.RoomID))
-	if get.Err() != nil {
-		return &game.RoomServerInfo{}, get.Err()
+	if get.Err() != nil || get.Err() == redis.Nil {
+		return &game.RoomServerInfo{}, errors.New("找不到该房间")
 	}
 	return &game.RoomServerInfo{ServerInfo: get.Val()}, nil
 }
@@ -37,7 +38,7 @@ func (s *GameServer) RecordRoomServer(ctx context.Context, in *game.RecordRoomSe
 	//先查询是否有了
 	get := global.RedisDB.Get(ctx, NameRoomServer(in.RoomID))
 	if get.Err() != redis.Nil {
-		return &emptypb.Empty{}, get.Err()
+		return &emptypb.Empty{}, errors.New("房间已存在了")
 	}
 	global.RedisDB.Set(ctx, NameRoomServer(in.RoomID), in.ServerInfo, 0)
 	return &emptypb.Empty{}, nil
