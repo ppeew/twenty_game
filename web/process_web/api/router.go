@@ -8,7 +8,7 @@ import (
 	"process_web/global"
 	"process_web/model"
 	"process_web/model/response"
-	game_proto "process_web/proto/game"
+	"process_web/proto/game"
 	"strconv"
 
 	"go.uber.org/zap"
@@ -50,10 +50,10 @@ func ConnSocket(ctx *gin.Context) {
 		return
 	}
 	//检查用户是否已经进房了
-	_, err := global.GameSrvClient.GetConnData(context.Background(), &game_proto.UserIDInfo{Id: userID})
+	_, err := global.GameSrvClient.GetConnData(context.Background(), &game.UserIDInfo{Id: userID})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "不在房间内",
+			"err": "请先退出原先房间",
 		})
 	}
 	// 建立websocket连接
@@ -90,11 +90,11 @@ func CreateRoom(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
 
-	var users []*game_proto.RoomUser
-	users = append(users, &game_proto.RoomUser{ID: userID, Ready: false})
+	var users []*game.RoomUser
+	users = append(users, &game.RoomUser{ID: userID, Ready: false})
 	zap.S().Infof("[CreateRoom]:注册房间主机和端口%s", fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port))
 	// 1.创建房间对应服务器信息 //TODO （查询之前是否已经有了该信息，有了就不允许创建）
-	_, err := global.GameSrvClient.RecordRoomServer(context.Background(), &game_proto.RecordRoomServerInfo{
+	_, err := global.GameSrvClient.RecordRoomServer(context.Background(), &game.RecordRoomServerInfo{
 		RoomID:     uint32(form.RoomID),
 		ServerInfo: fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port),
 	})
@@ -105,19 +105,19 @@ func CreateRoom(ctx *gin.Context) {
 		return
 	}
 	// 2.然后创建用户对应服务器的连接 TODO (可能因为用户已经再游戏中了创建失败，这个要回滚上一步操作)
-	_, err = global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+	_, err = global.GameSrvClient.RecordConnData(context.Background(), &game.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, form.RoomID),
 		Id:         userID,
 	})
 	if err != nil {
-		global.GameSrvClient.DelRoomServer(context.Background(), &game_proto.RoomIDInfo{RoomID: uint32(form.RoomID)})
+		global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: uint32(form.RoomID)})
 		zap.S().Infof("[CreateRoom]:删除房间服务器信息")
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "请先退出原先房间",
 		})
 		return
 	}
-	zap.S().Infof("[CreateRoom]:全通过了，开启房间线程")
+	//zap.S().Infof("[CreateRoom]:全通过了，开启房间线程")
 	//启动房间协程
 	ConnectCHAN[uint32(form.RoomID)] = make(chan uint32, 10)
 	u := make(map[uint32]response.UserData)
@@ -149,7 +149,7 @@ func UserIntoRoom(ctx *gin.Context) {
 	userID := claims.(*model.CustomClaims).ID
 	// 玩家进入房间，添加该玩家的服务器连接信息
 	//zap.S().Infof("[UserIntoRoom]:用户对应的服务器信息%s", fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID))
-	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game_proto.RecordConnInfo{
+	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game.RecordConnInfo{
 		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
 		Id:         userID,
 	})
@@ -160,7 +160,7 @@ func UserIntoRoom(ctx *gin.Context) {
 		return
 	}
 	// 告知协程用户进房信息
-	zap.S().Infof("[UserIntoRoom]:我进来了%d", uint32(roomID))
+	//zap.S().Infof("[UserIntoRoom]:我进来了%d", uint32(roomID))
 	if IntoRoomCHAN[uint32(roomID)] == nil {
 		IntoRoomCHAN[uint32(roomID)] = make(chan uint32)
 	}

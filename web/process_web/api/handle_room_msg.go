@@ -7,7 +7,7 @@ import (
 	"process_web/global"
 	"process_web/model"
 	"process_web/model/response"
-	game_proto "process_web/proto/game"
+	"process_web/proto/game"
 	"sort"
 	"time"
 
@@ -102,7 +102,7 @@ func (roomInfo *RoomStruct) QuitRoom(message model.Message) {
 	})
 	UsersConn[message.UserID].CloseConn()
 	//玩家退出，应该从redis删除其服务器连接信息
-	global.GameSrvClient.DelConnData(context.Background(), &game_proto.DelConnInfo{
+	global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
 		Id: message.UserID,
 	})
 }
@@ -135,7 +135,7 @@ func (roomInfo *RoomStruct) UpdateRoom(message model.Message) {
 			//if UsersConn[data.Kicker] != nil {
 			//	UsersConn[data.Kicker].CloseConn() //可能有nil错误
 			//}
-			global.GameSrvClient.DelConnData(context.Background(), &game_proto.DelConnInfo{
+			global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
 				Id: data.Kicker,
 			})
 			if roomInfo.RoomData.UserNumber <= 0 {

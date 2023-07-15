@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"game_srv/global"
 	"game_srv/proto/game"
@@ -37,7 +38,7 @@ func (s *GameServer) RecordRoomServer(ctx context.Context, in *game.RecordRoomSe
 	//先查询是否有了
 	get := global.RedisDB.Get(ctx, NameRoomServer(in.RoomID))
 	if get.Err() != redis.Nil {
-		return &emptypb.Empty{}, get.Err()
+		return &emptypb.Empty{}, errors.New("该房间已存在")
 	}
 	global.RedisDB.Set(ctx, NameRoomServer(in.RoomID), in.ServerInfo, 0)
 	return &emptypb.Empty{}, nil
