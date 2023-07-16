@@ -100,7 +100,7 @@ func UserRegister(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"token":      token,
-		"expired_at": (time.Now().Unix() + 60*60*24*30) * 1000, //返回是毫秒的
+		"expired_at": time.Now().Unix() + 60*60*24*5, //返回是毫秒的
 		"data":       resp,
 	})
 }
@@ -158,7 +158,7 @@ func UserLogin(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"token":      token,
-		"expired_at": (time.Now().Unix() + 60*60*24*30) * 1000, //返回是毫秒的
+		"expired_at": time.Now().Unix() + 60*60*24*30, //返回是毫秒的
 		"data":       resp,
 	})
 

@@ -27,8 +27,8 @@ func (s *GameServer) RecordConnData(ctx context.Context, in *game.RecordConnInfo
 	mutex := global.RedSync.NewMutex(fmt.Sprintf("RecordConnLock:%d", in.Id))
 	mutex.Lock()
 	defer mutex.Unlock()
-	get := global.RedisDB.Get(ctx, NameUserConnInfo(in.Id))
-	if get.Err() != redis.Nil {
+	err := global.RedisDB.Get(ctx, NameUserConnInfo(in.Id)).Err()
+	if err != redis.Nil {
 		//zap.S().Infof("[RecordConnData]:该用户已经有房间，不允许进房")
 		return &emptypb.Empty{}, errors.New("该用户已经有房间，不允许进房")
 	}

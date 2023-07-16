@@ -1,4 +1,4 @@
-package api
+package global
 
 import (
 	"errors"
@@ -6,8 +6,6 @@ import (
 	"process_web/model"
 	"process_web/model/response"
 	"sync"
-
-	"go.uber.org/zap"
 
 	"github.com/gorilla/websocket"
 )
@@ -45,7 +43,7 @@ func (ws *WSConn) readMsgLoop() {
 		err := ws.conn.ReadJSON(&data)
 		//zap.S().Infof("[readMsgLoop]:Data:%+v", data)
 		if err != nil {
-			zap.S().Warnf("[readMsgLoop]:%s", err)
+			//zap.S().Warnf("[readMsgLoop]:%s", err)
 			//发生错误,关闭连接，停止协程
 			ws.CloseConn()
 			break

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"process_web/api"
 	"process_web/global"
 	"process_web/initialize"
 	game_proto "process_web/proto/game"
@@ -19,7 +18,6 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitSrvConn()
-	initialize.InitSentinel()
 	routers := initialize.InitRouters()
 	//utils.CheckGoRoutines()
 
@@ -51,7 +49,7 @@ func main() {
 		zap.S().Info("注销服务失败")
 	}
 	//资源释放 释放房间
-	for roomID, _ := range api.ConnectCHAN {
+	for roomID, _ := range global.ConnectCHAN {
 		// 1.删除用户对应服务器连接
 
 		// 2.删除redis房间信息

@@ -9,7 +9,9 @@ import (
 )
 
 func InitRouters() *gin.Engine {
-	engine := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
+	engine := gin.New()
+
 	engine.GET("/health", func(context *gin.Context) {
 		context.Status(http.StatusOK)
 	})

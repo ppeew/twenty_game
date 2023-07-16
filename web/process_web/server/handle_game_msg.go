@@ -1,4 +1,4 @@
-package api
+package server
 
 import (
 	"context"
@@ -28,7 +28,6 @@ func (game *GameStruct) HandleAddCard(msg model.Message) {
 		CardID: game.MakeCardID,
 		Number: data.NeedNumber,
 	})
-	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.AddCard,
 		UserID:          msg.UserID,
@@ -41,7 +40,7 @@ func (game *GameStruct) HandleAddCard(msg model.Message) {
 }
 
 func (game *GameStruct) HandleUpdateCard(msg model.Message) {
-	ws := UsersConn[msg.UserID]
+	ws := global.UsersConn[msg.UserID]
 	data := msg.UseSpecialData.UpdateCardData
 	findUpdateCard := false
 	for _, card := range game.Users[data.TargetUserID].BaseCards {
@@ -52,7 +51,7 @@ func (game *GameStruct) HandleUpdateCard(msg model.Message) {
 		}
 	}
 	if findUpdateCard == false {
-		SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要更新的卡"))
+		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要更新的卡"))
 		return
 	}
 	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
@@ -70,13 +69,13 @@ func (game *GameStruct) HandleUpdateCard(msg model.Message) {
 }
 
 func (game *GameStruct) HandleDeleteCard(msg model.Message) {
-	ws := UsersConn[msg.UserID]
+	ws := global.UsersConn[msg.UserID]
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
 	//zap.S().Infof("[HandleDeleteCard]:玩家包括%v", game.Users)
 	//zap.S().Infof("[HandleDeleteCard]:被删除卡的玩家是%d", data.TargetUserID)
 	if game.Users[data.TargetUserID] == nil {
-		SendErrToUser(UsersConn[msg.UserID], "[HandleDeleteCard]", errors.New("未知的玩家"))
+		global.SendErrToUser(global.UsersConn[msg.UserID], "[HandleDeleteCard]", errors.New("未知的玩家"))
 		return
 	}
 	for i, card := range game.Users[data.TargetUserID].BaseCards {
@@ -92,7 +91,7 @@ func (game *GameStruct) HandleDeleteCard(msg model.Message) {
 		}
 	}
 	if findDelCard == false {
-		SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要删除的卡"))
+		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要删除的卡"))
 		return
 	}
 	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
@@ -108,7 +107,7 @@ func (game *GameStruct) HandleDeleteCard(msg model.Message) {
 }
 
 func (game *GameStruct) HandleChangeCard(msg model.Message) {
-	ws := UsersConn[msg.UserID]
+	ws := global.UsersConn[msg.UserID]
 	data := msg.UseSpecialData.ChangeCardData
 	//先找到两卡
 	findUserCard := false
@@ -123,7 +122,7 @@ func (game *GameStruct) HandleChangeCard(msg model.Message) {
 		}
 	}
 	if findUserCard == false {
-		SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要交换的的卡"))
+		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要交换的的卡"))
 		return
 	}
 	for _, info := range game.Users[data.TargetUserID].BaseCards {
@@ -134,14 +133,13 @@ func (game *GameStruct) HandleChangeCard(msg model.Message) {
 		}
 	}
 	if findTargetUserCard == false {
-		SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到对方交换的卡"))
+		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到对方交换的卡"))
 		return
 	}
 	//都找到了
 	temp := userInfo
 	userInfo = targetUserInfo
 	targetUserInfo = temp
-	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.ChangeCard,
 		UserID:          msg.UserID,
@@ -161,7 +159,7 @@ func (game *GameStruct) ProcessHealthMsg(todo context.Context) {
 			game.wg.Done()
 			return
 		case msg := <-game.HealthChan:
-			SendMsgToUser(UsersConn[msg.UserID], response.MessageResponse{
+			global.SendMsgToUser(global.UsersConn[msg.UserID], response.MessageResponse{
 				MsgType:         response.CheckHealthType,
 				HealthCheckInfo: &response.HealthCheck{},
 			})
@@ -177,7 +175,7 @@ func (game *GameStruct) ProcessItemMsg(todo context.Context) {
 			game.wg.Done()
 			return
 		case msg := <-game.ItemChan:
-			userInfo := UsersConn[msg.UserID]
+			userInfo := global.UsersConn[msg.UserID]
 			items := make([]uint32, 2)
 			switch game_proto.Type(msg.ItemMsgData.Item) {
 			case game_proto.Type_Apple:
@@ -190,7 +188,7 @@ func (game *GameStruct) ProcessItemMsg(todo context.Context) {
 				Items: items,
 			})
 			if isOk.IsOK == false {
-				SendErrToUser(userInfo, "[ProcessItemMsg]", err)
+				global.SendErrToUser(userInfo, "[ProcessItemMsg]", err)
 			}
 			//处理用户的物品使用,广播所有用户
 			rsp := response.UseItemResponse{
@@ -229,7 +227,7 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 		case <-ctx.Done():
 			game.wg.Done()
 			return
-		case message := <-UsersConn[userID].InChanRead():
+		case message := <-global.UsersConn[userID].InChanRead():
 			switch message.Type {
 			case model.ChatMsg:
 				//聊天信息发到聊天管道
@@ -274,10 +272,10 @@ func (game *GameStruct) DropSpecialCard(userID uint32, specialID uint32) (bool, 
 func BroadcastToAllGameUsers(game *GameStruct, msg response.MessageResponse) {
 	for userID := range game.Users {
 		//zap.S().Infof("[BroadcastToAllGameUsers]:正在向用户%d发送信息,消息为:%v", userID, msg)
-		err := UsersConn[userID].OutChanWrite(msg)
+		err := global.UsersConn[userID].OutChanWrite(msg)
 		if err != nil {
 			//zap.S().Infof("[BroadcastToAllGameUsers]:%d用户关闭了连接", userID)
-			//UsersConn[userID].CloseConn()
+			//global.UsersConn[userID].CloseConn()
 		}
 	}
 }
@@ -289,7 +287,7 @@ func CardModelToResponse(game *GameStruct) response.MessageResponse {
 			UserID:       userID,
 			BaseCards:    info.BaseCards,
 			SpecialCards: info.SpecialCards,
-			IsGetCard:    info.IsGetCard,
+			//IsGetCard:    info.GetBaseCardNum,
 			Score:        info.Score,
 			IntoRoomTime: info.IntoRoomTime,
 		}

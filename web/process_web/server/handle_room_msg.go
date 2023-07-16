@@ -1,4 +1,4 @@
-package api
+package server
 
 import (
 	"context"
@@ -29,35 +29,10 @@ func NewDealFunc(room *RoomStruct) map[uint32]dealFunc {
 	return dealFun
 }
 
-func (roomInfo *RoomStruct) MakeRoomResponse() *response.RoomResponse {
-	var users []response.UserData
-	for _, data := range roomInfo.RoomData.Users {
-		users = append(users, response.UserData{
-			ID:           data.ID,
-			Ready:        data.Ready,
-			IntoRoomTime: data.IntoRoomTime,
-		})
-	}
-	sort.Slice(users, func(i, j int) bool {
-		return users[i].IntoRoomTime.Before(users[j].IntoRoomTime)
-	})
-	roomResponse := &response.RoomResponse{
-		RoomID:        roomInfo.RoomData.RoomID,
-		MaxUserNumber: roomInfo.RoomData.MaxUserNumber,
-		GameCount:     roomInfo.RoomData.GameCount,
-		UserNumber:    roomInfo.RoomData.UserNumber,
-		RoomOwner:     roomInfo.RoomData.RoomOwner,
-		RoomWait:      roomInfo.RoomData.RoomWait,
-		RoomName:      roomInfo.RoomData.RoomName,
-		Users:         users,
-	}
-	return roomResponse
-}
-
 // RoomInfo 房间信息
 func (roomInfo *RoomStruct) RoomInfo(message model.Message) {
 	//zap.S().Info("[RoomInfo]:收到信息，")
-	SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+	global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 		MsgType:  response.RoomInfoResponseType,
 		RoomInfo: roomInfo.MakeRoomResponse(),
 	})
@@ -71,11 +46,11 @@ func (roomInfo *RoomStruct) QuitRoom(message model.Message) {
 	if roomInfo.RoomData.UserNumber == 0 {
 		//没人了，销毁房间
 		roomInfo.ExitChan <- RoomQuit
-		SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+		global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 			MsgType:  response.RoomInfoResponseType,
 			RoomInfo: roomInfo.MakeRoomResponse(),
 		})
-		UsersConn[message.UserID].CloseConn()
+		global.UsersConn[message.UserID].CloseConn()
 		return
 	}
 	if message.UserID == roomInfo.RoomData.RoomOwner {
@@ -84,7 +59,7 @@ func (roomInfo *RoomStruct) QuitRoom(message model.Message) {
 		for _, data := range roomInfo.RoomData.Users {
 			if num <= 0 {
 				roomInfo.RoomData.RoomOwner = data.ID
-				SendMsgToUser(UsersConn[data.ID], response.MessageResponse{
+				global.SendMsgToUser(global.UsersConn[data.ID], response.MessageResponse{
 					MsgType: response.MsgResponseType,
 					MsgInfo: &response.MsgResponse{MsgData: "房主是你的了"},
 				})
@@ -101,7 +76,7 @@ func (roomInfo *RoomStruct) QuitRoom(message model.Message) {
 		MsgType: response.MsgResponseType,
 		MsgInfo: &response.MsgResponse{MsgData: "某玩家退出房间"},
 	})
-	UsersConn[message.UserID].CloseConn()
+	global.UsersConn[message.UserID].CloseConn()
 	//玩家退出，应该从redis删除其服务器连接信息
 	global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
 		Id: message.UserID,
@@ -128,7 +103,7 @@ func (roomInfo *RoomStruct) UpdateRoom(message model.Message) {
 		//先t人
 		if _, ok := roomInfo.RoomData.Users[data.Kicker]; ok {
 			//找到人
-			SendMsgToUser(UsersConn[data.Kicker], response.MessageResponse{
+			global.SendMsgToUser(global.UsersConn[data.Kicker], response.MessageResponse{
 				MsgType: response.KickerResponseType,
 				KickerInfo: &response.KickerResponse{
 					ID: data.Kicker,
@@ -136,8 +111,8 @@ func (roomInfo *RoomStruct) UpdateRoom(message model.Message) {
 			})
 			delete(roomInfo.RoomData.Users, data.Kicker)
 			roomInfo.RoomData.UserNumber--
-			//if UsersConn[data.Kicker] != nil {
-			//	UsersConn[data.Kicker].CloseConn() //可能有nil错误
+			//if global.UsersConn[data.Kicker] != nil {
+			//	global.UsersConn[data.Kicker].CloseConn() //可能有nil错误
 			//}
 			global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
 				Id: data.Kicker,
@@ -155,7 +130,7 @@ func (roomInfo *RoomStruct) UpdateRoom(message model.Message) {
 		}
 	}
 
-	SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+	global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 		MsgType: response.MsgResponseType,
 		MsgInfo: &response.MsgResponse{
 			MsgData: "更新房间成功",
@@ -174,7 +149,7 @@ func (roomInfo *RoomStruct) UpdateUserReadyState(message model.Message) {
 	t.Ready = message.ReadyStateData.IsReady
 	roomInfo.RoomData.Users[message.UserID] = t
 
-	SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+	global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 		MsgType: response.MsgResponseType,
 		MsgInfo: &response.MsgResponse{
 			MsgData: fmt.Sprintf("玩家%d准备状态更新", message.UserID),
@@ -189,7 +164,7 @@ func (roomInfo *RoomStruct) UpdateUserReadyState(message model.Message) {
 // BeginGame 开始游戏
 func (roomInfo *RoomStruct) BeginGame(message model.Message) {
 	if message.UserID != roomInfo.RoomData.RoomOwner {
-		SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+		global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 			MsgType: response.MsgResponseType,
 			MsgInfo: &response.MsgResponse{
 				MsgData: fmt.Sprintf("玩家%d不是房主，不能开始游戏", message.UserID),
@@ -198,7 +173,7 @@ func (roomInfo *RoomStruct) BeginGame(message model.Message) {
 		return
 	}
 	if roomInfo.RoomData.UserNumber != roomInfo.RoomData.MaxUserNumber {
-		SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+		global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 			MsgType: response.MsgResponseType,
 			MsgInfo: &response.MsgResponse{
 				MsgData: "房间没满人,请改房间人数开始游戏",
@@ -208,7 +183,7 @@ func (roomInfo *RoomStruct) BeginGame(message model.Message) {
 	}
 	for _, data := range roomInfo.RoomData.Users {
 		if data.Ready == false {
-			SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+			global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 				MsgType: response.MsgResponseType,
 				MsgInfo: &response.MsgResponse{
 					MsgData: "还有玩家未准备，快T了他",
@@ -241,7 +216,7 @@ func (roomInfo *RoomStruct) ChatProcess(message model.Message) {
 }
 
 func (roomInfo *RoomStruct) CheckHealth(message model.Message) {
-	SendMsgToUser(UsersConn[message.UserID], response.MessageResponse{
+	global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 		MsgType:         response.CheckHealthType,
 		HealthCheckInfo: &response.HealthCheck{},
 	})
@@ -263,16 +238,37 @@ func (roomInfo *RoomStruct) UserInto(message model.Message) {
 		success = true
 	}
 	//zap.S().Infof("[UserInto]:room_id%d", roomInfo.RoomData.RoomID)
-	if IntoRoomRspCHAN[roomInfo.RoomData.RoomID] == nil {
-		IntoRoomRspCHAN[roomInfo.RoomData.RoomID] = make(chan bool)
+	if global.IntoRoomRspCHAN[roomInfo.RoomData.RoomID] == nil {
+		global.IntoRoomRspCHAN[roomInfo.RoomData.RoomID] = make(chan bool)
 	}
-	IntoRoomRspCHAN[roomInfo.RoomData.RoomID] <- success
+	global.IntoRoomRspCHAN[roomInfo.RoomData.RoomID] <- success
 	BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
 		MsgType:  response.RoomInfoResponseType,
 		RoomInfo: roomInfo.MakeRoomResponse(),
 	})
-	//BroadcastToAllRoomUsers(roomInfo, response.MessageResponse{
-	//	MsgType: response.MsgResponseType,
-	//	MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("玩家%d进入房间", message.UserID)},
-	//})
+}
+
+func (roomInfo *RoomStruct) MakeRoomResponse() *response.RoomResponse {
+	var users []response.UserData
+	for _, data := range roomInfo.RoomData.Users {
+		users = append(users, response.UserData{
+			ID:           data.ID,
+			Ready:        data.Ready,
+			IntoRoomTime: data.IntoRoomTime,
+		})
+	}
+	sort.Slice(users, func(i, j int) bool {
+		return users[i].IntoRoomTime.Before(users[j].IntoRoomTime)
+	})
+	roomResponse := &response.RoomResponse{
+		RoomID:        roomInfo.RoomData.RoomID,
+		MaxUserNumber: roomInfo.RoomData.MaxUserNumber,
+		GameCount:     roomInfo.RoomData.GameCount,
+		UserNumber:    roomInfo.RoomData.UserNumber,
+		RoomOwner:     roomInfo.RoomData.RoomOwner,
+		RoomWait:      roomInfo.RoomData.RoomWait,
+		RoomName:      roomInfo.RoomData.RoomName,
+		Users:         users,
+	}
+	return roomResponse
 }

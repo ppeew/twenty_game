@@ -9,6 +9,7 @@ import (
 	"process_web/model"
 	"process_web/model/response"
 	"process_web/proto/game"
+	"process_web/server"
 	"strconv"
 
 	"go.uber.org/zap"
@@ -16,15 +17,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
-
-// ConnectCHAN 房间号对应创建读取协程的管道
-var ConnectCHAN = make(map[uint32]chan uint32)
-
-// IntoRoomCHAN 用户进房发送chan 房间服务器读取并处理 key:房间号 value:用户id
-var IntoRoomCHAN = make(map[uint32]chan uint32)
-
-// IntoRoomRspCHAN IntoRoomChan 对用户进房做出回复  key:房间号 value:加入是否成功
-var IntoRoomRspCHAN = make(map[uint32]chan bool)
 
 // 升级websocket
 var upgrade = websocket.Upgrader{
@@ -35,15 +27,12 @@ var upgrade = websocket.Upgrader{
 	},
 }
 
-// UsersConn 用户ID -> 用户连接
-var UsersConn = make(map[uint32]*WSConn)
-
 // ConnSocket 建立长连接 TODO 其他非玩家用户进房应该被拒绝
 func ConnSocket(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.DefaultQuery("room_id", "0"))
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
-	if ConnectCHAN[uint32(roomID)] == nil {
+	if global.ConnectCHAN[uint32(roomID)] == nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "传入room_id错误",
 		})
@@ -64,14 +53,14 @@ func ConnSocket(ctx *gin.Context) {
 		})
 		return
 	}
-	if UsersConn[userID] != nil {
-		UsersConn[userID].CloseConn()
+	if global.UsersConn[userID] != nil {
+		global.UsersConn[userID].CloseConn()
 	}
-	UsersConn[userID] = InitWebSocket(conn, userID)
-	ConnectCHAN[uint32(roomID)] <- userID
+	global.UsersConn[userID] = global.InitWebSocket(conn, userID)
+	global.ConnectCHAN[uint32(roomID)] <- userID
 }
 
-// CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息 // TODO 创建房间应该先查询房间是否存在
+// CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息  TODO 创建房间应该先查询房间是否存在
 func CreateRoom(ctx *gin.Context) {
 	form := forms.CreateRoomForm{}
 	if err := ctx.ShouldBind(&form); err != nil {
@@ -118,14 +107,13 @@ func CreateRoom(ctx *gin.Context) {
 		return
 	}
 	//zap.S().Infof("[CreateRoom]:全通过了，开启房间线程")
-	//启动房间协程
-	ConnectCHAN[uint32(form.RoomID)] = make(chan uint32, 10)
+	global.ConnectCHAN[uint32(form.RoomID)] = make(chan uint32, 10)
 	u := make(map[uint32]response.UserData)
 	u[userID] = response.UserData{
 		ID:    userID,
 		Ready: true,
 	}
-	go startRoomThread(RoomData{
+	go server.StartRoomThread(server.RoomData{
 		RoomID:        uint32(form.RoomID),
 		MaxUserNumber: uint32(form.MaxUserNumber),
 		GameCount:     uint32(form.GameCount),
@@ -161,15 +149,15 @@ func UserIntoRoom(ctx *gin.Context) {
 	}
 	// 告知协程用户进房信息
 	//zap.S().Infof("[UserIntoRoom]:我进来了%d", uint32(roomID))
-	if IntoRoomCHAN[uint32(roomID)] == nil {
-		IntoRoomCHAN[uint32(roomID)] = make(chan uint32)
+	if global.IntoRoomCHAN[uint32(roomID)] == nil {
+		global.IntoRoomCHAN[uint32(roomID)] = make(chan uint32)
 	}
-	IntoRoomCHAN[uint32(roomID)] <- userID
+	global.IntoRoomCHAN[uint32(roomID)] <- userID
 
-	if IntoRoomRspCHAN[uint32(roomID)] == nil {
-		IntoRoomRspCHAN[uint32(roomID)] = make(chan bool)
+	if global.IntoRoomRspCHAN[uint32(roomID)] == nil {
+		global.IntoRoomRspCHAN[uint32(roomID)] = make(chan bool)
 	}
-	ok := <-IntoRoomRspCHAN[uint32(roomID)]
+	ok := <-global.IntoRoomRspCHAN[uint32(roomID)]
 
 	if !ok {
 		ctx.JSON(http.StatusForbidden, gin.H{

@@ -3,8 +3,8 @@ package tests
 import (
 	"fmt"
 	"math/rand"
-	"process_web/api"
 	"process_web/model/response"
+	"process_web/server"
 	"testing"
 
 	"go.uber.org/zap"
@@ -21,8 +21,8 @@ func TestQuit(t *testing.T) {
 		ID:    5,
 		Ready: false,
 	}
-	roomInfo := api.RoomStruct{
-		RoomData: api.RoomData{
+	roomInfo := server.RoomStruct{
+		RoomData: server.RoomData{
 			RoomID:        2,
 			MaxUserNumber: 2,
 			GameCount:     3,

@@ -35,7 +35,7 @@ type BaseCard struct {
 type UserGameInfo struct {
 	BaseCards        []*BaseCard    `json:"baseCards,omitempty"`    //普通卡
 	SpecialCards     []*SpecialCard `json:"specialCards,omitempty"` //特殊卡
-	IsGetCard        bool           `json:"isGetCard,omitempty"`    //当前回合已经抢过普通卡了
+	GetBaseCardNum   int            `json:"isGetCard,omitempty"`    //当前回合抢普通卡数量
 	IsGetSpecialCard bool           `json:"isGetSpecialCard"`       //当前回合已经抢过特殊卡了
 	Score            uint32         `json:"score,omitempty"`
 	IntoRoomTime     time.Time      `json:"-"`
