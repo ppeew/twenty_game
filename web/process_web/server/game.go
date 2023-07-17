@@ -294,7 +294,7 @@ func (game *GameStruct) BackToRoom() {
 	game.wg.Wait()    //等待全部子协程关闭
 
 	//完成所有环境，退出游戏协程，创建房间协程
-	go StartRoomThread(RoomData{
+	go RunRoom(RoomData{
 		RoomID:        game.GameData.RoomID,
 		MaxUserNumber: game.GameData.UserNumber,
 		GameCount:     game.GameData.GameCount,

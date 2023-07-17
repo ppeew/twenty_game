@@ -113,7 +113,7 @@ func CreateRoom(ctx *gin.Context) {
 		ID:    userID,
 		Ready: true,
 	}
-	go server.StartRoomThread(server.RoomData{
+	go server.RunRoom(server.RoomData{
 		RoomID:        uint32(form.RoomID),
 		MaxUserNumber: uint32(form.MaxUserNumber),
 		GameCount:     uint32(form.GameCount),

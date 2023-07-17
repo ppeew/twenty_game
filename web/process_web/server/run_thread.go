@@ -8,8 +8,37 @@ import (
 	"time"
 )
 
+func Run(roomID uint32, maxUserNumber uint32, gameCount uint32, userNumber uint32, roomOwner uint32, roomName string) {
+	for true {
+		users := make(map[uint32]response.UserData)
+		users[roomOwner] = response.UserData{
+			ID:           roomOwner,
+			Ready:        false,
+			IntoRoomTime: time.Time{},
+		}
+		RunRoom(RoomData{
+			RoomID:        roomID,
+			MaxUserNumber: maxUserNumber,
+			GameCount:     gameCount,
+			UserNumber:    userNumber,
+			RoomOwner:     roomOwner,
+			RoomWait:      true,
+			Users:         users,
+			RoomName:      roomName,
+		})
+		RunGame(GameData{
+			RoomID:     0,
+			GameCount:  0,
+			UserNumber: 0,
+			RoomOwner:  0,
+			Users:      nil,
+			RoomName:   "",
+		})
+	}
+}
+
 // 房间主函数
-func StartRoomThread(data RoomData) {
+func RunRoom(data RoomData) {
 	ctx, cancel := context.WithCancel(context.Background())
 	room := NewRoom(data)
 	dealFunc := NewDealFunc(room)
@@ -28,7 +57,7 @@ func StartRoomThread(data RoomData) {
 	for {
 		select {
 		case msg := <-room.MsgChan:
-			//zap.S().Infof("[StartRoomThread]]:%+v", msg)
+			//zap.S().Infof("[RunRoom]]:%+v", msg)
 			if dealFunc[msg.Type] != nil {
 				dealFunc[msg.Type](msg)
 			}
@@ -36,7 +65,7 @@ func StartRoomThread(data RoomData) {
 			// 停止信号，关闭主函数及相关子协程，优雅退出
 			cancel()
 			room.wg.Wait()
-			//zap.S().Info("[StartRoomThread]]:其他协程已关闭")
+			//zap.S().Info("[RunRoom]]:其他协程已关闭")
 			if msg == RoomQuit {
 				global.GameSrvClient.DeleteRoom(context.Background(), &game.RoomIDInfo{RoomID: room.RoomData.RoomID})
 				global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: room.RoomData.RoomID})
