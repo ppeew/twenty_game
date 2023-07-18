@@ -1,127 +1,86 @@
-package api
+package server
 
 import (
 	"context"
 	"errors"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"process_web/global"
-	"process_web/model"
-	"process_web/model/response"
+	"process_web/my_struct"
+	"process_web/my_struct/response"
 	game_proto "process_web/proto/game"
+	"process_web/utils"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
+
+	"github.com/parnurzeal/gorequest"
+	"go.uber.org/zap"
 )
 
 type GameStruct struct {
-	Users        map[uint32]*model.UserGameInfo
-	CurrentCount uint32             //当前是第几回合
-	CommonChan   chan model.Message //游戏逻辑管道
-	ChatChan     chan model.Message //聊天管道
-	ItemChan     chan model.Message //使用物品管道
-	HealthChan   chan model.Message //心脏包管道
-	MakeCardID   uint32             //依次生成卡的id
-	RandCard     []*model.Card      //卡id->卡信息(包含特殊和普通卡)
-	exitCancel   context.CancelFunc //负责退出
-	wg           sync.WaitGroup     //等待其他协程退出
+	Users        map[uint32]*my_struct.UserGameInfo
+	CurrentCount uint32                 //当前是第几回合
+	CommonChan   chan my_struct.Message //游戏逻辑管道
+	ChatChan     chan my_struct.Message //聊天管道
+	ItemChan     chan my_struct.Message //使用物品管道
+	HealthChan   chan my_struct.Message //心脏包管道
+	wg           sync.WaitGroup
+	MakeCardID   uint32            //依次生成卡的id
+	RandCard     []*my_struct.Card //卡id->卡信息(包含特殊和普通卡)
 
-	GameData GameData
-}
-
-type GameData struct {
 	RoomID     uint32
 	GameCount  uint32
 	UserNumber uint32
 	RoomOwner  uint32
-	Users      map[uint32]response.UserData
 	RoomName   string
 }
 
-// RunGame 游戏主函数
-func RunGame(data GameData) {
-	//游戏初始化阶段
-	game := NewGame(data)
-	for i := uint32(0); i < game.GameData.GameCount; i++ {
-		//循环初始化
-		game.DoFlush()
-		//zap.S().Info("游戏[DoFlush]完成")
-		BroadcastToAllGameUsers(game, response.MessageResponse{
-			MsgType: response.MsgResponseType,
-			MsgInfo: &response.MsgResponse{MsgData: "进入抢卡阶段"},
-		})
-		time.Sleep(time.Second * 2)
-		//zap.S().Info("游戏[BroadcastToAllGameUsers]完成")
-		//发牌阶段
-		game.DoDistributeCard()
-		//zap.S().Info("游戏[DoDistributeCard]完成")
-		//抢卡阶段
-		game.DoListenDistributeCard(6, 8)
-		//zap.S().Info("游戏[DoListenDistributeCard]完成")
-		BroadcastToAllGameUsers(game, response.MessageResponse{
-			MsgType: response.MsgResponseType,
-			MsgInfo: &response.MsgResponse{MsgData: "进入出牌阶段"},
-		})
-		time.Sleep(time.Second * 2)
-		//特殊卡处理阶段
-		game.DoHandleSpecialCard(8, 18)
-		//zap.S().Info("游戏[DoHandleSpecialCard]完成")
-		//分数计算阶段
-		game.DoScoreCount()
-		//zap.S().Info("游戏[DoScoreCount]完成")
-	}
-	// 回到房间
-	game.BackToRoom()
-	//游戏计算排名发奖励阶段
-	game.DoEndGame()
-	//zap.S().Info("游戏[RunGame]完成")
-}
+func NewGameData(data *Data) GameStruct {
+	users := make(map[uint32]*my_struct.UserGameInfo)
+	//查询API用户信息
+	for _, userID := range data.users {
+		var res utils.UserInfo
+		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6NTAsImV4cCI6MTY4OTY5NTQ3OCwiaXNzIjoicHBlZXciLCJuYmYiOjE2ODkyNjM0Nzh9.w4hH23492VGH5aq1b2jVLntFG-gPQnobKthK0lSgSVM").
+			Param("id", strconv.Itoa(int(userID))).Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
+		users[userID] = &my_struct.UserGameInfo{
+			ID:           userID,
+			IntoRoomTime: time.Now(),
+			Nickname:     res.Nickname,
+			Gender:       res.Gender,
+			Username:     res.Username,
+			Image:        res.Image,
 
-func NewGame(data GameData) *GameStruct {
-	rand.Seed(time.Now().Unix())
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	game := &GameStruct{
-		Users:        make(map[uint32]*model.UserGameInfo),
-		CurrentCount: 0,
-		CommonChan:   make(chan model.Message, 1024),
-		ChatChan:     make(chan model.Message, 1024),
-		ItemChan:     make(chan model.Message, 1024),
-		HealthChan:   make(chan model.Message, 1024),
-		exitCancel:   cancelFunc,
-		wg:           sync.WaitGroup{},
-		GameData:     data,
-	}
-	//创建三个协程，用来处理用户聊天消息和用户使用道具和心脏包回复，异步执行
-	go game.ProcessChatMsg(ctx)
-	go game.ProcessItemMsg(ctx)
-	go game.ProcessHealthMsg(ctx)
-	game.wg.Add(3)
-	for _, info := range game.GameData.Users {
-		//zap.S().Infof("[NewGame]初始化用户%d", info.ID)
-		game.Users[info.ID] = &model.UserGameInfo{
-			BaseCards:    make([]*model.BaseCard, 0),
-			SpecialCards: make([]*model.SpecialCard, 0),
-			IsGetCard:    false,
-			Score:        0,
-			IntoRoomTime: info.IntoRoomTime,
+			BaseCards:        make([]*my_struct.BaseCard, 0),
+			SpecialCards:     make([]*my_struct.SpecialCard, 0),
+			GetBaseCardNum:   0,
+			IsGetSpecialCard: false,
+			Score:            0,
 		}
-		//对于每个用户开启一个协程，用于读取他的消息到游戏管道（分发消息功能）
-		go game.ReadGameUserMsg(ctx, info.ID)
-		game.wg.Add(1)
+		zap.S().Infof("[NewGameData]:查询出用户信息%+v", res)
 	}
-	//等待用户页面初始化完成
-	BroadcastToAllGameUsers(game, response.MessageResponse{
-		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{MsgData: "游戏2秒后开始！"},
-	})
-	time.Sleep(time.Second * 2)
-	return game
+
+	return GameStruct{
+		Users:        users,
+		CommonChan:   make(chan my_struct.Message, 1024),
+		ChatChan:     make(chan my_struct.Message, 1024),
+		ItemChan:     make(chan my_struct.Message, 1024),
+		HealthChan:   make(chan my_struct.Message, 1024),
+		wg:           sync.WaitGroup{},
+		MakeCardID:   0,
+		RandCard:     make([]*my_struct.Card, 0),
+		RoomID:       data.roomID,
+		CurrentCount: 0,
+		GameCount:    data.gameCount,
+	}
 }
 
 func (game *GameStruct) DoFlush() {
-	game.RandCard = []*model.Card{}
+	game.RandCard = []*my_struct.Card{}
 	for _, info := range game.Users {
-		info.IsGetCard = false
+		info.GetBaseCardNum = 0
 		info.IsGetSpecialCard = false
 	}
 	game.CurrentCount++
@@ -129,7 +88,7 @@ func (game *GameStruct) DoFlush() {
 
 func (game *GameStruct) DoDistributeCard() {
 	//要生成userNumber+2的卡牌，其中包含普通卡和特殊卡
-	needCount := 6
+	needCount := 12
 	//特殊卡数量[0,1]
 	special := rand.Intn(3)
 	cards := make([]int, needCount)
@@ -147,10 +106,10 @@ func (game *GameStruct) DoDistributeCard() {
 		if cards[index] == 0 {
 			//生成普通卡
 			game.MakeCardID++
-			game.RandCard = append(game.RandCard, &model.Card{
+			game.RandCard = append(game.RandCard, &my_struct.Card{
 				CardID: game.MakeCardID,
-				Type:   model.BaseType,
-				BaseCardInfo: model.BaseCard{
+				Type:   my_struct.BaseType,
+				BaseCardInfo: my_struct.BaseCard{
 					CardID: game.MakeCardID,
 					Number: uint32(1 + rand.Intn(9)),
 				},
@@ -159,10 +118,10 @@ func (game *GameStruct) DoDistributeCard() {
 			//生成特殊卡
 			cardType := 1 << rand.Intn(4)
 			game.MakeCardID++
-			game.RandCard = append(game.RandCard, &model.Card{
+			game.RandCard = append(game.RandCard, &my_struct.Card{
 				CardID: game.MakeCardID,
-				Type:   model.SpecialType,
-				SpecialCardInfo: model.SpecialCard{
+				Type:   my_struct.SpecialType,
+				SpecialCardInfo: my_struct.SpecialCard{
 					CardID: game.MakeCardID, //这个字段每张卡必须唯一
 					Type:   uint32(cardType),
 				},
@@ -186,25 +145,25 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 	for true {
 		select {
 		case msg := <-game.CommonChan:
-			userInfo := UsersConn[msg.UserID]
-			if msg.Type == model.GrabCardMsg {
+			userInfo := global.UsersConn[msg.UserID]
+			if msg.Type == my_struct.GrabCardMsg {
 				data := msg.GetCardData
 				isOK := false
 				for _, card := range game.RandCard {
 					if data.GetCardID == card.CardID && !card.HasOwner {
-						if card.Type == model.BaseType {
-							if game.Users[msg.UserID].IsGetCard {
-								SendMsgToUser(userInfo, response.MessageResponse{
+						if card.Type == my_struct.BaseType {
+							if game.Users[msg.UserID].GetBaseCardNum >= 2 {
+								global.SendMsgToUser(userInfo, response.MessageResponse{
 									MsgType: response.MsgResponseType,
-									MsgInfo: &response.MsgResponse{MsgData: "一回合最多抢一次普通卡噢！"},
+									MsgInfo: &response.MsgResponse{MsgData: "一回合最多抢两次普通卡噢！"},
 								})
 								return
 							}
 							game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, &card.BaseCardInfo)
-							game.Users[msg.UserID].IsGetCard = true
-						} else if card.Type == model.SpecialType {
+							game.Users[msg.UserID].GetBaseCardNum++
+						} else if card.Type == my_struct.SpecialType {
 							if game.Users[msg.UserID].IsGetSpecialCard {
-								SendMsgToUser(userInfo, response.MessageResponse{
+								global.SendMsgToUser(userInfo, response.MessageResponse{
 									MsgType: response.MsgResponseType,
 									MsgInfo: &response.MsgResponse{MsgData: "一回合最多抢一次特殊卡噢！"},
 								})
@@ -220,14 +179,9 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 				}
 				//发送给用户信息
 				if isOK {
-					SendMsgToUser(userInfo, response.MessageResponse{
-						MsgType: response.MsgResponseType,
-						MsgInfo: &response.MsgResponse{MsgData: "抢到卡了！"},
-					})
-					resp := CardModelToResponse(game)
-					BroadcastToAllGameUsers(game, resp)
+					BroadcastToAllGameUsers(game, CardModelToResponse(game))
 				} else {
-					SendMsgToUser(userInfo, response.MessageResponse{
+					global.SendMsgToUser(userInfo, response.MessageResponse{
 						MsgType: response.MsgResponseType,
 						MsgInfo: &response.MsgResponse{MsgData: "没抢到卡~~~"},
 					})
@@ -266,14 +220,14 @@ func (game *GameStruct) DoHandleSpecialCard(min, max int) {
 	for true {
 		select {
 		case msg := <-game.CommonChan:
-			userInfo := UsersConn[msg.UserID]
-			if msg.Type == model.UseSpecialCardMsg {
+			userInfo := global.UsersConn[msg.UserID]
+			if msg.Type == my_struct.UseSpecialCardMsg {
 				//只有这类型的消息才处理
 				isFind, cardType := game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
 				if isFind {
 					handleFunc[cardType](msg)
 				} else {
-					SendErrToUser(userInfo, "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
+					global.SendErrToUser(userInfo, "[DoHandleSpecialCard]", errors.New("找不到该特殊卡"))
 				}
 			}
 		case <-after:
@@ -289,7 +243,7 @@ func (game *GameStruct) DoScoreCount() {
 		total := len(info.BaseCards)
 		if total > 6 {
 			info.BaseCards = info.BaseCards[total-6:]
-			SendMsgToUser(UsersConn[id], response.MessageResponse{
+			global.SendMsgToUser(global.UsersConn[id], response.MessageResponse{
 				MsgType: response.MsgResponseType,
 				MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("卡没了噢爆了！")},
 			})
@@ -300,21 +254,21 @@ func (game *GameStruct) DoScoreCount() {
 			sum += card.Number
 		}
 		if sum/20 == 1 {
-			info.BaseCards = make([]*model.BaseCard, 0)
+			info.BaseCards = make([]*my_struct.BaseCard, 0)
 			if sum%20 == 0 {
 				info.Score += 6
-				SendMsgToUser(UsersConn[id], response.MessageResponse{
+				global.SendMsgToUser(global.UsersConn[id], response.MessageResponse{
 					MsgType: response.MsgResponseType,
 					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("得分啦！")},
 				})
 			} else {
 				//生成多的数字
 				game.MakeCardID++
-				info.BaseCards = append(info.BaseCards, &model.BaseCard{
+				info.BaseCards = append(info.BaseCards, &my_struct.BaseCard{
 					CardID: game.MakeCardID,
 					Number: sum % 20,
 				})
-				SendMsgToUser(UsersConn[id], response.MessageResponse{
+				global.SendMsgToUser(global.UsersConn[id], response.MessageResponse{
 					MsgType: response.MsgResponseType,
 					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("超出12了！")},
 				})
@@ -325,24 +279,7 @@ func (game *GameStruct) DoScoreCount() {
 }
 
 func (game *GameStruct) BackToRoom() {
-	BroadcastToAllGameUsers(game, response.MessageResponse{
-		MsgType:      response.GameOverResponseType,
-		GameOverInfo: &response.GameOverResponse{},
-	})
-	game.exitCancel() //关闭子协程
-	game.wg.Wait()    //等待全部子协程关闭
 
-	//完成所有环境，退出游戏协程，创建房间协程
-	go startRoomThread(RoomData{
-		RoomID:        game.GameData.RoomID,
-		MaxUserNumber: game.GameData.UserNumber,
-		GameCount:     game.GameData.GameCount,
-		UserNumber:    game.GameData.UserNumber,
-		RoomOwner:     game.GameData.RoomOwner,
-		Users:         game.GameData.Users,
-		RoomName:      game.GameData.RoomName,
-		RoomWait:      true,
-	})
 }
 
 func (game *GameStruct) DoEndGame() {
@@ -367,9 +304,57 @@ func (game *GameStruct) DoEndGame() {
 		for i, u := range ranks {
 			global.GameSrvClient.UpdateRanks(context.Background(), &game_proto.UpdateRanksInfo{
 				UserID:       u.UserID,
-				AddScore:     game.GameData.UserNumber - uint32(i),
+				AddScore:     game.UserNumber - uint32(i),
 				AddGametimes: 1,
 			})
 		}
 	}()
+}
+
+func (game *GameStruct) RunGame() {
+	rand.Seed(time.Now().Unix())
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	//创建三个协程，用来处理用户聊天消息和用户使用道具和心脏包回复，异步执行
+	go game.ProcessChatMsg(ctx)
+	go game.ProcessItemMsg(ctx)
+	go game.ProcessHealthMsg(ctx)
+	game.wg.Add(3)
+	for _, info := range game.Users {
+		//对于每个用户开启一个协程，用于读取他的消息到游戏管道（分发消息功能）
+		go game.ReadGameUserMsg(ctx, info.ID)
+		game.wg.Add(1)
+	}
+	//等待用户页面初始化完成
+	BroadcastToAllGameUsers(game, response.MessageResponse{
+		MsgType: response.MsgResponseType,
+		MsgInfo: &response.MsgResponse{MsgData: "游戏2秒后开始！"},
+	})
+	time.Sleep(time.Second * 2)
+	//游戏初始化阶段
+	for i := uint32(0); i < game.GameCount; i++ {
+		game.DoFlush()
+		BroadcastToAllGameUsers(game, response.MessageResponse{
+			MsgType: response.MsgResponseType,
+			MsgInfo: &response.MsgResponse{MsgData: "进入抢卡阶段"},
+		})
+		time.Sleep(time.Second * 2)
+		game.DoDistributeCard()
+		game.DoListenDistributeCard(10, 14)
+		BroadcastToAllGameUsers(game, response.MessageResponse{
+			MsgType: response.MsgResponseType,
+			MsgInfo: &response.MsgResponse{MsgData: "进入出牌阶段"},
+		})
+		time.Sleep(time.Second * 2)
+		game.DoHandleSpecialCard(14, 18)
+		game.DoScoreCount()
+	}
+	BroadcastToAllGameUsers(game, response.MessageResponse{
+		MsgType:      response.GameOverResponseType,
+		GameOverInfo: &response.GameOverResponse{},
+	})
+	cancelFunc() //关闭子协程
+	game.wg.Wait()
+	//游戏计算排名发奖励阶段
+	game.DoEndGame()
+
 }

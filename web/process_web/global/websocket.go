@@ -1,13 +1,11 @@
-package api
+package global
 
 import (
 	"errors"
 	"fmt"
-	"process_web/model"
-	"process_web/model/response"
+	"process_web/my_struct"
+	"process_web/my_struct/response"
 	"sync"
-
-	"go.uber.org/zap"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,7 +13,7 @@ import (
 type WSConn struct {
 	conn      *websocket.Conn
 	userID    uint32                        //标识是哪个用户的连接
-	inChan    chan model.Message            //读客户端发来数据
+	inChan    chan my_struct.Message        //读客户端发来数据
 	outChan   chan response.MessageResponse //向客户端写入数据
 	closeChan chan struct{}                 //标记ws是否关闭，关闭chan后，消费者依然可以读,通过这个标志说明是否关闭
 	isClose   bool                          // 通道closeChan是否已经关闭,chan不能多次关闭，所有需要保证只能关闭一次
@@ -26,7 +24,7 @@ type WSConn struct {
 func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 	ws = &WSConn{
 		userID:    userID,
-		inChan:    make(chan model.Message, 5),
+		inChan:    make(chan my_struct.Message, 5),
 		outChan:   make(chan response.MessageResponse, 30),
 		closeChan: make(chan struct{}),
 		conn:      conn,
@@ -41,16 +39,16 @@ func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 func (ws *WSConn) readMsgLoop() {
 	for true {
 		//zap.S().Infof("[readMsgLoop]读到:%v", data)
-		data := model.Message{}
+		data := my_struct.Message{}
 		err := ws.conn.ReadJSON(&data)
 		//zap.S().Infof("[readMsgLoop]:Data:%+v", data)
 		if err != nil {
-			zap.S().Warnf("[readMsgLoop]:%s", err)
+			//zap.S().Warnf("[readMsgLoop]:%s", err)
 			//发生错误,关闭连接，停止协程
 			ws.CloseConn()
 			break
 		}
-		if data.Type == model.UserIntoMsg {
+		if data.Type == my_struct.UserIntoMsg {
 			continue
 		}
 		ws.inChan <- data
@@ -71,7 +69,7 @@ func (ws *WSConn) writeMsgLoop() {
 }
 
 // 从inChan读
-func (ws *WSConn) InChanRead() chan model.Message {
+func (ws *WSConn) InChanRead() chan my_struct.Message {
 	return ws.inChan
 }
 

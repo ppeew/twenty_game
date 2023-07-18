@@ -59,7 +59,7 @@ func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (
 		tx.Rollback()
 		return nil, status.Errorf(codes.Internal, result.Error.Error())
 	}
-	zap.S().Info("插入用户成功，接下来插入物品")
+	//zap.S().Info("插入用户成功，接下来插入物品")
 	//创建用户表成功，接下来为游戏用户添加物品表(跨服务调用,失败采用事务回滚)
 	consulInfo := global.ServerConfig.ConsulInfo
 	gameConn, err := grpc.Dial(
@@ -83,7 +83,7 @@ func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (
 		tx.Rollback()
 		return nil, err
 	}
-	zap.S().Info("插入物品成功，commit")
+	//zap.S().Info("插入物品成功，commit")
 	tx.Commit()
 	return ModelToResponse(u2), nil
 }
@@ -166,7 +166,6 @@ func ModelToResponse(u *model.User) *user.UserInfoResponse {
 		Password: u.Password,
 		Id:       u.ID,
 		Image:    u.Image,
-		//State:    u.UserState,
 	}
 	return userInfoRep
 }
