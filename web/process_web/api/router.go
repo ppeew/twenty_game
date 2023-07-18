@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"process_web/forms"
 	"process_web/global"
-	"process_web/model"
-	"process_web/model/response"
+	"process_web/my_struct"
+	"process_web/my_struct/response"
 	"process_web/proto/game"
 	"process_web/server"
 	"strconv"
@@ -31,7 +31,7 @@ var upgrade = websocket.Upgrader{
 func ConnSocket(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.DefaultQuery("room_id", "0"))
 	claims, _ := ctx.Get("claims")
-	userID := claims.(*model.CustomClaims).ID
+	userID := claims.(*my_struct.CustomClaims).ID
 	if global.ConnectCHAN[uint32(roomID)] == nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "传入room_id错误",
@@ -69,7 +69,6 @@ func CreateRoom(ctx *gin.Context) {
 		})
 		return
 	}
-	//zap.S().Infof("[CreateRoom]房间ID:%d", form.RoomID)
 	if form.RoomID <= 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "房间号不能小于0",
@@ -77,7 +76,7 @@ func CreateRoom(ctx *gin.Context) {
 		return
 	}
 	claims, _ := ctx.Get("claims")
-	userID := claims.(*model.CustomClaims).ID
+	userID := claims.(*my_struct.CustomClaims).ID
 
 	var users []*game.RoomUser
 	users = append(users, &game.RoomUser{ID: userID, Ready: false})
@@ -100,29 +99,18 @@ func CreateRoom(ctx *gin.Context) {
 	})
 	if err != nil {
 		global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: uint32(form.RoomID)})
-		zap.S().Infof("[CreateRoom]:删除房间服务器信息")
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"err": "请先退出原先房间",
 		})
 		return
 	}
-	//zap.S().Infof("[CreateRoom]:全通过了，开启房间线程")
-	global.ConnectCHAN[uint32(form.RoomID)] = make(chan uint32, 10)
+	global.ConnectCHAN[form.RoomID] = make(chan uint32, 10)
 	u := make(map[uint32]response.UserData)
 	u[userID] = response.UserData{
 		ID:    userID,
 		Ready: true,
 	}
-	go server.RunRoom(server.RoomData{
-		RoomID:        uint32(form.RoomID),
-		MaxUserNumber: uint32(form.MaxUserNumber),
-		GameCount:     uint32(form.GameCount),
-		UserNumber:    1,
-		RoomOwner:     userID,
-		RoomWait:      true,
-		Users:         u,
-		RoomName:      form.RoomName,
-	})
+	go server.Run(server.NewData(form.RoomID, form.MaxUserNumber, form.GameCount, 1, userID, form.RoomName, []uint32{userID}))
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "创建成功",
 	})
@@ -134,7 +122,7 @@ func UserIntoRoom(ctx *gin.Context) {
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
 	//zap.S().Infof("[UserIntoRoom]:RoomID是：%d", roomID)
 	claims, _ := ctx.Get("claims")
-	userID := claims.(*model.CustomClaims).ID
+	userID := claims.(*my_struct.CustomClaims).ID
 	// 玩家进入房间，添加该玩家的服务器连接信息
 	//zap.S().Infof("[UserIntoRoom]:用户对应的服务器信息%s", fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID))
 	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game.RecordConnInfo{

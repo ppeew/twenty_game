@@ -18,6 +18,10 @@ type UserData struct {
 	ID           uint32    `json:"ID"`
 	Ready        bool      `json:"Ready"`
 	IntoRoomTime time.Time `json:"-"` //忽略
+	Nickname     string    `json:"nickname"`
+	Gender       bool      `json:"gender"`
+	Username     string    `json:"username"`
+	Image        string    `json:"image"`
 }
 
 // 踢人的信息体，告知所有用户是谁被t了

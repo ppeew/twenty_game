@@ -1,4 +1,4 @@
-package model
+package my_struct
 
 // 前端发送websocket通讯的消息体,前端通过传Type字段，服务器知道消息是什么类型，做什么处理
 type Message struct {
@@ -65,63 +65,6 @@ type UseSpecialData struct {
 	DeleteCardData DeleteCardData `json:"deleteCardData"`
 	//交换卡需要指定自己的一张数字卡和对方玩家ID的一张数字卡
 	ChangeCardData ChangeCardData `json:"changeCardData"`
-}
-
-// 交换卡结构体
-type ChangeCardData struct {
-	CardID       uint32 `json:"cardID"`
-	TargetUserID uint32 `json:"targetUserID"`
-	TargetCard   uint32 `json:"targetCard"`
-}
-
-// 删除卡结构体
-type DeleteCardData struct {
-	TargetUserID uint32 `json:"targetUserID"`
-	CardID       uint32 `json:"cardID"`
-}
-
-// 更改卡结构体
-type UpdateCardData struct {
-	TargetUserID uint32 `json:"targetUserID"`
-	CardID       uint32 `json:"cardID"`
-	UpdateNumber uint32 `json:"updateNumber"`
-}
-
-// 增加卡结构体
-type AddCardData struct {
-	NeedNumber uint32 `json:"needNumber"`
-	CardID     uint32 `json:"cardID"` //服务器返回时候，告知是生成了哪张卡ID
-}
-
-// 抢卡结构体
-type GetCardData struct {
-	GetCardID uint32 `json:"getCardID"`
-}
-
-// 退出房间结构体
-type QuitRoomData struct {
-}
-
-// 更新房间结构体
-type UpdateData struct {
-	MaxUserNumber uint32 `json:"maxUserNumber"`
-	GameCount     uint32 `json:"gameCount"`
-	RoomName      string `json:"roomName"`
-	Owner         uint32 `json:"owner"`
-	Kicker        uint32 `json:"kicker"`
-}
-
-// 查询房间数据结构体
-type RoomData struct {
-}
-
-// 更新装备状态结构体
-type ReadyStateData struct {
-	IsReady bool `json:"isReady"`
-}
-
-// 开始游戏结构体
-type BeginGameData struct {
 }
 
 // 仅服务器使用！！！！！

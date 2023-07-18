@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"process_web/global"
-	"process_web/model"
+	"process_web/my_struct"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -95,14 +95,14 @@ func NewJWT() *JWT {
 }
 
 // 创建一个token
-func (j *JWT) CreateToken(claims model.CustomClaims) (string, error) {
+func (j *JWT) CreateToken(claims my_struct.CustomClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(j.SigningKey)
 }
 
 // 解析 token
-func (j *JWT) ParseToken(tokenString string) (*model.CustomClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &model.CustomClaims{}, func(token *jwt.Token) (i interface{}, e error) {
+func (j *JWT) ParseToken(tokenString string) (*my_struct.CustomClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &my_struct.CustomClaims{}, func(token *jwt.Token) (i interface{}, e error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
@@ -120,7 +120,7 @@ func (j *JWT) ParseToken(tokenString string) (*model.CustomClaims, error) {
 		}
 	}
 	if token != nil {
-		if claims, ok := token.Claims.(*model.CustomClaims); ok && token.Valid {
+		if claims, ok := token.Claims.(*my_struct.CustomClaims); ok && token.Valid {
 			return claims, nil
 		}
 		return nil, TokenInvalid
@@ -137,13 +137,13 @@ func (j *JWT) RefreshToken(tokenString string) (string, error) {
 	jwt.TimeFunc = func() time.Time {
 		return time.Unix(0, 0)
 	}
-	token, err := jwt.ParseWithClaims(tokenString, &model.CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &my_struct.CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
 		return "", err
 	}
-	if claims, ok := token.Claims.(*model.CustomClaims); ok && token.Valid {
+	if claims, ok := token.Claims.(*my_struct.CustomClaims); ok && token.Valid {
 		jwt.TimeFunc = time.Now
 		claims.StandardClaims.ExpiresAt = time.Now().Add(1 * time.Hour).Unix()
 		return j.CreateToken(*claims)

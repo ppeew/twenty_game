@@ -4,34 +4,34 @@ import (
 	"context"
 	"errors"
 	"process_web/global"
-	"process_web/model"
-	"process_web/model/response"
+	"process_web/my_struct"
+	"process_web/my_struct/response"
 	game_proto "process_web/proto/game"
 	"sort"
 )
 
-type HandlerCard func(model.Message)
+type HandlerCard func(my_struct.Message)
 
 func NewHandleFunc(game *GameStruct) map[uint32]HandlerCard {
 	var HandleCard = make(map[uint32]HandlerCard)
-	HandleCard[model.AddCard] = game.HandleAddCard
-	HandleCard[model.DeleteCard] = game.HandleDeleteCard
-	HandleCard[model.UpdateCard] = game.HandleUpdateCard
-	HandleCard[model.ChangeCard] = game.HandleChangeCard
+	HandleCard[my_struct.AddCard] = game.HandleAddCard
+	HandleCard[my_struct.DeleteCard] = game.HandleDeleteCard
+	HandleCard[my_struct.UpdateCard] = game.HandleUpdateCard
+	HandleCard[my_struct.ChangeCard] = game.HandleChangeCard
 	return HandleCard
 }
 
-func (game *GameStruct) HandleAddCard(msg model.Message) {
+func (game *GameStruct) HandleAddCard(msg my_struct.Message) {
 	data := msg.UseSpecialData.AddCardData
 	game.MakeCardID++
-	game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, &model.BaseCard{
+	game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, &my_struct.BaseCard{
 		CardID: game.MakeCardID,
 		Number: data.NeedNumber,
 	})
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.AddCard,
 		UserID:          msg.UserID,
-		AddCardData: &model.AddCardData{
+		AddCardData: &my_struct.AddCardData{
 			NeedNumber: msg.UseSpecialData.AddCardData.NeedNumber,
 			CardID:     game.MakeCardID,
 		},
@@ -39,7 +39,7 @@ func (game *GameStruct) HandleAddCard(msg model.Message) {
 	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: &rsp})
 }
 
-func (game *GameStruct) HandleUpdateCard(msg model.Message) {
+func (game *GameStruct) HandleUpdateCard(msg my_struct.Message) {
 	ws := global.UsersConn[msg.UserID]
 	data := msg.UseSpecialData.UpdateCardData
 	findUpdateCard := false
@@ -58,7 +58,7 @@ func (game *GameStruct) HandleUpdateCard(msg model.Message) {
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.UpdateCard,
 		UserID:          msg.UserID,
-		UpdateCardData: &model.UpdateCardData{
+		UpdateCardData: &my_struct.UpdateCardData{
 			TargetUserID: msg.UseSpecialData.UpdateCardData.TargetUserID,
 			CardID:       msg.UseSpecialData.UpdateCardData.CardID,
 			UpdateNumber: msg.UseSpecialData.UpdateCardData.UpdateNumber,
@@ -68,7 +68,7 @@ func (game *GameStruct) HandleUpdateCard(msg model.Message) {
 
 }
 
-func (game *GameStruct) HandleDeleteCard(msg model.Message) {
+func (game *GameStruct) HandleDeleteCard(msg my_struct.Message) {
 	ws := global.UsersConn[msg.UserID]
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
@@ -98,7 +98,7 @@ func (game *GameStruct) HandleDeleteCard(msg model.Message) {
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.DeleteCard,
 		UserID:          msg.UserID,
-		DeleteCardData: &model.DeleteCardData{
+		DeleteCardData: &my_struct.DeleteCardData{
 			TargetUserID: msg.UseSpecialData.DeleteCardData.TargetUserID,
 			CardID:       msg.UseSpecialData.DeleteCardData.CardID,
 		},
@@ -106,14 +106,14 @@ func (game *GameStruct) HandleDeleteCard(msg model.Message) {
 	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: &rsp})
 }
 
-func (game *GameStruct) HandleChangeCard(msg model.Message) {
+func (game *GameStruct) HandleChangeCard(msg my_struct.Message) {
 	ws := global.UsersConn[msg.UserID]
 	data := msg.UseSpecialData.ChangeCardData
 	//先找到两卡
 	findUserCard := false
-	var userInfo *model.BaseCard
+	var userInfo *my_struct.BaseCard
 	findTargetUserCard := false
-	var targetUserInfo *model.BaseCard
+	var targetUserInfo *my_struct.BaseCard
 	for _, info := range game.Users[msg.UserID].BaseCards {
 		if info.CardID == data.CardID {
 			findUserCard = true
@@ -143,7 +143,7 @@ func (game *GameStruct) HandleChangeCard(msg model.Message) {
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.ChangeCard,
 		UserID:          msg.UserID,
-		ChangeCardData: &model.ChangeCardData{
+		ChangeCardData: &my_struct.ChangeCardData{
 			CardID:       msg.UseSpecialData.ChangeCardData.CardID,
 			TargetUserID: msg.UseSpecialData.ChangeCardData.TargetUserID,
 			TargetCard:   msg.UseSpecialData.ChangeCardData.TargetCard,
@@ -192,7 +192,7 @@ func (game *GameStruct) ProcessItemMsg(todo context.Context) {
 			}
 			//处理用户的物品使用,广播所有用户
 			rsp := response.UseItemResponse{
-				ItemMsgData: model.ItemMsgData{
+				ItemMsgData: my_struct.ItemMsgData{
 					Item:         msg.ItemMsgData.Item,
 					TargetUserID: msg.ItemMsgData.TargetUserID,
 				},
@@ -229,17 +229,17 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 			return
 		case message := <-global.UsersConn[userID].InChanRead():
 			switch message.Type {
-			case model.ChatMsg:
+			case my_struct.ChatMsg:
 				//聊天信息发到聊天管道
 				message.UserID = userID
 				game.ChatChan <- message
-			case model.ItemMsg:
+			case my_struct.ItemMsg:
 				//物品信息发到物品管道
 				message.UserID = userID
 				game.ItemChan <- message
 			//case model.CheckHealthMsg:
 			//	//心脏包
-			//	message.UserID = userID
+			//	message.UserID = ID
 			//	game.HealthChan <- message
 			default:
 				//其他信息是通用信息
@@ -271,11 +271,9 @@ func (game *GameStruct) DropSpecialCard(userID uint32, specialID uint32) (bool, 
 
 func BroadcastToAllGameUsers(game *GameStruct, msg response.MessageResponse) {
 	for userID := range game.Users {
-		//zap.S().Infof("[BroadcastToAllGameUsers]:正在向用户%d发送信息,消息为:%v", userID, msg)
 		err := global.UsersConn[userID].OutChanWrite(msg)
 		if err != nil {
-			//zap.S().Infof("[BroadcastToAllGameUsers]:%d用户关闭了连接", userID)
-			//global.UsersConn[userID].CloseConn()
+			//global.UsersConn[ID].CloseConn()
 		}
 	}
 }
@@ -287,9 +285,12 @@ func CardModelToResponse(game *GameStruct) response.MessageResponse {
 			UserID:       userID,
 			BaseCards:    info.BaseCards,
 			SpecialCards: info.SpecialCards,
-			//IsGetCard:    info.GetBaseCardNum,
 			Score:        info.Score,
 			IntoRoomTime: info.IntoRoomTime,
+			Nickname:     info.Nickname,
+			Gender:       info.Gender,
+			Username:     info.Username,
+			Image:        info.Image,
 		}
 		users = append(users, userGameInfoResponse)
 	}
@@ -297,7 +298,7 @@ func CardModelToResponse(game *GameStruct) response.MessageResponse {
 		return users[i].IntoRoomTime.Before(users[j].IntoRoomTime)
 	})
 	info := response.GameStateResponse{
-		GameCount:    game.GameData.GameCount,
+		GameCount:    game.GameCount,
 		GameCurCount: game.CurrentCount,
 		Users:        users,
 		RandCard:     game.RandCard,

@@ -1,4 +1,4 @@
-package model
+package my_struct
 
 import "github.com/dgrijalva/jwt-go"
 
