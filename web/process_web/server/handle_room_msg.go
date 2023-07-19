@@ -36,7 +36,6 @@ func NewDealFunc(room *RoomStruct) map[uint32]dealFunc {
 
 // RoomInfo 房间信息
 func (room *RoomStruct) RoomInfo(message my_struct.Message) {
-	//zap.S().Info("[RoomInfo]:收到信息，")
 	global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 		MsgType:  response.RoomInfoResponseType,
 		RoomInfo: room.MakeRoomResponse(),
@@ -124,7 +123,6 @@ func (room *RoomStruct) UpdateRoom(message my_struct.Message) {
 			})
 			if room.UserNumber <= 0 {
 				room.ExitChan <- RoomQuit
-				//return
 			}
 		}
 	}
