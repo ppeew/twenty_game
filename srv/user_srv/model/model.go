@@ -1,0 +1,25 @@
+package model
+
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
+type BaseModel struct {
+	ID        uint32 `gorm:"primaryKey;autoIncrement"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+type User struct {
+	BaseModel
+	UserName string `gorm:"index;unique;not null"`
+	Password string
+	Nickname string `gorm:"index;not null"`
+	Gender   bool
+	Image    string `gorm:"not null;default: /"` //路径存储
+	Good     int    `gorm:"not null;comment:金币"`
+	Diamond  int    `gorm:"not null;comment:钻石"`
+}

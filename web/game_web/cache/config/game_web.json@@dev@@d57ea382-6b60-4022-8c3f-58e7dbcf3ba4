@@ -1,0 +1,13 @@
+{
+    "port": 8083,
+    "game_srv": {
+        "name": "twelve_game_game_srv"
+    },
+    "jwt": {
+        "key": "9fl_qct+PUj!U8(5O8$OttbKFhBo3mG%yTW(yO%81UbtHWX4@Nyb_G5Zcn4IWMQmICtrOICG&r5762tA6hhoj3aH"
+    },
+    "consul": {
+        "host": "192.168.159.134",
+        "port": 8500
+    }
+}

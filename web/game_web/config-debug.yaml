@@ -1,0 +1,7 @@
+host: '192.168.159.134'
+port: 8848
+namespace: 'd57ea382-6b60-4022-8c3f-58e7dbcf3ba4'
+user: 'nacos'
+password: 'nacos'
+dataid: 'game_web.json'
+group: 'dev'
