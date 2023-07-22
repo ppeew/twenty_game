@@ -101,16 +101,7 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 
 // 删除房间
 func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
-	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
-	if get.Err() == redis.Nil {
-		return &emptypb.Empty{}, get.Err()
-	}
-	room := model.Room{}
-	_ = json.Unmarshal([]byte(get.Val()), &room)
-	for _, info := range room.Users {
-		global.RedisDB.Del(ctx, NameUserConnInfo(info.ID)) //删除了用户连接信息
-	}
-	global.RedisDB.Del(ctx, fmt.Sprintf("%s", NameRoom(in.RoomID)))
+	global.RedisDB.Del(ctx, NameRoom(in.RoomID))
 	return &emptypb.Empty{}, nil
 }
 

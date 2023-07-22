@@ -12,8 +12,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/parnurzeal/gorequest"
 	"go.uber.org/zap"
+
+	"github.com/parnurzeal/gorequest"
 )
 
 const (
@@ -39,21 +40,20 @@ type RoomStruct struct {
 func NewRoomStruct(data *Data) RoomStruct {
 	users := make(map[uint32]my_struct.UserRoomData)
 	for _, userID := range data.users {
-		//发起api请求，拿到数据
 		//查询API用户信息
 		var res utils.UserInfo
-		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6NTAsImV4cCI6MTY4OTY5NTQ3OCwiaXNzIjoicHBlZXciLCJuYmYiOjE2ODkyNjM0Nzh9.w4hH23492VGH5aq1b2jVLntFG-gPQnobKthK0lSgSVM").
-			Param("id", strconv.Itoa(int(userID))).Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
-		zap.S().Infof("[NewRoomStruct]:查询出用户信息%+v", res)
+		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(userID))).
+			Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
 		users[userID] = my_struct.UserRoomData{
 			ID:           userID,
-			Ready:        true,
+			Ready:        false,
 			IntoRoomTime: time.Now(),
 			Nickname:     res.Nickname,
 			Gender:       res.Gender,
 			Username:     res.Username,
 			Image:        res.Image,
 		}
+		zap.S().Infof("[NewRoomStruct]:查询出用户信息%+v", res)
 	}
 	return RoomStruct{
 		MsgChan:  make(chan my_struct.Message, 1024),
@@ -71,7 +71,7 @@ func NewRoomStruct(data *Data) RoomStruct {
 	}
 }
 
-func (room *RoomStruct) RunRoom(d *Data) bool {
+func (room *RoomStruct) RunRoom() (*Data, bool) {
 	ctx, cancel := context.WithCancel(context.Background())
 	dealFunc := NewDealFunc(room)
 	for _, userData := range room.Users {
@@ -85,7 +85,6 @@ func (room *RoomStruct) RunRoom(d *Data) bool {
 	go room.CheckClientHealth(ctx)
 	//定时发送到redis，更新房间列表信息，为大厅外查询更新数据
 	go room.UpdateRedisRoom(ctx)
-	zap.S().Infof("[RunRoom]:初始化完成")
 	for {
 		select {
 		case msg := <-room.MsgChan:
@@ -98,7 +97,12 @@ func (room *RoomStruct) RunRoom(d *Data) bool {
 			if msg == RoomQuit {
 				global.GameSrvClient.DeleteRoom(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
 				global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
-				return true
+				zap.S().Infof("[RoomQuit]:准备删除房间所有用户信息%+v", room.Users)
+				for id := range room.Users {
+					zap.S().Infof("[RoomQuit]:正在删除用户%d的连接信息", id)
+					global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{Id: id})
+				}
+				return nil, true
 			} else if msg == GameStart {
 				room.RoomWait = false
 				var users []*game.RoomUser
@@ -122,8 +126,7 @@ func (room *RoomStruct) RunRoom(d *Data) bool {
 				for userID := range room.Users {
 					rsp = append(rsp, userID)
 				}
-				d = NewData(room.RoomID, room.MaxUserNumber, room.GameCount, room.UserNumber, room.RoomOwner, room.RoomName, rsp)
-				return false
+				return NewData(room.RoomID, room.MaxUserNumber, room.GameCount, room.UserNumber, room.RoomOwner, room.RoomName, rsp), false
 			}
 		}
 	}

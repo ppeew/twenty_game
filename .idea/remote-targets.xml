@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <targets>
+      <target name="root@139.159.234.134:22" type="ssh/sftp" uuid="502e99a9-c741-4d90-b70f-f8c638c73bd5">
+        <config>
+          <option name="projectRootOnTarget" value="/root/twenty_game" />
+          <option name="serverName" value="root@139.159.234.134:22 password" />
+        </config>
+        <ContributedStateBase type="GoLanguageRuntime">
+          <config>
+            <option name="goPath" value="/root/go" />
+            <option name="goRoot" value="/usr/bin/go" />
+            <option name="goVersion" value="go1.19.9 linux/amd64" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

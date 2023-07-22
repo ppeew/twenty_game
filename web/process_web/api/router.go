@@ -60,7 +60,7 @@ func ConnSocket(ctx *gin.Context) {
 	global.ConnectCHAN[uint32(roomID)] <- userID
 }
 
-// CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息  TODO 创建房间应该先查询房间是否存在
+// CreateRoom 创建房间,房间创建，需要创建一个协程处理房间及游戏内所有信息
 func CreateRoom(ctx *gin.Context) {
 	form := forms.CreateRoomForm{}
 	if err := ctx.ShouldBind(&form); err != nil {
@@ -83,7 +83,7 @@ func CreateRoom(ctx *gin.Context) {
 	zap.S().Infof("[CreateRoom]:注册房间主机和端口%s", fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port))
 	// 1.创建房间对应服务器信息 //TODO （查询之前是否已经有了该信息，有了就不允许创建）
 	_, err := global.GameSrvClient.RecordRoomServer(context.Background(), &game.RecordRoomServerInfo{
-		RoomID:     uint32(form.RoomID),
+		RoomID:     form.RoomID,
 		ServerInfo: fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port),
 	})
 	if err != nil {
@@ -118,25 +118,11 @@ func CreateRoom(ctx *gin.Context) {
 
 // UserIntoRoom 玩家进入房间 房间满人或者其他错误不成功，应该返回错误
 func UserIntoRoom(ctx *gin.Context) {
-	//zap.S().Infof("[UserIntoRoom]:我在这")
 	roomID, _ := strconv.Atoi(ctx.Query("room_id"))
-	//zap.S().Infof("[UserIntoRoom]:RoomID是：%d", roomID)
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*my_struct.CustomClaims).ID
-	// 玩家进入房间，添加该玩家的服务器连接信息
 	//zap.S().Infof("[UserIntoRoom]:用户对应的服务器信息%s", fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID))
-	_, err := global.GameSrvClient.RecordConnData(context.Background(), &game.RecordConnInfo{
-		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
-		Id:         userID,
-	})
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": err,
-		})
-		return
-	}
 	// 告知协程用户进房信息
-	//zap.S().Infof("[UserIntoRoom]:我进来了%d", uint32(roomID))
 	if global.IntoRoomCHAN[uint32(roomID)] == nil {
 		global.IntoRoomCHAN[uint32(roomID)] = make(chan uint32)
 	}
@@ -154,6 +140,6 @@ func UserIntoRoom(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": "ok",
+		"data": "进房成功",
 	})
 }

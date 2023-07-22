@@ -8,6 +8,7 @@ type Data struct {
 	roomOwner     uint32
 	roomName      string
 	users         []uint32
+	gameMode      int
 }
 
 func NewData(roomID, maxUserNumber, gameCount, userNumber, roomOwner uint32, roomName string, users []uint32) *Data {
@@ -19,17 +20,21 @@ func NewData(roomID, maxUserNumber, gameCount, userNumber, roomOwner uint32, roo
 		roomOwner:     roomOwner,
 		roomName:      roomName,
 		users:         users,
+		gameMode:      0,
 	}
 }
 
 func Run(data *Data) {
 	for true {
 		room := NewRoomStruct(data)
-		isQuit := room.RunRoom(data)
+		d, isQuit := room.RunRoom()
 		if isQuit {
 			return
 		}
-		game := NewGameData(data)
-		game.RunGame()
+		switch d.gameMode {
+		case 0:
+			game := NewGameData(d)
+			game.RunGame()
+		}
 	}
 }

@@ -53,7 +53,7 @@ func DownTradeItem(ctx *gin.Context) {
 		return
 	}
 	tradeDao := dao.TradeDao{}
-	err = tradeDao.DeleteByUserID(req.TradeItemID, userID)
+	err = tradeDao.DeleteByID(req.TradeItemID, userID)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 		return
@@ -72,7 +72,6 @@ func BuyTradeItem(ctx *gin.Context) {
 	}
 	tradeDao := dao.TradeDao{}
 
-	//确定购买成功了（钱够）
 	err = tradeDao.BuyTradeItem(req.TradeItemID, int(userID))
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)

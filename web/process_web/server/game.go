@@ -43,8 +43,8 @@ func NewGameData(data *Data) GameStruct {
 	//查询API用户信息
 	for _, userID := range data.users {
 		var res utils.UserInfo
-		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6NTAsImV4cCI6MTY4OTY5NTQ3OCwiaXNzIjoicHBlZXciLCJuYmYiOjE2ODkyNjM0Nzh9.w4hH23492VGH5aq1b2jVLntFG-gPQnobKthK0lSgSVM").
-			Param("id", strconv.Itoa(int(userID))).Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
+		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(userID))).
+			Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
 		users[userID] = &my_struct.UserGameInfo{
 			ID:           userID,
 			IntoRoomTime: time.Now(),
@@ -89,8 +89,8 @@ func (game *GameStruct) DoFlush() {
 func (game *GameStruct) DoDistributeCard() {
 	//要生成userNumber+2的卡牌，其中包含普通卡和特殊卡
 	needCount := 12
-	//特殊卡数量[0,1]
-	special := rand.Intn(3)
+	//特殊卡数量[0,3)
+	special := rand.Intn(5)
 	cards := make([]int, needCount)
 	used := make([]bool, needCount)
 	for i := needCount - 1; i >= needCount-special; i-- {
@@ -153,21 +153,13 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 					if data.GetCardID == card.CardID && !card.HasOwner {
 						if card.Type == my_struct.BaseType {
 							if game.Users[msg.UserID].GetBaseCardNum >= 2 {
-								global.SendMsgToUser(userInfo, response.MessageResponse{
-									MsgType: response.MsgResponseType,
-									MsgInfo: &response.MsgResponse{MsgData: "一回合最多抢两次普通卡噢！"},
-								})
-								return
+								break
 							}
 							game.Users[msg.UserID].BaseCards = append(game.Users[msg.UserID].BaseCards, &card.BaseCardInfo)
 							game.Users[msg.UserID].GetBaseCardNum++
 						} else if card.Type == my_struct.SpecialType {
 							if game.Users[msg.UserID].IsGetSpecialCard {
-								global.SendMsgToUser(userInfo, response.MessageResponse{
-									MsgType: response.MsgResponseType,
-									MsgInfo: &response.MsgResponse{MsgData: "一回合最多抢一次特殊卡噢！"},
-								})
-								return
+								break
 							}
 							game.Users[msg.UserID].SpecialCards = append(game.Users[msg.UserID].SpecialCards, &card.SpecialCardInfo)
 							game.Users[msg.UserID].IsGetSpecialCard = true
@@ -177,7 +169,6 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 						break
 					}
 				}
-				//发送给用户信息
 				if isOK {
 					BroadcastToAllGameUsers(game, CardModelToResponse(game))
 				} else {
@@ -270,7 +261,7 @@ func (game *GameStruct) DoScoreCount() {
 				})
 				global.SendMsgToUser(global.UsersConn[id], response.MessageResponse{
 					MsgType: response.MsgResponseType,
-					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("超出12了！")},
+					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("超出20了！")},
 				})
 			}
 		}
@@ -304,7 +295,7 @@ func (game *GameStruct) DoEndGame() {
 		for i, u := range ranks {
 			global.GameSrvClient.UpdateRanks(context.Background(), &game_proto.UpdateRanksInfo{
 				UserID:       u.UserID,
-				AddScore:     game.UserNumber - uint32(i),
+				AddScore:     game.UserNumber - uint32(i), //小心这边变负数
 				AddGametimes: 1,
 			})
 		}

@@ -51,7 +51,9 @@ func main() {
 	//资源释放 释放房间
 	for roomID, _ := range global.ConnectCHAN {
 		// 1.删除用户对应服务器连接
-
+		for id, _ := range global.UsersConn {
+			global.GameSrvClient.DelConnData(context.Background(), &game_proto.DelConnInfo{Id: id})
+		}
 		// 2.删除redis房间信息
 		global.GameSrvClient.DelRoomServer(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
 		// 3.删除该房间对应的服务器信息

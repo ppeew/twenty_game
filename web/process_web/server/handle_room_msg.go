@@ -46,14 +46,9 @@ func (room *RoomStruct) RoomInfo(message my_struct.Message) {
 func (room *RoomStruct) QuitRoom(message my_struct.Message) {
 	delete(room.Users, message.UserID)
 	room.UserNumber--
-	zap.S().Infof("[QuitRoom]:%d", room.UserNumber)
 	if room.UserNumber == 0 {
 		//没人了，销毁房间
 		room.ExitChan <- RoomQuit
-		global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
-			MsgType:  response.RoomInfoResponseType,
-			RoomInfo: room.MakeRoomResponse(),
-		})
 		global.UsersConn[message.UserID].CloseConn()
 		return
 	}
@@ -75,10 +70,6 @@ func (room *RoomStruct) QuitRoom(message my_struct.Message) {
 	BroadcastToAllRoomUsers(room, response.MessageResponse{
 		MsgType:  response.RoomInfoResponseType,
 		RoomInfo: room.MakeRoomResponse(),
-	})
-	BroadcastToAllRoomUsers(room, response.MessageResponse{
-		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{MsgData: "某玩家退出房间"},
 	})
 	global.UsersConn[message.UserID].CloseConn()
 	//玩家退出，应该从redis删除其服务器连接信息
@@ -151,13 +142,6 @@ func (room *RoomStruct) UpdateUserReadyState(message my_struct.Message) {
 	t := room.Users[message.UserID]
 	t.Ready = message.ReadyStateData.IsReady
 	room.Users[message.UserID] = t
-
-	global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
-		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{
-			MsgData: fmt.Sprintf("玩家%d准备状态更新", message.UserID),
-		},
-	})
 	BroadcastToAllRoomUsers(room, response.MessageResponse{
 		MsgType:  response.RoomInfoResponseType,
 		RoomInfo: room.MakeRoomResponse(),
@@ -185,7 +169,7 @@ func (room *RoomStruct) BeginGame(message my_struct.Message) {
 		return
 	}
 	for _, data := range room.Users {
-		if data.Ready == false {
+		if data.Ready == false && data.ID != room.RoomOwner {
 			global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
 				MsgType: response.MsgResponseType,
 				MsgInfo: &response.MsgResponse{
@@ -232,11 +216,11 @@ func (room *RoomStruct) UserInto(message my_struct.Message) {
 		room.UserNumber++
 		//查询API用户信息
 		var res utils.UserInfo
-		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6NTAsImV4cCI6MTY4OTY5NTQ3OCwiaXNzIjoicHBlZXciLCJuYmYiOjE2ODkyNjM0Nzh9.w4hH23492VGH5aq1b2jVLntFG-gPQnobKthK0lSgSVM").
-			Param("id", strconv.Itoa(int(message.UserID))).Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
+		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(message.UserID))).
+			Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
 		room.Users[message.UserID] = my_struct.UserRoomData{
 			ID:           message.UserID,
-			Ready:        true,
+			Ready:        false,
 			IntoRoomTime: time.Now(),
 			Nickname:     res.Nickname,
 			Gender:       res.Gender,

@@ -2,13 +2,13 @@ package utils
 
 import (
 	"store_web/global"
-	"store_web/service/domain"
+	"store_web/service/domains"
 )
 
 func CreateTable() {
-	global.MysqlDB.AutoMigrate(&domain.Good{})
-	global.MysqlDB.AutoMigrate(&domain.TradeItem{})
-	global.MysqlDB.AutoMigrate(&domain.Item{})
-	global.MysqlDB.AutoMigrate(&domain.UserAndItem{})
-	global.MysqlDB.AutoMigrate(&domain.User{})
+	global.MysqlDB.AutoMigrate(&domains.Good{})
+	global.MysqlDB.AutoMigrate(&domains.TradeItem{})
+	global.MysqlDB.AutoMigrate(&domains.Item{})
+	global.MysqlDB.AutoMigrate(&domains.UserAndItem{})
+	global.MysqlDB.AutoMigrate(&domains.User{})
 }

@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"store_web/service/domain"
+	"store_web/service/domains"
 )
 
 type TradeSelectReq struct {
@@ -18,14 +18,14 @@ type TradePushReq struct {
 	Desc         string
 }
 
-func (r TradePushReq) ToDomain(userID int) domain.TradeItem {
-	return domain.TradeItem{
+func (r TradePushReq) ToDomain(userID int) domains.TradeItem {
+	return domains.TradeItem{
 		UserID:       userID,
 		ItemID:       r.ItemID,
 		PriceGood:    r.GoodPrice,
 		PriceDiamond: r.DiamondPrice,
 		Count:        r.Count,
-		Status:       domain.NotBuy,
+		Status:       domains.NotBuy,
 		Desc:         r.Desc,
 	}
 }
