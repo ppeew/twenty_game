@@ -45,11 +45,15 @@ func (room *RoomStruct) RoomInfo(message my_struct.Message) {
 // QuitRoom 退出房间（房主退出会房主转移）
 func (room *RoomStruct) QuitRoom(message my_struct.Message) {
 	delete(room.Users, message.UserID)
+	//玩家退出，应该从redis删除其服务器连接信息
+	global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
+		Id: message.UserID,
+	})
+	global.UsersConn[message.UserID].CloseConn()
 	room.UserNumber--
 	if room.UserNumber == 0 {
 		//没人了，销毁房间
 		room.ExitChan <- RoomQuit
-		global.UsersConn[message.UserID].CloseConn()
 		return
 	}
 	if message.UserID == room.RoomOwner {
@@ -71,11 +75,7 @@ func (room *RoomStruct) QuitRoom(message my_struct.Message) {
 		MsgType:  response.RoomInfoResponseType,
 		RoomInfo: room.MakeRoomResponse(),
 	})
-	global.UsersConn[message.UserID].CloseConn()
-	//玩家退出，应该从redis删除其服务器连接信息
-	global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
-		Id: message.UserID,
-	})
+
 }
 
 // UpdateRoom 更新房间的房主或者游戏配置(仅房主)
