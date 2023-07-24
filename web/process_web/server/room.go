@@ -12,8 +12,6 @@ import (
 	"sync"
 	"time"
 
-	"go.uber.org/zap"
-
 	"github.com/parnurzeal/gorequest"
 )
 
@@ -53,7 +51,6 @@ func NewRoomStruct(data *Data) RoomStruct {
 			Username:     res.Username,
 			Image:        res.Image,
 		}
-		//zap.S().Infof("[NewRoomStruct]:查询出用户信息%+v", res)
 	}
 	return RoomStruct{
 		MsgChan:  make(chan my_struct.Message, 1024),
@@ -98,7 +95,6 @@ func (room *RoomStruct) RunRoom() (*Data, bool) {
 				global.GameSrvClient.DeleteRoom(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
 				global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
 				for id := range room.Users {
-					zap.S().Infof("[RoomQuit]:正在删除用户%d的连接信息", id)
 					global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{Id: id})
 				}
 				return nil, true
@@ -111,7 +107,6 @@ func (room *RoomStruct) RunRoom() (*Data, bool) {
 						Ready: data.Ready,
 					})
 				}
-				zap.S().Infof("[RunRoom]:roomWait=%v", room.RoomWait)
 				global.GameSrvClient.SetGlobalRoom(context.Background(), &game.RoomInfo{
 					RoomID:        room.RoomID,
 					MaxUserNumber: room.MaxUserNumber,

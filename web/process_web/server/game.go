@@ -247,7 +247,7 @@ func (game *GameStruct) DoScoreCount() {
 		if sum/20 == 1 {
 			info.BaseCards = make([]*my_struct.BaseCard, 0)
 			if sum%20 == 0 {
-				info.Score += 6
+				info.Score += 888
 				global.SendMsgToUser(global.UsersConn[id], response.MessageResponse{
 					MsgType: response.MsgResponseType,
 					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("得分啦！")},

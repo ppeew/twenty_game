@@ -60,7 +60,7 @@ func GetRoomList(ctx *gin.Context) {
 			"gameCount":     room.GameCount,
 			"userNumber":    room.UserNumber,
 			"roomOwner":     room.RoomOwner,
-			"roomWait":      true,
+			"roomWait":      room.RoomWait,
 			"roomName":      room.RoomName,
 			"users":         user,
 		})

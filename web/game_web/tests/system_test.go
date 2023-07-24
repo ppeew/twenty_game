@@ -14,8 +14,8 @@ import (
 func TestSystem(t *testing.T) {
 	//测试系统并发情况，支持10000并发
 	group := sync.WaitGroup{}
+	group.Add(10000)
 	for i := 0; i < 10000; i++ {
-		group.Add(10000)
 		go func(i int) {
 			defer group.Done()
 			//1.新建用户
@@ -30,11 +30,9 @@ func TestSystem(t *testing.T) {
 				fmt.Println(fmt.Sprintf("%d线程创房失败", i))
 				return
 			}
-			//3.进入房间
-
-			//4.开始游戏
+			//3.开始游戏
 			//BeginGame()
-			//5.游戏结束
+			//4.游戏结束
 		}(i)
 	}
 	group.Wait()

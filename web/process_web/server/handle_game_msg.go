@@ -36,6 +36,8 @@ func (game *GameStruct) HandleAddCard(msg my_struct.Message) {
 			CardID:     game.MakeCardID,
 		},
 	}
+	//用户使用增加卡,给该玩家加分
+	game.Users[msg.UserID].Score += 200
 	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: &rsp})
 }
 
@@ -54,7 +56,7 @@ func (game *GameStruct) HandleUpdateCard(msg my_struct.Message) {
 		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要更新的卡"))
 		return
 	}
-	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
+	game.Users[data.TargetUserID].Score += 100
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.UpdateCard,
 		UserID:          msg.UserID,
@@ -72,7 +74,6 @@ func (game *GameStruct) HandleDeleteCard(msg my_struct.Message) {
 	ws := global.UsersConn[msg.UserID]
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
-	//zap.S().Infof("[HandleDeleteCard]:玩家包括%v", game.Users)
 	//zap.S().Infof("[HandleDeleteCard]:被删除卡的玩家是%d", data.TargetUserID)
 	if game.Users[data.TargetUserID] == nil {
 		global.SendErrToUser(global.UsersConn[msg.UserID], "[HandleDeleteCard]", errors.New("未知的玩家"))
@@ -94,7 +95,8 @@ func (game *GameStruct) HandleDeleteCard(msg my_struct.Message) {
 		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要删除的卡"))
 		return
 	}
-	//game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
+	// 删除卡，被删除的玩家加分
+	game.Users[data.TargetUserID].Score += 100
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.DeleteCard,
 		UserID:          msg.UserID,
@@ -136,6 +138,7 @@ func (game *GameStruct) HandleChangeCard(msg my_struct.Message) {
 		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到对方交换的卡"))
 		return
 	}
+	game.Users[data.TargetUserID].Score += 300
 	//都找到了
 	temp := userInfo
 	userInfo = targetUserInfo
