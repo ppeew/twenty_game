@@ -53,7 +53,7 @@ func NewRoomStruct(data *Data) RoomStruct {
 			Username:     res.Username,
 			Image:        res.Image,
 		}
-		zap.S().Infof("[NewRoomStruct]:查询出用户信息%+v", res)
+		//zap.S().Infof("[NewRoomStruct]:查询出用户信息%+v", res)
 	}
 	return RoomStruct{
 		MsgChan:  make(chan my_struct.Message, 1024),
@@ -142,7 +142,6 @@ func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 	room.wg.Add(1)
 	defer room.wg.Done()
 	for true {
-		//fmt.Printf("[ReadRoomUserMsg] %+v,%+v,%+v\n", global.UsersConn, ID, global.UsersConn[ID])
 		select {
 		case <-ctx.Done():
 			return
@@ -151,7 +150,6 @@ func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 			message.UserID = userID //添加标识，能够识别用户
 			room.MsgChan <- message
 		case <-global.UsersConn[userID].IsDisConn():
-			//zap.S().Infof("[ReadRoomUserMsg]:%d用户掉线了", userID)
 			return
 		}
 	}

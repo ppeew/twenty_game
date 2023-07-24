@@ -12,8 +12,6 @@ import (
 	"process_web/server"
 	"strconv"
 
-	"go.uber.org/zap"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -73,7 +71,7 @@ func CreateRoom(ctx *gin.Context) {
 
 	var users []*game.RoomUser
 	users = append(users, &game.RoomUser{ID: userID, Ready: false})
-	zap.S().Infof("[CreateRoom]:注册房间主机和端口%s", fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port))
+	//zap.S().Infof("[CreateRoom]:注册房间主机和端口%s", fmt.Sprintf("%s:%d", global.ServerConfig.Host, global.ServerConfig.Port))
 	// 1.创建房间对应服务器信息 //TODO （查询之前是否已经有了该信息，有了就不允许创建）
 	_, err := global.GameSrvClient.RecordRoomServer(context.Background(), &game.RecordRoomServerInfo{
 		RoomID:     form.RoomID,

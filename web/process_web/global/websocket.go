@@ -7,6 +7,8 @@ import (
 	"process_web/my_struct/response"
 	"sync"
 
+	"go.uber.org/zap"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -38,12 +40,10 @@ func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 // 协程接受客户端msg
 func (ws *WSConn) readMsgLoop() {
 	for true {
-		//zap.S().Infof("[readMsgLoop]读到:%v", data)
 		data := my_struct.Message{}
 		err := ws.conn.ReadJSON(&data)
-		//zap.S().Infof("[readMsgLoop]:Data:%+v", data)
+		zap.S().Infof("[readMsgLoop]读到:%v", data)
 		if err != nil {
-			//zap.S().Warnf("[readMsgLoop]:%s", err)
 			//发生错误,关闭连接，停止协程
 			ws.CloseConn()
 			break
