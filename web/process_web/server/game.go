@@ -17,7 +17,6 @@ import (
 	"time"
 
 	"github.com/parnurzeal/gorequest"
-	"go.uber.org/zap"
 )
 
 type GameStruct struct {
@@ -59,7 +58,7 @@ func NewGameData(data *Data) GameStruct {
 			IsGetSpecialCard: false,
 			Score:            0,
 		}
-		zap.S().Infof("[NewGameData]:查询出用户信息%+v", res)
+		//zap.S().Infof("[NewGameData]:查询出用户信息%+v", res)
 	}
 
 	return GameStruct{

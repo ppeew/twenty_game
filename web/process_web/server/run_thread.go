@@ -25,15 +25,16 @@ func NewData(roomID, maxUserNumber, gameCount, userNumber, roomOwner uint32, roo
 }
 
 func Run(data *Data) {
+	var isQuit bool
 	for true {
 		room := NewRoomStruct(data)
-		d, isQuit := room.RunRoom()
+		data, isQuit = room.RunRoom()
 		if isQuit {
 			return
 		}
-		switch d.gameMode {
+		switch data.gameMode {
 		case 0:
-			game := NewGameData(d)
+			game := NewGameData(data)
 			game.RunGame()
 		}
 	}
