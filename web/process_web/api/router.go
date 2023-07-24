@@ -38,13 +38,6 @@ func ConnSocket(ctx *gin.Context) {
 		})
 		return
 	}
-	//检查用户是否已经进房了
-	_, err := global.GameSrvClient.GetConnData(context.Background(), &game.UserIDInfo{Id: userID})
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "请先退出原先房间",
-		})
-	}
 	// 建立websocket连接
 	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {

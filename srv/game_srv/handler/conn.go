@@ -15,9 +15,9 @@ import (
 func (s *GameServer) GetConnData(ctx context.Context, in *game.UserIDInfo) (*game.ConnResponse, error) {
 	//查询redis
 	get := global.RedisDB.Get(ctx, NameUserConnInfo(in.Id))
-	if get.Err() != nil {
+	if get.Err() == redis.Nil {
 		//找不到或者其他错误
-		return &game.ConnResponse{}, errors.New("找不到对应的服务器")
+		return &game.ConnResponse{}, errors.New("找不到用户对应的处理服务器")
 	}
 	return &game.ConnResponse{ServerInfo: get.Val()}, nil
 }
@@ -30,7 +30,7 @@ func (s *GameServer) RecordConnData(ctx context.Context, in *game.RecordConnInfo
 	err := global.RedisDB.Get(ctx, NameUserConnInfo(in.Id)).Err()
 	if err != redis.Nil {
 		//zap.S().Infof("[RecordConnData]:该用户已经有房间，不允许进房")
-		return &emptypb.Empty{}, errors.New("该用户已经有房间，不允许进房")
+		return &emptypb.Empty{}, errors.New("该用户已经有房间")
 	}
 	//zap.S().Infof("[RecordConnData]:该用户在大厅，允许进房")
 	set := global.RedisDB.Set(ctx, NameUserConnInfo(in.Id), in.ServerInfo, 0)

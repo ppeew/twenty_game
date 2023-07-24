@@ -220,6 +220,21 @@ func (game *GameStruct) ProcessChatMsg(todo context.Context) {
 	}
 }
 
+func (game *GameStruct) ForUserIntoRoom(ctx context.Context) {
+	if global.IntoRoomCHAN[game.RoomID] == nil {
+		global.IntoRoomCHAN[game.RoomID] = make(chan uint32)
+	}
+	for true {
+		select {
+		case <-ctx.Done():
+			game.wg.Done()
+			return
+		case _ = <-global.IntoRoomCHAN[game.RoomID]:
+			global.IntoRoomRspCHAN[game.RoomID] <- false
+		}
+	}
+}
+
 // 读取用户信息协程
 func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 	for true {

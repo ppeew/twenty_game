@@ -309,7 +309,9 @@ func (game *GameStruct) RunGame() {
 	go game.ProcessChatMsg(ctx)
 	go game.ProcessItemMsg(ctx)
 	go game.ProcessHealthMsg(ctx)
-	game.wg.Add(3)
+	// 用于用户进房（都是拒绝的）
+	go game.ForUserIntoRoom(ctx)
+	game.wg.Add(4)
 	for _, info := range game.Users {
 		//对于每个用户开启一个协程，用于读取他的消息到游戏管道（分发消息功能）
 		go game.ReadGameUserMsg(ctx, info.ID)
