@@ -18,6 +18,7 @@ func GetEnvInfo(env string) bool {
 
 func InitConfig() {
 	global.DEBUG = GetEnvInfo("PPEEW_DEBUG")
+
 	v := viper.New()
 	fileName := "config-pro.yaml"
 	if global.DEBUG {
@@ -47,6 +48,7 @@ func InitConfig() {
 		"serverConfigs": serverConfigs,
 		"clientConfig":  clientConfig,
 	})
+
 	if err != nil {
 		zap.S().Fatalf("[InitConfig]连接nacos错误:%s", err.Error())
 	}

@@ -97,7 +97,9 @@ func (room *RoomStruct) RunRoom() (*Data, bool) {
 			if msg == RoomQuit {
 				global.GameSrvClient.DeleteRoom(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
 				global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
+				zap.S().Infof("[RoomQuit]:准备删除房间所有用户信息%+v", room.Users)
 				for id := range room.Users {
+					zap.S().Infof("[RoomQuit]:正在删除用户%d的连接信息", id)
 					global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{Id: id})
 				}
 				return nil, true

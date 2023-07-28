@@ -1,0 +1,2 @@
+2023-07-25T12:46:26.964+0800	INFO	game_srv/main.go:47	启动服务成功
+[mysql] 2023/07/26 09:37:45 packets.go:122: closing bad idle connection: EOF

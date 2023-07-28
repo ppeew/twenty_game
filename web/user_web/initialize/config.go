@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"encoding/json"
+	"fmt"
 	"user_web/global"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
@@ -18,9 +19,9 @@ func GetEnvInfo(env string) bool {
 
 func InitConfig() {
 	v := viper.New()
-	debug := GetEnvInfo("PPEEW_DEBUG")
+	global.DEBUG = GetEnvInfo("PPEEW_DEBUG")
 	fileName := "config-pro.yaml"
-	if debug {
+	if global.DEBUG {
 		fileName = "config-debug.yaml"
 	}
 	v.SetConfigFile(fileName)
@@ -58,6 +59,7 @@ func InitConfig() {
 		zap.S().Fatalf("[InitConfig]读取nacos服务器的配置信息错误:%s", err.Error())
 	}
 	err = json.Unmarshal([]byte(content), global.ServerConfig)
+	fmt.Printf("%+v\n", global.ServerConfig)
 	if err != nil {
 		zap.S().Fatalf("[InitConfig]反序列化ServerConfig失败:%s", err.Error())
 	}
