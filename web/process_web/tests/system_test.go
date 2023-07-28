@@ -27,60 +27,93 @@ func Test1(t *testing.T) {
 	EnterRoom(token, roomID)
 }
 
+type Record struct {
+	login  atomic.Int64
+	create atomic.Int64
+	enter  atomic.Int64
+	begin  atomic.Int64
+	end    atomic.Int64
+	quit   atomic.Int64
+}
+
+var record = new(Record)
+
 func TestSystem(t *testing.T) {
 	//测试系统并发情况，支持10000并发
 	group := sync.WaitGroup{}
-	testNum := 1000
+	testNum := 10000
 	group.Add(testNum)
 
 	var count int64 = 0
 	go countNum(&count)
 	for i := 0; i < testNum; i++ {
 		go func(i int) {
+			defer group.Done()
 			//1.新建用户
-			userName := randString(5)
+			atomic.AddInt64(&count, 1)
+			time.Sleep(time.Millisecond * time.Duration(rand.Intn(5000)))
+			num := fmt.Sprintf("%d", i+3000)
+			userName := fmt.Sprintf("%s", num)
 			token, err := RegisterUser(userName)
 			if err != nil {
 				// 注册失败则尝试登录获取token
+				atomic.AddInt64(&count, 1)
 				token, err = Login(userName)
 				if err != nil {
 					return
 				}
 			}
 
-			//2.创建房间
-			err = CreateRoom(token, userName)
+			//token, err := Login(userName)
 			if err != nil {
-				fmt.Println(fmt.Sprintf("%d线程创房失败", i))
+				fmt.Printf("[Login] %s登录失败\n", userName)
 				return
 			}
+			record.login.Add(1)
 
+			//2.创建房间
 			atomic.AddInt64(&count, 1)
+			roomID, err := CreateRoom(token, num)
+			if err != nil {
+				fmt.Println(fmt.Sprintf("%d线程创房失败, %v", i, err))
+				return
+			}
+			record.create.Add(1)
+
 			//3.进入房间
+			atomic.AddInt64(&count, 1)
 			time.Sleep(time.Second)
-			wsConn, err := EnterRoom(token, userName)
+			wsConn, err := EnterRoom(token, roomID)
 			if err != nil {
 				fmt.Println(fmt.Sprintf("%d线程进入房间失败", i))
 				return
 			}
+			record.enter.Add(1)
 
 			//4.开始游戏
+			atomic.AddInt64(&count, 1)
 			BeginGame(wsConn)
+			record.begin.Add(1)
 
 			//5.游戏结束
+			atomic.AddInt64(&count, 1)
 			EndGame(wsConn, userName)
+			record.end.Add(1)
 
 			//6.退出房间
+			atomic.AddInt64(&count, 1)
 			QuitRoom(wsConn, userName)
-			group.Done()
+			record.quit.Add(1)
+
 		}(i)
 	}
 	group.Wait()
+	fmt.Printf("%+v\n", record)
 }
 
 func countNum(counter *int64) {
 	// 启动定时器
-	ticker := time.NewTicker(time.Millisecond * 500)
+	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
 	// 定时器的回调函数
@@ -154,11 +187,11 @@ func RegisterUser(i string) (string, error) {
 		return "", err
 	}
 	defer res.Body.Close()
+
+	m, _ := getBody(res.Body)
 	if res.StatusCode != http.StatusOK {
 		return "", errors.New("注册失败")
 	}
-
-	m, _ := getBody(res.Body)
 	fmt.Printf("[Register] %s注册成功\n", i)
 	return m["token"].(string), nil
 }
@@ -192,29 +225,32 @@ func Login(userName string) (string, error) {
 		return "", err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return "", errors.New("登录失败")
-	}
 
 	m, _ := getBody(res.Body)
-	fmt.Println("[Login] 登录成功")
+	if res.StatusCode != http.StatusOK {
+		fmt.Printf("[Login] %+v\n", m)
+		return "", errors.New("登录失败")
+	}
+	fmt.Printf("[Login] %s登录成功\n", userName)
 	return m["token"].(string), nil
 }
 
-func CreateRoom(token string, i string) error {
+func CreateRoom(token string, i string) (string, error) {
 	url := Host() + "/game/v1/createRoom"
 	method := "POST"
 
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
-	_ = writer.WriteField("room_id", i)
+
+	roomID := fmt.Sprintf("%d%s", time.Now().Second(), i)
+	_ = writer.WriteField("room_id", roomID)
 	_ = writer.WriteField("max_user_number", "1")
 	_ = writer.WriteField("game_count", "1")
 	_ = writer.WriteField("room_name", "测试房间")
 	err := writer.Close()
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 
 	client := &http.Client{}
@@ -222,7 +258,7 @@ func CreateRoom(token string, i string) error {
 
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 	req.Header.Add("token", token)
 	req.Header.Add("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
@@ -231,13 +267,16 @@ func CreateRoom(token string, i string) error {
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 	defer res.Body.Close()
 
 	m, _ := getBody(res.Body)
 	fmt.Printf("[CreateRoom] %+v\n", m)
-	return nil
+	if res.StatusCode != http.StatusOK {
+		return "", errors.New("创建房间失败")
+	}
+	return roomID, nil
 }
 
 func getTargetAddress(token string, roomID string) (string, error) {
@@ -260,12 +299,12 @@ func getTargetAddress(token string, roomID string) (string, error) {
 		return "", err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return "", errors.New("获取远程服务器失败")
-	}
 
 	m, _ := getBody(res.Body)
 	fmt.Printf("[EnterRoom] %+v\n", m)
+	if res.StatusCode != http.StatusOK {
+		return "", errors.New("获取远程服务器失败")
+	}
 	return m["server"].(map[string]interface{})["serverInfo"].(string), nil
 }
 
@@ -334,6 +373,9 @@ func quitRoomMsg() []byte {
 }
 
 func EnterRoom(token string, roomID string) (*websocket.Conn, error) {
+	if roomID == "" {
+		return nil, errors.New("[EnterRoom] roomID为空")
+	}
 	targetURL, err := getTargetAddress(token, roomID)
 	wsConn := connectSocket(targetURL, token, roomID)
 	return wsConn, err

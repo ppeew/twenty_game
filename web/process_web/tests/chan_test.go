@@ -82,3 +82,20 @@ func TestChan2(t *testing.T) {
 	}()
 	time.Sleep(time.Second * 5)
 }
+
+func TestChan3(t *testing.T) {
+	a := make(chan struct{})
+	for i := 0; i < 3; i++ {
+		go func(i int) {
+			v, ok := <-a
+			fmt.Println(i, v, ok)
+		}(i)
+	}
+
+	go func() {
+		time.Sleep(time.Second * 3)
+		close(a)
+		//a <- struct{}{}
+	}()
+	time.Sleep(time.Minute)
+}
