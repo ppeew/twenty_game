@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -98,4 +99,24 @@ func TestChan3(t *testing.T) {
 		//a <- struct{}{}
 	}()
 	time.Sleep(time.Minute)
+}
+
+func Test4(t *testing.T) {
+	var a uint = 0
+	var b uint = 1
+	c := a - b
+	fmt.Println(reflect.TypeOf(c))
+	fmt.Println(c)
+}
+
+func Test5(t *testing.T) {
+	a := [3]int{1, 2, 3}
+	for k, v := range a {
+		if k == 0 {
+			a[0], a[1] = 100, 200
+			fmt.Println(a)
+		}
+		a[k] = 100 + v
+	}
+	fmt.Println(a)
 }
