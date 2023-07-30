@@ -158,6 +158,7 @@ func Host() string {
 
 func RegisterUser(i string) (string, error) {
 	url := Host() + "/user/v1/register"
+	url = "http://139.159.234.134:9000/v1/register"
 	method := "POST"
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)

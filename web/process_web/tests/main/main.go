@@ -18,8 +18,6 @@ import (
 	"time"
 )
 
-var isLocal = false
-
 func Test1() {
 	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTU2LCJleHAiOjE2OTA4MDM0NjUsImlzcyI6InBwZWV3IiwibmJmIjoxNjkwMzcxNDY1fQ.hZt6hWO7Hb-7NvoSKInKA1qy_OOvC5qv2r0M6QHGmHY"
 	roomID := "11"
@@ -35,35 +33,82 @@ type Record struct {
 	quit   atomic.Int64
 }
 
-var record = new(Record)
+type Test struct {
+	testNum int
+	begin   int
+}
 
-func TestSystem() {
+var isLocal = false
+var record = new(Record)
+var test = new(Test)
+
+func isStart() (bool, error) {
+	url := Host() + "/game/v1/isStart"
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		fmt.Println(err)
+		return false, err
+	}
+	req.Header.Add("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return false, err
+	}
+	defer res.Body.Close()
+
+	m, _ := getBody(res.Body)
+	fmt.Printf("[isStart] %+v\n", m)
+	if res.StatusCode != http.StatusOK || !m["isTest"].(bool) {
+		return false, errors.New("还没开始测试")
+	}
+
+	test.testNum = int(m["count"].(float64))
+	test.begin = int(m["begin"].(float64))
+	test.testNum = 5000
+	test.begin = 0
+	return true, nil
+}
+
+func main() {
+	for {
+		start, _ := isStart()
+		if start {
+			fmt.Println("[Start] 开始测试")
+			break
+		}
+		time.Sleep(time.Second)
+	}
+
 	//测试系统并发情况，支持10000并发
 	group := sync.WaitGroup{}
-	testNum := 10000
-	group.Add(testNum)
+	group.Add(test.testNum)
 
 	var count int64 = 0
 	go countNum(&count)
-	for i := 0; i < testNum; i++ {
+	for i := 0; i < test.testNum; i++ {
 		go func(i int) {
 			defer group.Done()
 			//1.新建用户
 			atomic.AddInt64(&count, 1)
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(5000)))
-			num := fmt.Sprintf("%d", i+3000)
-			userName := fmt.Sprintf("%s", num)
-			token, err := RegisterUser(userName)
-			if err != nil {
-				// 注册失败则尝试登录获取token
-				atomic.AddInt64(&count, 1)
-				token, err = Login(userName)
-				if err != nil {
-					return
-				}
-			}
+			num := fmt.Sprintf("%d", test.begin+i)
+			userName := fmt.Sprintf("user-%s", num)
+			//token, err := RegisterUser(userName)
+			//if err != nil {
+			//	// 注册失败则尝试登录获取token
+			//	atomic.AddInt64(&count, 1)
+			//	token, err = Login(userName)
+			//	if err != nil {
+			//		return
+			//	}
+			//}
 
-			//token, err := Login(userName)
+			token, err := Login(userName)
 			if err != nil {
 				fmt.Printf("[Login] %s登录失败\n", userName)
 				return
@@ -157,6 +202,8 @@ func Host() string {
 
 func RegisterUser(i string) (string, error) {
 	url := Host() + "/user/v1/register"
+	url = "http://139.159.234.134:9000/v1/register"
+
 	method := "POST"
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
@@ -189,6 +236,7 @@ func RegisterUser(i string) (string, error) {
 
 	m, _ := getBody(res.Body)
 	if res.StatusCode != http.StatusOK {
+		fmt.Printf("[Register] %s注册失败，状态码：%d 信息：%+v\n", i, res.StatusCode, m)
 		return "", errors.New("注册失败")
 	}
 	fmt.Printf("[Register] %s注册成功\n", i)
@@ -197,6 +245,8 @@ func RegisterUser(i string) (string, error) {
 
 func Login(userName string) (string, error) {
 	url := Host() + "/user/v1/login"
+	url = "http://139.159.234.134:9000/v1/login"
+
 	method := "POST"
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
@@ -227,7 +277,7 @@ func Login(userName string) (string, error) {
 
 	m, _ := getBody(res.Body)
 	if res.StatusCode != http.StatusOK {
-		fmt.Printf("[Login] %+v\n", m)
+		fmt.Printf("[Login] 登录失败 %+v\n", m)
 		return "", errors.New("登录失败")
 	}
 	fmt.Printf("[Login] %s登录成功\n", userName)
