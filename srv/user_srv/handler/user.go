@@ -3,16 +3,15 @@ package handler
 import (
 	"context"
 	"crypto/sha512"
+	"errors"
 	"fmt"
+	"go.uber.org/zap"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"strings"
 	"user_srv/global"
 	"user_srv/model"
-	"user_srv/proto/game"
 	"user_srv/proto/user"
-
-	"google.golang.org/grpc"
-
-	"go.uber.org/zap"
 
 	"github.com/anaskhan96/go-password-encoder"
 	"google.golang.org/grpc/codes"
@@ -27,8 +26,18 @@ type UserServer struct {
 // 用户注册
 func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (*user.UserInfoResponse, error) {
 	//先查询用户是否存在
+	//Mysql
+	mysqlInfo := global.ServerConfig.MysqlInfo
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		mysqlInfo.User, mysqlInfo.Password, mysqlInfo.Host, mysqlInfo.Port, mysqlInfo.Database)
+	var err error
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		zap.S().Fatalf("[InitDB]打开mysql错误:%s", err.Error())
+	}
+
 	var u model.User
-	result := global.MysqlDB.Where("user_name = ?", req.UserName).First(&u)
+	result := db.Where("user_name = ?", req.UserName).First(&u)
 	if result.RowsAffected == 1 {
 		return nil, status.Error(codes.AlreadyExists, "用户已经存在")
 	}
@@ -49,42 +58,14 @@ func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (
 		Good:     10,
 		Diamond:  1,
 	}
-	tx := global.MysqlDB.Begin()
-	res := tx.Create(u2)
+	res := db.Create(u2)
 	if res.Error != nil {
-		tx.Rollback()
-		return nil, result.Error
+		fmt.Printf("[res.error]:%v\n", res.Error)
+		return nil, res.Error
 	}
 	if res.RowsAffected == 0 {
-		tx.Rollback()
-		return nil, status.Errorf(codes.Internal, result.Error.Error())
+		return nil, errors.New("mysql影响行数0")
 	}
-	//zap.S().Info("插入用户成功，接下来插入物品")
-	//创建用户表成功，接下来为游戏用户添加物品表(跨服务调用,失败采用事务回滚)
-	consulInfo := global.ServerConfig.ConsulInfo
-	gameConn, err := grpc.Dial(
-		fmt.Sprintf("consul://%s:%d/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.GameSrvInfo.Name),
-		grpc.WithInsecure(),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-	)
-	if err != nil {
-		zap.S().Fatal("[InitSrvConn] 连接 【游戏物品服务失败】")
-	}
-	client := game.NewGameClient(gameConn)
-	_, err = client.CreateUserItems(ctx, &game.UserItemsInfo{
-		Id:      u2.ID,
-		Gold:    10000,
-		Diamond: 100,
-		Apple:   2,
-		Banana:  2,
-	})
-	if err != nil {
-		zap.S().Info(err.Error())
-		tx.Rollback()
-		return nil, err
-	}
-	//zap.S().Info("插入物品成功，commit")
-	tx.Commit()
 	return ModelToResponse(u2), nil
 }
 

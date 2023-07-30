@@ -38,30 +38,35 @@ func InitWebSocket(conn *websocket.Conn, userID uint32) (ws *WSConn) {
 // 协程接受客户端msg
 func (ws *WSConn) readMsgLoop() {
 	for true {
-		data := my_struct.Message{}
-		err := ws.conn.ReadJSON(&data)
-		//zap.S().Infof("[readMsgLoop]读到:%v", data)
-		if err != nil {
-			//发生错误,关闭连接，停止协程
-			ws.CloseConn()
-			break
+		select {
+		case <-ws.closeChan:
+			return
+		default:
+			data := my_struct.Message{}
+			err := ws.conn.ReadJSON(&data)
+			if err != nil {
+				ws.CloseConn()
+				break
+			}
+			if data.Type == my_struct.UserIntoMsg {
+				continue
+			}
+			ws.inChan <- data
 		}
-		if data.Type == my_struct.UserIntoMsg {
-			continue
-		}
-		ws.inChan <- data
 	}
 }
 
 // 协程发送客户端msg
 func (ws *WSConn) writeMsgLoop() {
 	for true {
-		data := <-ws.outChan
-		err := ws.conn.WriteJSON(data)
-		if err != nil {
-			//发生错误,关闭连接，停止协程
-			ws.CloseConn()
-			break
+		select {
+		case data := <-ws.outChan:
+			err := ws.conn.WriteJSON(data)
+			if err != nil {
+				//发生错误,关闭连接，停止协程
+				ws.CloseConn()
+				break
+			}
 		}
 	}
 }

@@ -14,8 +14,6 @@ import (
 
 	"github.com/go-resty/resty/v2"
 
-	"github.com/hashicorp/consul/api"
-
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -120,18 +118,13 @@ func CreateRoom(ctx *gin.Context) {
 		return
 	}
 
-	config := api.DefaultConfig()
-	config.Address = "139.159.234.134:8500"
-	c, _ := api.NewClient(config)
-	service, _, err := c.Catalog().Service("process-web", "", nil)
-	if err != nil {
+	if len(global.ConsulProcessWebServices) == 0 {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": "找不到游戏服务器",
+			"err": "找不到目标服务器",
 		})
 		return
 	}
-	num := rand.Intn(len(service))
-
+	num := rand.Intn(len(global.ConsulProcessWebServices))
 	//请求转发
 	client := resty.New()
 	resp, err := client.R().SetHeader("token", token).SetFormData(map[string]string{
@@ -139,7 +132,7 @@ func CreateRoom(ctx *gin.Context) {
 		"max_user_number": strconv.Itoa(form.MaxUserNumber),
 		"game_count":      strconv.Itoa(form.GameCount),
 		"room_name":       form.RoomName,
-	}).Post(fmt.Sprintf("http://%s:%d/v1/createRoom", service[num].ServiceAddress, service[num].ServicePort))
+	}).Post(fmt.Sprintf("http://%s:%d/v1/createRoom", global.ConsulProcessWebServices[num].ServiceAddress, global.ConsulProcessWebServices[num].ServicePort))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"err": err,
@@ -149,5 +142,5 @@ func CreateRoom(ctx *gin.Context) {
 	ctx.JSON(resp.StatusCode(), string(resp.Body()))
 
 	//ctx.Redirect(http.StatusPermanentRedirect,
-	//	fmt.Sprintf("http://%s:%d/v1/createRoom", service[num].ServiceAddress, service[num].ServicePort))
+	//	fmt.Sprintf("http://%s:%d/v1/createRoom", services[num].ServiceAddress, services[num].ServicePort))
 }

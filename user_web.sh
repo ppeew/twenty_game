@@ -3,4 +3,4 @@
 cd ~/twenty_game/web/user_web
 chmod 766 ./user_web
 go build
-./user_web
+nohup ./user_web > gw.log 2>&1 &

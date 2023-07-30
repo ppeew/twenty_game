@@ -3,6 +3,7 @@ package initialize
 import (
 	"context"
 	"fmt"
+	"gorm.io/gorm/logger"
 	"user_srv/global"
 
 	"github.com/redis/go-redis/v9"
@@ -17,7 +18,9 @@ func InitDB() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		mysqlInfo.User, mysqlInfo.Password, mysqlInfo.Host, mysqlInfo.Port, mysqlInfo.Database)
 	var err error
-	global.MysqlDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	global.MysqlDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		zap.S().Fatalf("[InitDB]打开mysql错误:%s", err.Error())
 	}
