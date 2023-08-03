@@ -3,11 +3,7 @@ package handler
 import (
 	"context"
 	"crypto/sha512"
-	"errors"
 	"fmt"
-	"go.uber.org/zap"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"strings"
 	"user_srv/global"
 	"user_srv/model"
@@ -26,18 +22,8 @@ type UserServer struct {
 // 用户注册
 func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (*user.UserInfoResponse, error) {
 	//先查询用户是否存在
-	//Mysql
-	mysqlInfo := global.ServerConfig.MysqlInfo
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		mysqlInfo.User, mysqlInfo.Password, mysqlInfo.Host, mysqlInfo.Port, mysqlInfo.Database)
-	var err error
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		zap.S().Fatalf("[InitDB]打开mysql错误:%s", err.Error())
-	}
-
 	var u model.User
-	result := db.Where("user_name = ?", req.UserName).First(&u)
+	result := global.MysqlDB.Where("user_name = ?", req.UserName).First(&u)
 	if result.RowsAffected == 1 {
 		return nil, status.Error(codes.AlreadyExists, "用户已经存在")
 	}
@@ -58,13 +44,12 @@ func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (
 		Good:     10,
 		Diamond:  1,
 	}
-	res := db.Create(u2)
+	res := global.MysqlDB.Create(u2)
 	if res.Error != nil {
-		fmt.Printf("[res.error]:%v\n", res.Error)
 		return nil, res.Error
 	}
 	if res.RowsAffected == 0 {
-		return nil, errors.New("mysql影响行数0")
+		return nil, status.Errorf(codes.Internal, result.Error.Error())
 	}
 	return ModelToResponse(u2), nil
 }
@@ -86,9 +71,6 @@ func (s *UserServer) GetUserByID(ctx context.Context, req *user.UserIDInfo) (*us
 func (s *UserServer) GetUserByUsername(ctx context.Context, req *user.UserNameInfo) (*user.UserInfoResponse, error) {
 	var u model.User
 	result := global.MysqlDB.Where("user_name = ?", req.UserName).First(&u)
-	if result.Error != nil {
-		return nil, result.Error
-	}
 	if result.RowsAffected == 0 {
 		return nil, status.Error(codes.NotFound, "用户不存在")
 	}
@@ -127,6 +109,9 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *user.UpdateUserInfo) (
 	}
 	salt, encoded := password.Encode(req.Password, options)
 	encodePassword := fmt.Sprintf("%s$%s", salt, encoded)
+	if req.Password == "" {
+		encodePassword = ""
+	}
 	res := global.MysqlDB.Model(&u).Where("id=?", fmt.Sprintf("%d", req.Id)).Updates(model.User{
 		UserName: req.UserName,
 		Password: encodePassword,

@@ -14,7 +14,7 @@ func InitRouters() *gin.Engine {
 		context.Status(http.StatusOK)
 	})
 	//中间件
-	engine.Use(middlewares.FlowBegin(), middlewares.Cors())
+	engine.Use(middlewares.Cors())
 	versionGroup := engine.Group("/v1")
 	router.InitUserRouter(versionGroup)
 	return engine

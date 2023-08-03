@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -216,8 +217,9 @@ func (room *RoomStruct) UserInto(message my_struct.Message) {
 		room.UserNumber++
 		//查询API用户信息
 		var res utils.UserInfo
-		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(message.UserID))).
-			Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
+		_, _, errors := gorequest.New().TLSClientConfig(&tls.Config{InsecureSkipVerify: true}).Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(message.UserID))).
+			Retry(5, time.Second, http.StatusInternalServerError, http.StatusNotFound).EndStruct(&res)
+		zap.S().Infof("%v", errors)
 		room.Users[message.UserID] = my_struct.UserRoomData{
 			ID:           message.UserID,
 			Ready:        false,

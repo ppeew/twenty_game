@@ -33,7 +33,7 @@ func main() {
 	}()
 	consulClient, serverID := utils.RegistAndHealthCheck()
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, os.Kill, os.Interrupt)
 	<-quit
 	// 资源释放
 	go func() {

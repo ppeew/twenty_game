@@ -177,15 +177,7 @@ func UserUpdate(ctx *gin.Context) {
 		return
 	}
 
-	//必须先查询是否有username=form.Username
-	_, err := global.UserSrvClient.GetUserByUsername(context.Background(), &user.UserNameInfo{UserName: form.Username})
-	if err == nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"err": "用户名已经被使用",
-		})
-		return
-	}
-	_, err = global.UserSrvClient.UpdateUser(context.Background(), &user.UpdateUserInfo{
+	_, err := global.UserSrvClient.UpdateUser(context.Background(), &user.UpdateUserInfo{
 		Id:       id,
 		Nickname: form.Nickname,
 		Gender:   ToBool(form.Gender),

@@ -22,7 +22,7 @@ func main() {
 	initialize.InitSentinel()
 	initialize.GetConsulServer()
 	routers := initialize.InitRouters()
-	//utils.CheckGoRoutines()
+	utils.CheckGoRoutines()
 
 	//自动获取可用端口号
 	port, err := utils.GetFreePort()
@@ -39,7 +39,7 @@ func main() {
 	//服务注册及健康检查
 	consulClient, serverID := utils.RegistAndHealthCheck()
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, os.Kill, os.Interrupt)
 	<-quit
 	// 资源释放
 	go func() {

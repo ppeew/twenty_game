@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
+	"go.uber.org/zap"
 	"net/http"
 	"process_web/global"
 	"process_web/my_struct"
@@ -40,8 +42,12 @@ func NewRoomStruct(data *Data) RoomStruct {
 	for _, userID := range data.users {
 		//查询API用户信息
 		var res utils.UserInfo
-		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(userID))).
-			Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
+		//协程查询
+		rsp, _, errors := gorequest.New().TLSClientConfig(&tls.Config{InsecureSkipVerify: true}).Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(userID))).
+			Retry(5, time.Second, http.StatusInternalServerError, http.StatusNotFound).EndStruct(&res)
+		zap.S().Infof("%v", errors)
+		zap.S().Infof("%v", rsp.StatusCode)
+		zap.S().Infof("[NewRoomStruct]查询用户%d:%v", userID, res)
 		users[userID] = my_struct.UserRoomData{
 			ID:           userID,
 			Ready:        false,

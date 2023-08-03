@@ -25,6 +25,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	//port = 9000
 	global.ServerConfig.Port = port
 
 	go func() {

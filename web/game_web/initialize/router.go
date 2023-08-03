@@ -4,9 +4,13 @@ import (
 	"game_web/middlewares"
 	"game_web/router"
 	"net/http"
+	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
 )
+
+var num = int64(0)
+var count = int64(5000)
 
 func InitRouters() *gin.Engine {
 	engine := gin.Default()
@@ -21,8 +25,10 @@ func InitRouters() *gin.Engine {
 	versionGroup.GET("/isStart", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"isTest": isTest,
-			"count":  200,
+			"begin":  num,
+			"count":  count,
 		})
+		atomic.AddInt64(&num, count)
 	})
 
 	router.InitCommonRouter(versionGroup)

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/handler/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/handler/room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/user_srv/handler/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/handler/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/user_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/file_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/file_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/initialize/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/tests/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/tests/main/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/server/game.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/game.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/server/handle_room_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/handle_room_msg.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/server/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/store_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/user_web/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/user_web/api/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/user_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/user_web/initialize/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/user_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/user_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/user_web/router/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/user_web/router/user.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files/Go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2THaGYstFNpfjx0wT3kdeoe1Rmc" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/22378/GolandProjects/twenty-game/web/game_web/tests/main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.maddyhome.idea.vim.ui.VimEmulationConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\web\game_web\tests\main" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Go 构建.go build main.go">
+    <configuration name="go build game_web" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/web/game_web" />
+      <kind value="PACKAGE" />
+      <package value="game_web" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/web/game_web/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/web/game_web" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/web/game_web/tests/main/main.go" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go 构建.go build main.go" />
+        <item itemvalue="Go 构建.go build game_web" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>

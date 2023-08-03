@@ -2,8 +2,10 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"math/rand"
 	"net/http"
 	"process_web/global"
@@ -42,8 +44,9 @@ func NewGameData(data *Data) GameStruct {
 	//查询API用户信息
 	for _, userID := range data.users {
 		var res utils.UserInfo
-		gorequest.New().Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(userID))).
-			Retry(5, time.Second, http.StatusInternalServerError).EndStruct(&res)
+		_, _, errs := gorequest.New().TLSClientConfig(&tls.Config{InsecureSkipVerify: true}).Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(userID))).
+			Retry(5, time.Second, http.StatusInternalServerError, http.StatusNotFound).EndStruct(&res)
+		zap.S().Infof("%v", errs)
 		users[userID] = &my_struct.UserGameInfo{
 			ID:           userID,
 			IntoRoomTime: time.Now(),
