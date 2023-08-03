@@ -6,36 +6,29 @@
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/handler/conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/handler/conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/handler/item.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/model/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/model/model.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/user_srv/handler/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/handler/user.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/file_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/api/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/initialize/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/file_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/file_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/game_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/router/game_item.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/game_data..go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/my_struct/game_data..go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/response/room_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/my_struct/response/room_resp.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/process_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/proto/game/game_grpc.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/process_web/server/handle_game_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/handle_game_msg.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/server/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/tests/quitroom_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/tests/quitroom_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/store_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/user_web/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/store_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/store_web/service/dao/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/dao/shop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/store_web/service/dao/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/dao/trade.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/store_web/service/dto/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/dto/shop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/store_web/service/dto/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/dto/trade.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/store_web/service/router/store.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/router/store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/store_web/service/tests/raw_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/tests/raw_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/user_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/user_web/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +80,7 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\web\game_web\tests\main" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build main.go (2)">
+  <component name="RunManager" selected="Go 测试.store_web/service/tests 中的 TestRaw3">
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/web/store_web" />
@@ -120,21 +113,25 @@
       <filePath value="$PROJECT_DIR$/web/game_web/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="store_web/service/tests 中的 TestRaw3" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/web/file_web" />
-      <kind value="FILE" />
+      <working_directory value="$PROJECT_DIR$/web/store_web/service/tests" />
+      <root_directory value="$PROJECT_DIR$/web/store_web" />
+      <kind value="PACKAGE" />
+      <package value="store_web/service/tests" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/web/file_web/main.go" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestRaw3\E$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 构建.go build main.go (2)" />
+        <item itemvalue="Go 测试.store_web/service/tests 中的 TestRaw3" />
         <item itemvalue="Go 构建.go build main.go (1)" />
+        <item itemvalue="Go 构建.go build main.go (2)" />
         <item itemvalue="Go 构建.go build main.go (4)" />
         <item itemvalue="Go 构建.go build main.go (5)" />
-        <item itemvalue="Go 构建.go build main.go" />
       </list>
     </recent_temporary>
   </component>
@@ -155,5 +152,16 @@
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/web/store_web/service/dao/trade.go</url>
+          <line>102</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

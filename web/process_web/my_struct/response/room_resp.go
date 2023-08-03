@@ -15,7 +15,7 @@ type RoomResponse struct {
 }
 
 type UserData struct {
-	ID           uint32    `json:"ID"`
+	ID           uint32    `json:"ShopID"`
 	Ready        bool      `json:"Ready"`
 	IntoRoomTime time.Time `json:"-"` //忽略
 	Nickname     string    `json:"nickname"`
@@ -26,7 +26,7 @@ type UserData struct {
 
 // 踢人的信息体，告知所有用户是谁被t了
 type KickerResponse struct {
-	ID uint32 `json:"ID"`
+	ID uint32 `json:"ShopID"`
 }
 
 type BeginGameData struct {

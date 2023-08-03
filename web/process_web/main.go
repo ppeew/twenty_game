@@ -27,7 +27,10 @@ func main() {
 		panic(err)
 	}
 	global.ServerConfig.Port = port
-
+	if global.DEBUG {
+		//是debug
+		global.ServerConfig.Port = 9002
+	}
 	go func() {
 		if err := routers.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
 			zap.S().Panic("启动失败:", err.Error())

@@ -1,6 +1,7 @@
 package router
 
 import (
+	"store_web/middlewares"
 	"store_web/service/apis"
 
 	"github.com/gin-gonic/gin"
@@ -8,12 +9,12 @@ import (
 
 func InitStoreRouter(r *gin.RouterGroup) {
 	trade := r.Group("/trade")
-	trade.GET("", apis.SelectTradeItems)
-	trade.POST("/:id", apis.PushTradeItem)
-	trade.PUT("/:id", apis.BuyTradeItem)
-	trade.DELETE("/:id", apis.DownTradeItem)
+	trade.GET("", middlewares.JWTAuth(), apis.SelectTradeItems)
+	trade.POST("/:id", middlewares.JWTAuth(), apis.PushTradeItem)
+	trade.PUT("/:id", middlewares.JWTAuth(), apis.BuyTradeItem)
+	trade.DELETE("/:id", middlewares.JWTAuth(), apis.DownTradeItem)
 
 	shop := r.Group("/shop")
-	shop.GET("", apis.SelectShopGoods)
-	shop.PUT("/:id", apis.BuyShopGood)
+	shop.GET("", middlewares.JWTAuth(), apis.SelectShopGoods)
+	shop.PUT("/:id", middlewares.JWTAuth(), apis.BuyShopGood)
 }

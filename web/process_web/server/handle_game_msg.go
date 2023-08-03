@@ -257,7 +257,7 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 				game.ItemChan <- message
 			//case model.CheckHealthMsg:
 			//	//心脏包
-			//	message.UserID = ID
+			//	message.UserID = ShopID
 			//	game.HealthChan <- message
 			default:
 				//其他信息是通用信息
@@ -291,7 +291,7 @@ func BroadcastToAllGameUsers(game *GameStruct, msg response.MessageResponse) {
 	for userID := range game.Users {
 		err := global.UsersConn[userID].OutChanWrite(msg)
 		if err != nil {
-			//global.UsersConn[ID].CloseConn()
+			//global.UsersConn[ShopID].CloseConn()
 		}
 	}
 }

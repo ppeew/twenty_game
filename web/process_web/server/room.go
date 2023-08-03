@@ -246,7 +246,7 @@ func BroadcastToAllRoomUsers(roomInfo *RoomStruct, message response.MessageRespo
 		if global.UsersConn[info.ID] != nil {
 			err := global.UsersConn[info.ID].OutChanWrite(message)
 			if err != nil {
-				//zap.S().Infof("ID为%d的用户掉线了", info.ID)
+				//zap.S().Infof("ID为%d的用户掉线了", info.ShopID)
 			}
 		}
 	}

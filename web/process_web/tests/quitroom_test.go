@@ -15,11 +15,11 @@ package tests
 //	//输入
 //	us := make(map[uint32]response.UserData, 2)
 //	us[4] = response.UserData{
-//		ID:    4,
+//		ShopID:    4,
 //		Ready: false,
 //	}
 //	us[5] = response.UserData{
-//		ID:    5,
+//		ShopID:    5,
 //		Ready: false,
 //	}
 //	roomInfo := server.RoomStruct{
@@ -49,7 +49,7 @@ package tests
 //		num := rand.Intn(int(roomInfo.RoomData.UserNumber))
 //		for _, data := range roomInfo.RoomData.Users {
 //			if num <= 0 {
-//				roomInfo.RoomData.RoomOwner = data.ID
+//				roomInfo.RoomData.RoomOwner = data.ShopID
 //				break
 //			}
 //			num--
@@ -72,7 +72,7 @@ package tests
 //		num := rand.Intn(int(roomInfo.RoomData.UserNumber))
 //		for _, data := range roomInfo.RoomData.Users {
 //			if num <= 0 {
-//				roomInfo.RoomData.RoomOwner = data.ID
+//				roomInfo.RoomData.RoomOwner = data.ShopID
 //				break
 //			}
 //			num--

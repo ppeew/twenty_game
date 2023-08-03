@@ -47,3 +47,24 @@
  
 2023-08-03T23:46:49.080+0800	[33mWARN[0m	config_client/config_client.go:207	[client.GetConfig] config not found, dataId: store-web.json, group: dev, namespaceId: 3920b1ba-9eab-4e3f-85c3-513c887b221e2.
 2023-08-03T23:48:46.485+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-03T23:55:38.689+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-03T23:55:59.114+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T00:03:52.240+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T00:21:23.213+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T00:21:41.978+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T00:27:58.069+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T00:41:17.011+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T00:43:59.033+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T00:49:20.971+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T00:50:17.300+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T00:52:54.044+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:04:47.673+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:08:49.228+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:09:48.409+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:14:21.036+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:22:37.659+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:35:54.124+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:37:47.798+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:45:07.626+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:46:28.054+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-04T01:47:25.932+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>

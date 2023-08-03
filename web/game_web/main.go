@@ -30,6 +30,10 @@ func main() {
 		panic(err)
 	}
 	global.ServerConfig.Port = port
+	if global.DEBUG {
+		//是debug
+		global.ServerConfig.Port = 9003
+	}
 
 	go func() {
 		if err := routers.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {

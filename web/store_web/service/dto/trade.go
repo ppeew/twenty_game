@@ -10,7 +10,6 @@ type TradeSelectReq struct {
 }
 
 type TradePushReq struct {
-	UserID       int
 	ItemID       int
 	GoodPrice    int
 	DiamondPrice int

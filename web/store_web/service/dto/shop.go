@@ -6,6 +6,6 @@ type ShopSelectReq struct {
 }
 
 type ShopBuyReq struct {
-	ID  int `json:"ID"`
-	Num int `json:"Num"`
+	ShopID int `json:"shopID"`
+	Num    int `json:"num"`
 }

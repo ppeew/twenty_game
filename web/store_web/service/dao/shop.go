@@ -21,7 +21,7 @@ func (s ShopDao) BuyGood(req dto.ShopBuyReq, userID int) error {
 	begin := global.MysqlDB.Begin()
 	//1.查询出该商品的价格及用什么支付
 	good := domains.Good{}
-	err := begin.Table("goods").Where("id=?", req.ID).First(&good).Error
+	err := begin.Table("goods").Where("id=?", req.ShopID).First(&good).Error
 	if err != nil {
 		begin.Rollback()
 		return errors.New("商品不存在")
@@ -36,9 +36,9 @@ func (s ShopDao) BuyGood(req dto.ShopBuyReq, userID int) error {
 	user := domains.User{}
 	begin.Table("users").Where("id=?", userID).First(&user)
 	newGood := user.Good - req.Num*good.PriceGood
-	newDiamond := user.Good - req.Num*good.PriceDiamond
+	newDiamond := user.Diamond - req.Num*good.PriceDiamond
 	if newGood >= 0 && newDiamond >= 0 {
-		begin.Table("users").Updates(map[string]interface{}{
+		begin.Table("users").Where("id=?", userID).Updates(map[string]interface{}{
 			"good":    newGood,
 			"diamond": newDiamond,
 		})
@@ -48,17 +48,17 @@ func (s ShopDao) BuyGood(req dto.ShopBuyReq, userID int) error {
 		return errors.New("货币不够")
 	}
 	//3.将库存扣减
-	err = begin.Table("goods").Where("id=?", req.ID).Update("inventory", newInventory).Error
+	err = begin.Table("goods").Where("id=?", req.ShopID).Update("inventory", newInventory).Error
 	if err != nil {
 		begin.Rollback()
 		return errors.New("服务器错误")
 	}
 	//4.给用户添加物品（用户与物品是多对多关系，用户可以对应多个物品记录，物品记录可以有多个用户持有）
 	m := make(map[string]interface{})
-	tx := begin.Raw("select a.item_nums from user_and_item a inner join users b on a.user_id = b.id where a.item_id = ? AND b.id=?", req.ID, userID).Scan(&m)
+	tx := begin.Raw("select a.item_nums from user_and_item a inner join users b on a.user_id = b.id where a.item_id = ? AND b.id=?", good.ItemID, userID).Scan(&m)
 	if tx.RowsAffected == 0 {
 		//如果找不到该记录，则添加
-		exec := begin.Exec("insert into user_and_item (`user_id`,`item_id`,`item_nums`,`lock_nums`) values (?,?,?,0)", userID, req.ID, req.Num)
+		exec := begin.Exec("insert into user_and_item (`user_id`,`item_id`,`item_nums`,`lock_nums`) values (?,?,?,0)", userID, good.ItemID, req.Num)
 		if exec.RowsAffected == 0 {
 			//出现问题回滚一切操作
 			begin.Rollback()
@@ -66,7 +66,7 @@ func (s ShopDao) BuyGood(req dto.ShopBuyReq, userID int) error {
 		}
 	} else {
 		//否则就是找到了记录，在原来数量添加
-		exec := begin.Exec("update user_and_item set item_nums = ? where user_id=? and item_id=?", gorm.Expr("item_nums+?", req.Num), userID, req.ID)
+		exec := begin.Exec("update user_and_item set item_nums = ? where user_id=? and item_id=?", gorm.Expr("item_nums+?", req.Num), userID, good.ItemID)
 		if exec.RowsAffected == 0 {
 			//出现问题回滚一切操作
 			begin.Rollback()

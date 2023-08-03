@@ -41,8 +41,8 @@ func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (
 		Gender:   req.Gender,
 		UserName: req.UserName,
 		Password: encodePassword,
-		Good:     10,
-		Diamond:  1,
+		Good:     100,
+		Diamond:  10,
 	}
 	res := global.MysqlDB.Create(u2)
 	if res.Error != nil {

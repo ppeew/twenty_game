@@ -66,3 +66,13 @@ func TestRawCreateUserItem2(t *testing.T) {
 	db.Commit()
 
 }
+
+func TestRaw3(t *testing.T) {
+	db := InitDB()
+	s1 := 1
+	s2 := 1
+	s3 := 7622
+	s4 := 1
+	db.Debug().Exec("update user_and_item set item_nums=? , lock_nums=? where user_id=? and item_id=?", gorm.Expr("item_nums - ?", s1), gorm.Expr("lock_nums - ?", s2), s3, s4)
+
+}
