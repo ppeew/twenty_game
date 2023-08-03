@@ -22,7 +22,7 @@ func main() {
 	initialize.InitSentinel()
 	initialize.GetConsulServer()
 	routers := initialize.InitRouters()
-	utils.CheckGoRoutines()
+	//utils.CheckGoRoutines()
 
 	//自动获取可用端口号
 	port, err := utils.GetFreePort()

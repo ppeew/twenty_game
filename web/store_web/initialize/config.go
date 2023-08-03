@@ -18,10 +18,9 @@ func GetEnvInfo(env string) bool {
 
 func InitConfig() {
 	v := viper.New()
-	debug := GetEnvInfo("PPEEW_DEBUG")
-	debug = false
+	global.DEBUG = GetEnvInfo("PPEEW_DEBUG")
 	fileName := "config-pro.yaml"
-	if debug {
+	if global.DEBUG {
 		fileName = "config-debug.yaml"
 	}
 	v.SetConfigFile(fileName)

@@ -1,7 +1,7 @@
-host: '192.168.159.134'
+host: '139.159.234.134'
 port: 8848
-namespace: 'd57ea382-6b60-4022-8c3f-58e7dbcf3ba4'
+namespace: '3920b1ba-9eab-4e3f-85c3-513c887b221e2'
 user: 'nacos'
-password: 'nacos'
-dataid: 'game_web.json'
+password: '518888'
+dataid: 'store-web.json'
 group: 'dev'
