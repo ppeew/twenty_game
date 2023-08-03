@@ -69,22 +69,6 @@ func GetRoomList(ctx *gin.Context) {
 	})
 }
 
-// SelectItems 查询个人的物品信息
-func SelectItems(ctx *gin.Context) {
-	claims, _ := ctx.Get("claims")
-	userID := claims.(*model.CustomClaims).ID
-	info, err := global.GameSrvClient.GetUserItemsInfo(context.Background(), &game_proto.UserIDInfo{Id: userID})
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": err.Error(),
-		})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": info,
-	})
-}
-
 // 查询房间对应的服务器
 func SelectRoomServer(ctx *gin.Context) {
 	roomIDStr := ctx.DefaultQuery("room_id", "0")

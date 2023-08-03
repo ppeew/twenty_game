@@ -33,3 +33,17 @@
 2023-08-03T23:12:28.408+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
 2023-08-03T23:16:33.197+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
 2023-08-03T23:21:28.791+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-03T23:46:48.881+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-03T23:46:49.054+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuYWNvcyIsImV4cCI6MTY5MTA5NTYwOH0.wQ-VYh-tP0RpCDCO8MFWnuSe2kiBUSJm6lTtnMs2k3I","dataId":"store-web.json","group":"dev","tenant":"3920b1ba-9eab-4e3f-85c3-513c887b221e2"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2023-08-03T23:46:49.066+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuYWNvcyIsImV4cCI6MTY5MTA5NTYwOH0.wQ-VYh-tP0RpCDCO8MFWnuSe2kiBUSJm6lTtnMs2k3I","dataId":"store-web.json","group":"dev","tenant":"3920b1ba-9eab-4e3f-85c3-513c887b221e2"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2023-08-03T23:46:49.078+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuYWNvcyIsImV4cCI6MTY5MTA5NTYwOH0.wQ-VYh-tP0RpCDCO8MFWnuSe2kiBUSJm6lTtnMs2k3I","dataId":"store-web.json","group":"dev","tenant":"3920b1ba-9eab-4e3f-85c3-513c887b221e2"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2023-08-03T23:46:49.078+0800	[31mERROR[0m	config_client/config_client.go:202	get config from server error:[404] config data not exist
+ 
+2023-08-03T23:46:49.080+0800	[33mWARN[0m	config_client/config_client.go:207	[client.GetConfig] config not found, dataId: store-web.json, group: dev, namespaceId: 3920b1ba-9eab-4e3f-85c3-513c887b221e2.
+2023-08-03T23:48:46.485+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>

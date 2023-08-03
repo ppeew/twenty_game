@@ -7,22 +7,35 @@
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/srv/game_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/handler/conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/handler/conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/handler/item.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game/game_grpc.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/srv/user_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/user_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/proto/game/game_grpc.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/file_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/file_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/file_web/global/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/file_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/file_web/utils/ser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/api/router.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/game_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/initialize/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/proto/game/game_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/router/game_item.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/web/process_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/cache/config/store-web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/cache/config/store-web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/proto/game/game_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/server/handle_game_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/handle_game_msg.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/store_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/initialize/config.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/store_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/log/nacos-sdk.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/user_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web/user_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/user_web/initialize/config.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,39 +61,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/22378/GolandProjects/twenty-game/web/game_web/tests/main&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.maddyhome.idea.vim.ui.VimEmulationConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "C:/Users/22378/GolandProjects/twenty-game/web/process_web/proto",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "settings.editor.selected.configurable": "com.maddyhome.idea.vim.ui.VimEmulationConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\web\process_web\proto" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\web\game_web\proto" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\srv\user_srv\proto" />
       <recent name="C:\Users\22378\GolandProjects\twenty-game\web\game_web\tests\main" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build main.go (1)">
-    <configuration name="go build game_web" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/web/game_web" />
-      <kind value="PACKAGE" />
-      <package value="game_web" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/web/game_web/main.go" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Go 构建.go build main.go (2)">
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/web/store_web" />
@@ -89,19 +96,45 @@
       <filePath value="$PROJECT_DIR$/web/store_web/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="go build main.go (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/web/user_web" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/web/user_web/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build main.go (4)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/web/process_web" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/web/process_web/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build main.go (5)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/web/game_web" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/web/game_web/tests/main/main.go" />
+      <filePath value="$PROJECT_DIR$/web/game_web/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/web/file_web" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/web/file_web/main.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build main.go (2)" />
         <item itemvalue="Go 构建.go build main.go (1)" />
+        <item itemvalue="Go 构建.go build main.go (4)" />
+        <item itemvalue="Go 构建.go build main.go (5)" />
         <item itemvalue="Go 构建.go build main.go" />
-        <item itemvalue="Go 构建.go build game_web" />
       </list>
     </recent_temporary>
   </component>

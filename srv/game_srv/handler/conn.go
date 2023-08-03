@@ -11,6 +11,10 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+type GameServer struct {
+	game.UnimplementedGameServer
+}
+
 // 获得用户重连需要的服务器信息（ip+port）
 func (s *GameServer) GetConnData(ctx context.Context, in *game.UserIDInfo) (*game.ConnResponse, error) {
 	//查询redis

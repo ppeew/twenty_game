@@ -4,7 +4,6 @@ package game
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -36,22 +35,6 @@ type GameClient interface {
 	GetRanks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RanksResponse, error)
 	// 更新排行榜
 	UpdateRanks(ctx context.Context, in *UpdateRanksInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// 新建用户道具表
-	CreateUserItems(ctx context.Context, in *UserItemsInfo, opts ...grpc.CallOption) (*UserItemsInfoResponse, error)
-	// 查询用户的金币钻石及道具
-	GetUserItemsInfo(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserItemsInfoResponse, error)
-	// 增加金币
-	AddGold(ctx context.Context, in *AddGoldRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// 增加钻石
-	AddDiamond(ctx context.Context, in *AddDiamondInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// 增加道具(道具类型应该区别)
-	AddItem(ctx context.Context, in *AddItemInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// 使用金币
-	UseGold(ctx context.Context, in *UseGoldRequest, opts ...grpc.CallOption) (*IsOK, error)
-	// 使用钻石
-	UseDiamond(ctx context.Context, in *UseDiamondInfo, opts ...grpc.CallOption) (*IsOK, error)
-	// 使用道具(道具类型应该区别)
-	UseItem(ctx context.Context, in *UseItemInfo, opts ...grpc.CallOption) (*IsOK, error)
 	// 查询所有房间
 	SearchAllRoom(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllRoomInfo, error)
 	// 设置全局房间
@@ -142,78 +125,6 @@ func (c *gameClient) UpdateRanks(ctx context.Context, in *UpdateRanksInfo, opts 
 	return out, nil
 }
 
-func (c *gameClient) CreateUserItems(ctx context.Context, in *UserItemsInfo, opts ...grpc.CallOption) (*UserItemsInfoResponse, error) {
-	out := new(UserItemsInfoResponse)
-	err := c.cc.Invoke(ctx, "/game.Game/CreateUserItems", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameClient) GetUserItemsInfo(ctx context.Context, in *UserIDInfo, opts ...grpc.CallOption) (*UserItemsInfoResponse, error) {
-	out := new(UserItemsInfoResponse)
-	err := c.cc.Invoke(ctx, "/game.Game/GetUserItemsInfo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameClient) AddGold(ctx context.Context, in *AddGoldRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/game.Game/AddGold", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameClient) AddDiamond(ctx context.Context, in *AddDiamondInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/game.Game/AddDiamond", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameClient) AddItem(ctx context.Context, in *AddItemInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/game.Game/AddItem", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameClient) UseGold(ctx context.Context, in *UseGoldRequest, opts ...grpc.CallOption) (*IsOK, error) {
-	out := new(IsOK)
-	err := c.cc.Invoke(ctx, "/game.Game/UseGold", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameClient) UseDiamond(ctx context.Context, in *UseDiamondInfo, opts ...grpc.CallOption) (*IsOK, error) {
-	out := new(IsOK)
-	err := c.cc.Invoke(ctx, "/game.Game/UseDiamond", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameClient) UseItem(ctx context.Context, in *UseItemInfo, opts ...grpc.CallOption) (*IsOK, error) {
-	out := new(IsOK)
-	err := c.cc.Invoke(ctx, "/game.Game/UseItem", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *gameClient) SearchAllRoom(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllRoomInfo, error) {
 	out := new(AllRoomInfo)
 	err := c.cc.Invoke(ctx, "/game.Game/SearchAllRoom", in, out, opts...)
@@ -270,22 +181,6 @@ type GameServer interface {
 	GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error)
 	// 更新排行榜
 	UpdateRanks(context.Context, *UpdateRanksInfo) (*emptypb.Empty, error)
-	// 新建用户道具表
-	CreateUserItems(context.Context, *UserItemsInfo) (*UserItemsInfoResponse, error)
-	// 查询用户的金币钻石及道具
-	GetUserItemsInfo(context.Context, *UserIDInfo) (*UserItemsInfoResponse, error)
-	// 增加金币
-	AddGold(context.Context, *AddGoldRequest) (*emptypb.Empty, error)
-	// 增加钻石
-	AddDiamond(context.Context, *AddDiamondInfo) (*emptypb.Empty, error)
-	// 增加道具(道具类型应该区别)
-	AddItem(context.Context, *AddItemInfo) (*emptypb.Empty, error)
-	// 使用金币
-	UseGold(context.Context, *UseGoldRequest) (*IsOK, error)
-	// 使用钻石
-	UseDiamond(context.Context, *UseDiamondInfo) (*IsOK, error)
-	// 使用道具(道具类型应该区别)
-	UseItem(context.Context, *UseItemInfo) (*IsOK, error)
 	// 查询所有房间
 	SearchAllRoom(context.Context, *emptypb.Empty) (*AllRoomInfo, error)
 	// 设置全局房间
@@ -324,30 +219,6 @@ func (UnimplementedGameServer) GetRanks(context.Context, *emptypb.Empty) (*Ranks
 }
 func (UnimplementedGameServer) UpdateRanks(context.Context, *UpdateRanksInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateRanks not implemented")
-}
-func (UnimplementedGameServer) CreateUserItems(context.Context, *UserItemsInfo) (*UserItemsInfoResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateUserItems not implemented")
-}
-func (UnimplementedGameServer) GetUserItemsInfo(context.Context, *UserIDInfo) (*UserItemsInfoResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserItemsInfo not implemented")
-}
-func (UnimplementedGameServer) AddGold(context.Context, *AddGoldRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddGold not implemented")
-}
-func (UnimplementedGameServer) AddDiamond(context.Context, *AddDiamondInfo) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddDiamond not implemented")
-}
-func (UnimplementedGameServer) AddItem(context.Context, *AddItemInfo) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddItem not implemented")
-}
-func (UnimplementedGameServer) UseGold(context.Context, *UseGoldRequest) (*IsOK, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UseGold not implemented")
-}
-func (UnimplementedGameServer) UseDiamond(context.Context, *UseDiamondInfo) (*IsOK, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UseDiamond not implemented")
-}
-func (UnimplementedGameServer) UseItem(context.Context, *UseItemInfo) (*IsOK, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UseItem not implemented")
 }
 func (UnimplementedGameServer) SearchAllRoom(context.Context, *emptypb.Empty) (*AllRoomInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchAllRoom not implemented")
@@ -518,150 +389,6 @@ func _Game_UpdateRanks_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Game_CreateUserItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserItemsInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).CreateUserItems(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/CreateUserItems",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).CreateUserItems(ctx, req.(*UserItemsInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Game_GetUserItemsInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserIDInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).GetUserItemsInfo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/GetUserItemsInfo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).GetUserItemsInfo(ctx, req.(*UserIDInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Game_AddGold_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddGoldRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).AddGold(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/AddGold",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).AddGold(ctx, req.(*AddGoldRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Game_AddDiamond_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddDiamondInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).AddDiamond(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/AddDiamond",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).AddDiamond(ctx, req.(*AddDiamondInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Game_AddItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddItemInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).AddItem(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/AddItem",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).AddItem(ctx, req.(*AddItemInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Game_UseGold_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UseGoldRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).UseGold(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/UseGold",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).UseGold(ctx, req.(*UseGoldRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Game_UseDiamond_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UseDiamondInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).UseDiamond(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/UseDiamond",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).UseDiamond(ctx, req.(*UseDiamondInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Game_UseItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UseItemInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).UseItem(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/UseItem",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).UseItem(ctx, req.(*UseItemInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Game_SearchAllRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -772,38 +499,6 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateRanks",
 			Handler:    _Game_UpdateRanks_Handler,
-		},
-		{
-			MethodName: "CreateUserItems",
-			Handler:    _Game_CreateUserItems_Handler,
-		},
-		{
-			MethodName: "GetUserItemsInfo",
-			Handler:    _Game_GetUserItemsInfo_Handler,
-		},
-		{
-			MethodName: "AddGold",
-			Handler:    _Game_AddGold_Handler,
-		},
-		{
-			MethodName: "AddDiamond",
-			Handler:    _Game_AddDiamond_Handler,
-		},
-		{
-			MethodName: "AddItem",
-			Handler:    _Game_AddItem_Handler,
-		},
-		{
-			MethodName: "UseGold",
-			Handler:    _Game_UseGold_Handler,
-		},
-		{
-			MethodName: "UseDiamond",
-			Handler:    _Game_UseDiamond_Handler,
-		},
-		{
-			MethodName: "UseItem",
-			Handler:    _Game_UseItem_Handler,
 		},
 		{
 			MethodName: "SearchAllRoom",

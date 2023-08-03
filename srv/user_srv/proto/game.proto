@@ -23,23 +23,6 @@ service Game{
   //更新排行榜
   rpc UpdateRanks(UpdateRanksInfo)returns(google.protobuf.Empty);
 
-  //新建用户道具表
-  rpc CreateUserItems(UserItemsInfo)returns(UserItemsInfoResponse);
-
-  //查询用户的金币钻石及道具
-  rpc GetUserItemsInfo(UserIDInfo) returns(UserItemsInfoResponse);
-  //增加金币
-  rpc AddGold(AddGoldRequest) returns(google.protobuf.Empty);
-  //增加钻石
-  rpc AddDiamond(AddDiamondInfo) returns(google.protobuf.Empty);
-  //增加道具(道具类型应该区别)
-  rpc AddItem(AddItemInfo) returns(google.protobuf.Empty);
-  //使用金币
-  rpc UseGold(UseGoldRequest) returns(IsOK);
-  //使用钻石
-  rpc UseDiamond(UseDiamondInfo) returns(IsOK);
-  //使用道具(道具类型应该区别)
-  rpc UseItem(UseItemInfo) returns(IsOK);
 
   //查询所有房间
   rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);

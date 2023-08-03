@@ -6,7 +6,6 @@ import (
 	"process_web/global"
 	"process_web/my_struct"
 	"process_web/my_struct/response"
-	game_proto "process_web/proto/game"
 	"sort"
 )
 
@@ -177,30 +176,31 @@ func (game *GameStruct) ProcessItemMsg(todo context.Context) {
 			//zap.S().Info("[ProcessItemMsg]退出")
 			game.wg.Done()
 			return
-		case msg := <-game.ItemChan:
-			userInfo := global.UsersConn[msg.UserID]
-			items := make([]uint32, 2)
-			switch game_proto.Type(msg.ItemMsgData.Item) {
-			case game_proto.Type_Apple:
-				items[game_proto.Type_Apple] = 1
-			case game_proto.Type_Banana:
-				items[game_proto.Type_Banana] = 1
-			}
-			isOk, err := global.GameSrvClient.UseItem(context.Background(), &game_proto.UseItemInfo{
-				Id:    msg.UserID,
-				Items: items,
-			})
-			if isOk.IsOK == false {
-				global.SendErrToUser(userInfo, "[ProcessItemMsg]", err)
-			}
+		case _ = <-game.ItemChan:
+			// TODO 处理item使用逻辑
+			//userInfo := global.UsersConn[msg.UserID]
+			//items := make([]uint32, 2)
+			//switch game_proto.Type(msg.ItemMsgData.Item) {
+			//case game_proto.Type_Apple:
+			//	items[game_proto.Type_Apple] = 1
+			//case game_proto.Type_Banana:
+			//	items[game_proto.Type_Banana] = 1
+			//}
+			//isOk, err := global.GameSrvClient.UseItem(context.Background(), &game_proto.UseItemInfo{
+			//	Id:    msg.UserID,
+			//	Items: items,
+			//})
+			//if isOk.IsOK == false {
+			//	global.SendErrToUser(userInfo, "[ProcessItemMsg]", err)
+			//}
 			//处理用户的物品使用,广播所有用户
-			rsp := response.UseItemResponse{
-				ItemMsgData: my_struct.ItemMsgData{
-					Item:         msg.ItemMsgData.Item,
-					TargetUserID: msg.ItemMsgData.TargetUserID,
-				},
-			}
-			BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseItemResponseType, UseItemInfo: &rsp})
+			//rsp := response.UseItemResponse{
+			//	ItemMsgData: my_struct.ItemMsgData{
+			//		Item:         msg.ItemMsgData.Item,
+			//		TargetUserID: msg.ItemMsgData.TargetUserID,
+			//	},
+			//}
+			//BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseItemResponseType, UseItemInfo: &rsp})
 		}
 	}
 }
