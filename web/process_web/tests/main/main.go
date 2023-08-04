@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/websocket"
 	"io"
 	"io/ioutil"
-	"log"
 	"math/rand"
 	"mime/multipart"
 	"net/http"
@@ -17,12 +16,6 @@ import (
 	"sync/atomic"
 	"time"
 )
-
-func Test1() {
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTU2LCJleHAiOjE2OTA4MDM0NjUsImlzcyI6InBwZWV3IiwibmJmIjoxNjkwMzcxNDY1fQ.hZt6hWO7Hb-7NvoSKInKA1qy_OOvC5qv2r0M6QHGmHY"
-	roomID := "11"
-	EnterRoom(token, roomID)
-}
 
 type Record struct {
 	login  atomic.Int64
@@ -38,9 +31,39 @@ type Test struct {
 	begin   int
 }
 
+type Limiter struct {
+	login  chan struct{}
+	create chan struct{}
+	enter  chan struct{}
+}
+
+func NewLimiter() *Limiter {
+	return &Limiter{
+		login:  make(chan struct{}, 30),
+		create: make(chan struct{}, 30),
+		enter:  make(chan struct{}, 30)}
+}
+
+type Game struct {
+	id       int
+	userName string
+	token    string
+	wsConn   *websocket.Conn
+	roomID   string
+}
+
+func Work(start func(), end func(), do func() error) error {
+	atomic.AddInt64(&count, 1)
+	start()
+	defer end()
+	return do()
+}
+
 var isLocal = false
 var record = new(Record)
 var test = new(Test)
+var count int64 = 0
+var limiter = NewLimiter()
 
 func isStart() (bool, error) {
 	url := Host() + "/game/v1/isStart"
@@ -69,12 +92,12 @@ func isStart() (bool, error) {
 
 	test.testNum = int(m["count"].(float64))
 	test.begin = int(m["begin"].(float64))
-	test.testNum = 5000
+	test.testNum = 1000
 	test.begin = 0
 	return true, nil
 }
 
-func main() {
+func ready() {
 	for {
 		start, _ := isStart()
 		if start {
@@ -83,72 +106,104 @@ func main() {
 		}
 		time.Sleep(time.Second)
 	}
+}
+
+func main() {
+	ready()
 
 	//测试系统并发情况，支持10000并发
 	group := sync.WaitGroup{}
 	group.Add(test.testNum)
 
-	var count int64 = 0
 	go countNum(&count)
 	for i := 0; i < test.testNum; i++ {
 		go func(i int) {
 			defer group.Done()
+			g := &Game{id: i, userName: fmt.Sprintf("user-%d", test.begin+i)}
+
 			//1.新建用户
-			atomic.AddInt64(&count, 1)
-			time.Sleep(time.Millisecond * time.Duration(rand.Intn(5000)))
-			num := fmt.Sprintf("%d", test.begin+i)
-			userName := fmt.Sprintf("user-%s", num)
-			//token, err := RegisterUser(userName)
-			//if err != nil {
-			//	// 注册失败则尝试登录获取token
-			//	atomic.AddInt64(&count, 1)
-			//	token, err = Login(userName)
-			//	if err != nil {
-			//		return
-			//	}
-			//}
-
-			token, err := Login(userName)
-			if err != nil {
-				fmt.Printf("[Login] %s登录失败\n", userName)
-				return
+			start := func() {
+				limiter.login <- struct{}{}
+				atomic.AddInt64(&count, 1)
+				record.login.Add(1)
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(5000)))
 			}
-			record.login.Add(1)
-
-			//2.创建房间
-			atomic.AddInt64(&count, 1)
-			roomID, err := CreateRoom(token, num)
-			if err != nil {
-				fmt.Println(fmt.Sprintf("%d线程创房失败, %v", i, err))
-				return
+			end := func() {
+				<-limiter.login
 			}
-			record.create.Add(1)
-
-			//3.进入房间
-			atomic.AddInt64(&count, 1)
-			time.Sleep(time.Second)
-			wsConn, err := EnterRoom(token, roomID)
-			if err != nil {
+			work := func() error {
+				err := g.RegisterUser()
+				if err != nil {
+					// 注册失败则尝试登录获取token
+					atomic.AddInt64(&count, 1)
+					return g.Login()
+				}
+				return nil
+			}
+			if Work(start, end, work) != nil {
 				fmt.Println(fmt.Sprintf("%d线程进入房间失败", i))
 				return
 			}
-			record.enter.Add(1)
+
+			//2.创建房间
+			start = func() {
+				limiter.create <- struct{}{}
+				atomic.AddInt64(&count, 1)
+				record.create.Add(1)
+				time.Sleep(time.Second)
+			}
+			end = func() {
+				<-limiter.create
+			}
+			if Work(start, end, g.CreateRoom) != nil {
+				fmt.Println(fmt.Sprintf("%d线程进入房间失败", i))
+				return
+			}
+
+			//3.进入房间
+			start = func() {
+				limiter.enter <- struct{}{}
+				atomic.AddInt64(&count, 1)
+				record.enter.Add(1)
+				time.Sleep(time.Second)
+			}
+			end = func() {
+				<-limiter.enter
+			}
+			if Work(start, end, g.EnterRoom) != nil {
+				fmt.Println(fmt.Sprintf("%d线程进入房间失败", i))
+				return
+			}
 
 			//4.开始游戏
-			atomic.AddInt64(&count, 1)
-			BeginGame(wsConn)
-			record.begin.Add(1)
+			start = func() {}
+			end = func() {
+				record.begin.Add(1)
+			}
+			if Work(start, end, g.BeginGame) != nil {
+				fmt.Println("[BeginGame] 失败")
+				return
+			}
 
 			//5.游戏结束
-			atomic.AddInt64(&count, 1)
-			EndGame(wsConn, userName)
-			record.end.Add(1)
+			start = func() {}
+			end = func() {
+				record.end.Add(1)
+			}
+			if Work(start, end, g.EndGame) != nil {
+				fmt.Println("[EndGame] 失败")
+				return
+			}
 
 			//6.退出房间
-			atomic.AddInt64(&count, 1)
-			QuitRoom(wsConn, userName)
-			record.quit.Add(1)
-
+			start = func() {}
+			end = func() {
+				record.begin.Add(1)
+			}
+			if Work(start, end, g.QuitRoom) != nil {
+				fmt.Println("[QuitRoom] 失败")
+				return
+			}
 		}(i)
 	}
 	group.Wait()
@@ -200,21 +255,21 @@ func Host() string {
 	return "http://139.159.234.134:8000"
 }
 
-func RegisterUser(i string) (string, error) {
+func (g *Game) RegisterUser() error {
 	url := Host() + "/user/v1/register"
-	url = "http://139.159.234.134:9000/v1/register"
+	//url = "http://139.159.234.134:9000/v1/register"
 
 	method := "POST"
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
 	_ = writer.WriteField("nickname", "test!")
 	_ = writer.WriteField("gender", "true")
-	_ = writer.WriteField("username", i)
+	_ = writer.WriteField("username", g.userName)
 	_ = writer.WriteField("password", "1234567")
 	err := writer.Close()
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return err
 	}
 
 	client := &http.Client{}
@@ -222,7 +277,7 @@ func RegisterUser(i string) (string, error) {
 
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return err
 	}
 	req.Header.Add("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
 
@@ -230,32 +285,33 @@ func RegisterUser(i string) (string, error) {
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return err
 	}
 	defer res.Body.Close()
 
 	m, _ := getBody(res.Body)
 	if res.StatusCode != http.StatusOK {
-		fmt.Printf("[Register] %s注册失败，状态码：%d 信息：%+v\n", i, res.StatusCode, m)
-		return "", errors.New("注册失败")
+		fmt.Printf("[Register] %s注册失败，状态码：%d 信息：%+v\n", g.userName, res.StatusCode, m)
+		return errors.New("注册失败")
 	}
-	fmt.Printf("[Register] %s注册成功\n", i)
-	return m["token"].(string), nil
+	fmt.Printf("[Register] %s注册成功\n", g.userName)
+	g.token = m["token"].(string)
+	return nil
 }
 
-func Login(userName string) (string, error) {
+func (g *Game) Login() error {
 	url := Host() + "/user/v1/login"
-	url = "http://139.159.234.134:9000/v1/login"
+	//url = "http://139.159.234.134:9000/v1/login"
 
 	method := "POST"
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
-	_ = writer.WriteField("username", userName)
+	_ = writer.WriteField("username", g.userName)
 	_ = writer.WriteField("password", "1234567")
 	err := writer.Close()
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return err
 	}
 
 	client := &http.Client{}
@@ -263,7 +319,7 @@ func Login(userName string) (string, error) {
 
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return err
 	}
 	req.Header.Add("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
 
@@ -271,35 +327,37 @@ func Login(userName string) (string, error) {
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return err
 	}
 	defer res.Body.Close()
 
 	m, _ := getBody(res.Body)
 	if res.StatusCode != http.StatusOK {
 		fmt.Printf("[Login] 登录失败 %+v\n", m)
-		return "", errors.New("登录失败")
+		return errors.New("登录失败")
 	}
-	fmt.Printf("[Login] %s登录成功\n", userName)
-	return m["token"].(string), nil
+	fmt.Printf("[Login] %s登录成功\n", g.userName)
+	g.token = m["token"].(string)
+	return nil
 }
 
-func CreateRoom(token string, i string) (string, error) {
+func (g *Game) CreateRoom() error {
 	url := Host() + "/game/v1/createRoom"
 	method := "POST"
 
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
 
-	roomID := fmt.Sprintf("%d%s", time.Now().Second(), i)
+	roomID := fmt.Sprintf("%d%d", time.Now().Second(), g.id)
+	g.roomID = roomID
 	_ = writer.WriteField("room_id", roomID)
 	_ = writer.WriteField("max_user_number", "1")
-	_ = writer.WriteField("game_count", "1")
+	_ = writer.WriteField("game_count", "100")
 	_ = writer.WriteField("room_name", "测试房间")
 	err := writer.Close()
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return err
 	}
 
 	client := &http.Client{}
@@ -307,25 +365,26 @@ func CreateRoom(token string, i string) (string, error) {
 
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return err
 	}
-	req.Header.Add("token", token)
+	req.Header.Add("token", g.token)
 	req.Header.Add("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
 
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return err
 	}
 	defer res.Body.Close()
 
 	m, _ := getBody(res.Body)
 	fmt.Printf("[CreateRoom] %+v\n", m)
 	if res.StatusCode != http.StatusOK {
-		return "", errors.New("创建房间失败")
+		errors.New("创建房间失败")
 	}
-	return roomID, nil
+
+	return nil
 }
 
 func getTargetAddress(token string, roomID string) (string, error) {
@@ -363,7 +422,7 @@ func connectSocket(targetURL string, token string, roomID string) *websocket.Con
 
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("[connectSocket]", err)
 		return nil
 	}
 
@@ -371,7 +430,7 @@ func connectSocket(targetURL string, token string, roomID string) *websocket.Con
 	wsDialer := websocket.DefaultDialer
 	wsConn, _, err := wsDialer.Dial(req.URL.String(), nil)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("[connectSocket]", err)
 		return nil
 	}
 
@@ -380,14 +439,14 @@ func connectSocket(targetURL string, token string, roomID string) *websocket.Con
 	fmt.Printf("Send message: %s\n", message)
 	err = wsConn.WriteMessage(websocket.TextMessage, message)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("[connectSocket]", err)
 		return nil
 	}
 
 	// 接收 WebSocket 服务器端发送的消息
 	_, message, err = wsConn.ReadMessage()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("[connectSocket]", err)
 		return nil
 	}
 	fmt.Printf("Received message: %s\n", message)
@@ -421,39 +480,42 @@ func quitRoomMsg() []byte {
 	return res
 }
 
-func EnterRoom(token string, roomID string) (*websocket.Conn, error) {
-	if roomID == "" {
-		return nil, errors.New("[EnterRoom] roomID为空")
+func (g *Game) EnterRoom() error {
+	if g.roomID == "" {
+		return errors.New("[EnterRoom] roomID为空")
 	}
-	targetURL, err := getTargetAddress(token, roomID)
-	wsConn := connectSocket(targetURL, token, roomID)
-	return wsConn, err
+	targetURL, err := getTargetAddress(g.token, g.roomID)
+	g.wsConn = connectSocket(targetURL, g.token, g.roomID)
+	return err
 }
 
-func BeginGame(wsConn *websocket.Conn) {
+func (g *Game) BeginGame() error {
 	msg := beginGameMsg()
 	fmt.Printf("[BeginGame] %s\n", msg)
-	wsConn.WriteMessage(websocket.TextMessage, msg)
+	g.wsConn.WriteMessage(websocket.TextMessage, msg)
+	return nil
 }
 
-func EndGame(wsConn *websocket.Conn, userName string) {
+func (g *Game) EndGame() error {
 	for {
-		_, message, err := wsConn.ReadMessage()
+		_, message, err := g.wsConn.ReadMessage()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println("[EndGame]", err)
 			break
 		}
 		m, err := getBody(bytes.NewReader(message))
 		fmt.Printf("Received message: %f\n", m["msgType"])
 		if int(m["msgType"].(float64)) == 304 {
-			fmt.Printf("%s 游戏结束\n", userName)
+			fmt.Printf("%s 游戏结束\n", g.userName)
 			break
 		}
 	}
+	return nil
 }
 
-func QuitRoom(wsConn *websocket.Conn, userName string) {
+func (g *Game) QuitRoom() error {
 	msg := quitRoomMsg()
-	fmt.Printf("[QuitRoom] %s退出房间\n", userName)
-	wsConn.WriteMessage(websocket.TextMessage, msg)
+	fmt.Printf("[QuitRoom] %s退出房间\n", g.userName)
+	g.wsConn.WriteMessage(websocket.TextMessage, msg)
+	return nil
 }
