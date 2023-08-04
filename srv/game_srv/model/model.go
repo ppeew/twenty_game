@@ -30,7 +30,7 @@ type UserItem struct {
 
 // redis存储
 type User struct {
-	ID    uint32 `json:"ShopID"`
+	ID    uint32 `json:"ID"`
 	Ready bool   `json:"Ready"`
 }
 

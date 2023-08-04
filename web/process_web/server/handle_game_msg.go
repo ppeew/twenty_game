@@ -36,7 +36,7 @@ func (game *GameStruct) HandleAddCard(msg my_struct.Message) {
 		},
 	}
 	//用户使用增加卡,给该玩家加分
-	game.Users[msg.UserID].Score += 200
+	game.Users[msg.UserID].Score += UseAddScore
 	BroadcastToAllGameUsers(game, response.MessageResponse{MsgType: response.UseSpecialCardResponseType, UseSpecialCardInfo: &rsp})
 }
 
@@ -44,10 +44,12 @@ func (game *GameStruct) HandleUpdateCard(msg my_struct.Message) {
 	ws := global.UsersConn[msg.UserID]
 	data := msg.UseSpecialData.UpdateCardData
 	findUpdateCard := false
+	var findCardNum uint32
 	for _, card := range game.Users[data.TargetUserID].BaseCards {
 		if card.CardID == data.CardID {
 			//更新
 			findUpdateCard = true
+			findCardNum = card.Number
 			card.Number = data.UpdateNumber
 		}
 	}
@@ -55,7 +57,7 @@ func (game *GameStruct) HandleUpdateCard(msg my_struct.Message) {
 		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要更新的卡"))
 		return
 	}
-	game.Users[data.TargetUserID].Score += 100
+	game.Users[msg.UserID].Score += 10 - (findCardNum - data.UpdateNumber) + UseUpdateScore
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.UpdateCard,
 		UserID:          msg.UserID,
@@ -78,10 +80,12 @@ func (game *GameStruct) HandleDeleteCard(msg my_struct.Message) {
 		global.SendErrToUser(global.UsersConn[msg.UserID], "[HandleDeleteCard]", errors.New("未知的玩家"))
 		return
 	}
+	var delCardNum uint32
 	for i, card := range game.Users[data.TargetUserID].BaseCards {
 		if card.CardID == data.CardID {
 			//删除
 			findDelCard = true
+			delCardNum = card.Number
 			if i+1 >= len(game.Users[data.TargetUserID].BaseCards) {
 				game.Users[data.TargetUserID].BaseCards = game.Users[data.TargetUserID].BaseCards[:i]
 			} else {
@@ -94,8 +98,8 @@ func (game *GameStruct) HandleDeleteCard(msg my_struct.Message) {
 		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到要删除的卡"))
 		return
 	}
-	// 删除卡，被删除的玩家加分
-	game.Users[data.TargetUserID].Score += 100
+	// 增加使用炸弹卡玩家得分
+	game.Users[msg.UserID].Score += 10 - delCardNum + UseDelScore
 	rsp := response.UseSpecialCardResponse{
 		SpecialCardType: response.DeleteCard,
 		UserID:          msg.UserID,
@@ -112,12 +116,17 @@ func (game *GameStruct) HandleChangeCard(msg my_struct.Message) {
 	data := msg.UseSpecialData.ChangeCardData
 	//先找到两卡
 	findUserCard := false
-	var userInfo *my_struct.BaseCard
 	findTargetUserCard := false
-	var targetUserInfo *my_struct.BaseCard
+	var (
+		firstChangeNum  uint32
+		secondChangeNum uint32
+		userInfo        *my_struct.BaseCard
+		targetUserInfo  *my_struct.BaseCard
+	)
 	for _, info := range game.Users[msg.UserID].BaseCards {
 		if info.CardID == data.CardID {
 			findUserCard = true
+			firstChangeNum = info.Number
 			userInfo = info
 			break
 		}
@@ -129,6 +138,7 @@ func (game *GameStruct) HandleChangeCard(msg my_struct.Message) {
 	for _, info := range game.Users[data.TargetUserID].BaseCards {
 		if info.CardID == data.TargetCard {
 			findTargetUserCard = true
+			secondChangeNum = info.Number
 			targetUserInfo = info
 			break
 		}
@@ -137,7 +147,7 @@ func (game *GameStruct) HandleChangeCard(msg my_struct.Message) {
 		global.SendErrToUser(ws, "[DoHandleSpecialCard]", errors.New("找不到对方交换的卡"))
 		return
 	}
-	game.Users[data.TargetUserID].Score += 300
+	game.Users[msg.UserID].Score += (firstChangeNum+secondChangeNum)/2 + UseChangeScore
 	//都找到了
 	temp := userInfo
 	userInfo = targetUserInfo

@@ -4,18 +4,18 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/store_web.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/store_web/tests/bind_test.go" afterDir="false" />
+    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="逻辑修改">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/apis/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/apis/shop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/apis/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/apis/trade.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/dto/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/dto/shop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/dto/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/dto/trade.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/router/store.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/router/store.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/tests/raw_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/tests/raw_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/model/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/model/model.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/game_data..go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/my_struct/game_data..go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/response/room_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/my_struct/response/room_resp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/server/game.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/game.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/process_web/server/handle_game_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/handle_game_msg.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,7 +70,7 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\web\store_web" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build main.go (1)">
+  <component name="RunManager" selected="Go 构建.go build main.go (4)">
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/web/store_web" />
@@ -121,11 +121,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build main.go (4)" />
         <item itemvalue="Go 构建.go build main.go (1)" />
         <item itemvalue="Go 测试.store_web/tests 中的 TestRaw3" />
         <item itemvalue="Go 测试.store_web/service/tests 中的 TestRaw3" />
         <item itemvalue="Go 构建.go build main.go (2)" />
-        <item itemvalue="Go 构建.go build main.go (4)" />
       </list>
     </recent_temporary>
   </component>
@@ -143,6 +143,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="逻辑修改" />
+    <option name="LAST_COMMIT_MESSAGE" value="逻辑修改" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

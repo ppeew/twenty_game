@@ -21,6 +21,25 @@ import (
 	"github.com/parnurzeal/gorequest"
 )
 
+/*
+凑齐20点得20分
+炸弹卡炸掉3点数就得 10-3 = 7分
+修改卡修改别人的卡，7点改成3点，得10 - （7-3）=6分
+交换卡，交换3点和6点，得（3+6）/2 = 4分，去平均值
+万能卡给自己用的，不加分
+
+玩家使用特殊卡干扰对方能加分。
+玩家一般都改大点数，使对方要多抢一张普通卡才能得分。因此得抑制玩家这种得分行为，修改点数越多，得分越少。
+*/
+
+const (
+	UseDelScore    = 0
+	UseAddScore    = 0
+	UseUpdateScore = 0
+	UseChangeScore = 0
+	TwentyAddScore = 20
+)
+
 type GameStruct struct {
 	Users        map[uint32]*my_struct.UserGameInfo
 	CurrentCount uint32                 //当前是第几回合
@@ -179,6 +198,8 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 						MsgInfo: &response.MsgResponse{MsgData: "没抢到卡~~~"},
 					})
 				}
+			} else {
+
 			}
 		case <-after:
 			//超时处理,超时就直接返回了
@@ -249,7 +270,7 @@ func (game *GameStruct) DoScoreCount() {
 		if sum/20 == 1 {
 			info.BaseCards = make([]*my_struct.BaseCard, 0)
 			if sum%20 == 0 {
-				info.Score += 888
+				info.Score += TwentyAddScore
 				global.SendMsgToUser(global.UsersConn[id], response.MessageResponse{
 					MsgType: response.MsgResponseType,
 					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("得分啦！")},
@@ -292,7 +313,7 @@ func (game *GameStruct) DoEndGame() {
 			Ranks: ranks,
 		},
 	})
-	// 分别给第一名和其他名次玩家发放奖励(第一名发放钻石，第一第二名，发放物品，全部玩家名发放金币),计算排行榜
+	// 分别给第一名和其他名次玩家发放奖励(计算排行榜)
 	go func() {
 		for i, u := range ranks {
 			global.GameSrvClient.UpdateRanks(context.Background(), &game_proto.UpdateRanksInfo{

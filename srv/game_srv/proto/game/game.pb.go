@@ -1118,7 +1118,7 @@ type RoomUser struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ID    uint32 `protobuf:"varint,1,opt,name=ShopID,proto3" json:"ShopID,omitempty"`
+	ID    uint32 `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
 	Ready bool   `protobuf:"varint,2,opt,name=Ready,proto3" json:"Ready,omitempty"`
 }
 

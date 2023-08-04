@@ -33,7 +33,7 @@ type BaseCard struct {
 }
 
 type UserGameInfo struct {
-	ID               uint32         `json:"ShopID,omitempty"`
+	ID               uint32         `json:"ID,omitempty"`
 	BaseCards        []*BaseCard    `json:"baseCards,omitempty"`    //普通卡
 	SpecialCards     []*SpecialCard `json:"specialCards,omitempty"` //特殊卡
 	GetBaseCardNum   int            `json:"isGetCard,omitempty"`    //当前回合抢普通卡数量
