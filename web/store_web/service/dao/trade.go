@@ -72,6 +72,7 @@ func (d TradeDao) DeleteByID(id int, userID uint32) error {
 
 // 买交易物品
 func (d TradeDao) BuyTradeItem(TradeID int, userID int) error {
+	// 多并发进来，做当前读，查询会被阻塞，直到最后提交了之后，其他表的查询+更新操作才能生效
 	begin := global.MysqlDB.Begin()
 	//1.查询出该商品的价格及用什么支付
 	tradeItem := domains.TradeItem{}
@@ -83,6 +84,7 @@ func (d TradeDao) BuyTradeItem(TradeID int, userID int) error {
 	//2.查询该用户货币数量（用户与货币是一对一关系）
 	user := domains.User{}
 	begin.Table("users").Where("id=?", userID).First(&user)
+	// 其他接口改了user.Good user.Diamond
 	if user.Good >= tradeItem.PriceGood && user.Diamond >= tradeItem.PriceDiamond {
 		begin.Table("users").Where("id=?", userID).Updates(map[string]interface{}{
 			"good":    user.Good - tradeItem.PriceGood,

@@ -4,18 +4,10 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="逻辑修改">
+    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="优化用户体验">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/model/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/model/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/game_srv/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/srv/user_srv/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/game_web/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/game_data..go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/my_struct/game_data..go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/response/room_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/my_struct/response/room_resp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/proto/game/game.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/process_web/server/game.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/game.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/server/handle_game_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/process_web/server/handle_game_msg.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/store_web/service/dao/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/store_web/service/dao/trade.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,7 +138,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="逻辑修改" />
-    <option name="LAST_COMMIT_MESSAGE" value="逻辑修改" />
+    <MESSAGE value="优化用户体验" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化用户体验" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

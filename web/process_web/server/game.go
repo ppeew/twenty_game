@@ -85,6 +85,7 @@ func NewGameData(data *Data) GameStruct {
 
 	return GameStruct{
 		Users:        users,
+		CurrentCount: 0,
 		CommonChan:   make(chan my_struct.Message, 1024),
 		ChatChan:     make(chan my_struct.Message, 1024),
 		ItemChan:     make(chan my_struct.Message, 1024),
@@ -93,8 +94,10 @@ func NewGameData(data *Data) GameStruct {
 		MakeCardID:   0,
 		RandCard:     make([]*my_struct.Card, 0),
 		RoomID:       data.roomID,
-		CurrentCount: 0,
 		GameCount:    data.gameCount,
+		UserNumber:   data.userNumber,
+		RoomOwner:    data.roomOwner,
+		RoomName:     data.roomName,
 	}
 }
 
