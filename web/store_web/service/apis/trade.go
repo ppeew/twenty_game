@@ -11,7 +11,7 @@ import (
 
 func SelectTradeItems(ctx *gin.Context) {
 	req := dto.TradeSelectReq{}
-	err := ctx.BindJSON(&req)
+	err := ctx.Bind(&req)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 		return
@@ -47,7 +47,7 @@ func DownTradeItem(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
 	req := dto.TradeDownReq{}
-	err := ctx.BindJSON(&req)
+	err := ctx.BindUri(&req)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 		return
@@ -65,7 +65,7 @@ func BuyTradeItem(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*model.CustomClaims).ID
 	req := dto.TradeBuyReq{}
-	err := ctx.BindJSON(&req)
+	err := ctx.BindUri(&req)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 		return

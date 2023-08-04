@@ -12,7 +12,7 @@ import (
 // 分页查询商品
 func SelectShopGoods(ctx *gin.Context) {
 	req := dto.ShopSelectReq{}
-	err := ctx.BindJSON(&req)
+	err := ctx.Bind(&req)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 		return
@@ -32,6 +32,11 @@ func BuyShopGood(ctx *gin.Context) {
 	userID := claims.(*model.CustomClaims).ID
 	req := dto.ShopBuyReq{}
 	err := ctx.BindJSON(&req)
+	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	err = ctx.ShouldBindUri(&req)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 		return

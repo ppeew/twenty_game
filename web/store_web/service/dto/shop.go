@@ -1,11 +1,11 @@
 package dto
 
 type ShopSelectReq struct {
-	Page int `json:"page"`
-	Size int `json:"size"`
+	Page int `form:"page"`
+	Size int `form:"size"`
 }
 
 type ShopBuyReq struct {
-	ShopID int `json:"shopID"`
+	ShopID int `uri:"id"`
 	Num    int `json:"num"`
 }

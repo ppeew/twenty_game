@@ -10,7 +10,7 @@ import (
 func InitStoreRouter(r *gin.RouterGroup) {
 	trade := r.Group("/trade")
 	trade.GET("", middlewares.JWTAuth(), apis.SelectTradeItems)
-	trade.POST("/:id", middlewares.JWTAuth(), apis.PushTradeItem)
+	trade.POST("", middlewares.JWTAuth(), apis.PushTradeItem)
 	trade.PUT("/:id", middlewares.JWTAuth(), apis.BuyTradeItem)
 	trade.DELETE("/:id", middlewares.JWTAuth(), apis.DownTradeItem)
 

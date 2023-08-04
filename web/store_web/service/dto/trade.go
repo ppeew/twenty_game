@@ -5,8 +5,8 @@ import (
 )
 
 type TradeSelectReq struct {
-	Page int `json:"page"`
-	Size int `json:"size"`
+	Page int `form:"page"`
+	Size int `form:"size"`
 }
 
 type TradePushReq struct {
@@ -30,9 +30,9 @@ func (r TradePushReq) ToDomain(userID int) domains.TradeItem {
 }
 
 type TradeDownReq struct {
-	TradeItemID int
+	TradeItemID int `uri:"id"`
 }
 
 type TradeBuyReq struct {
-	TradeItemID int
+	TradeItemID int `uri:"id"`
 }

@@ -22,3 +22,8 @@ nohup ./file_web > ../../fw.log 2>&1 &
 cd ~/twenty_game/web/process_web
 go build
 nohup ./process_web > ../../pw.log 2>&1 &
+
+
+cd ~/twenty_game/web/store_web
+go build
+nohup ./store_web > ../../sw.log 2>&1 &
