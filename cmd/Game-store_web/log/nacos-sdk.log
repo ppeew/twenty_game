@@ -78,3 +78,4 @@
 2023-08-04T12:31:20.663+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
 2023-08-04T12:31:32.052+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
 2023-08-04T12:32:51.173+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\store_web\cache>
+2023-08-06T00:55:58.579+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\store_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\store_web\cache>

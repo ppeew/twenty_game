@@ -5,277 +5,274 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="优化用户体验">
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/build.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file_web.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/file_web.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_srv.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/game_srv.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_web.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/game_web.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/process_web.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/process_web.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/redis.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/redis.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server1.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/server1.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server2.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/server2.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/.idea/game_srv.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/.idea/game_srv.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/global/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/handler/conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/handler/conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/handler/ranks.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/handler/ranks.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/handler/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/handler/room.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/handler/room_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/handler/room_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/initialize/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/initialize/db.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/initialize/srv_conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/model/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/model/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/proto/user.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/user/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/proto/user/user.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/proto/user/user_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/proto/user/user_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/tests/item_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/tests/item_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/tests/ranks_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/tests/ranks_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/utils/addr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/utils/room_tool.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/utils/room_tool.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/game_srv/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/utils/ser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/.idea/sshConfigs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/.idea/sshConfigs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/.idea/user_srv.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/.idea/user_srv.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/.idea/webServers.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/global/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/handler/image.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/handler/image.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/handler/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/handler/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/initialize/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/initialize/db.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/initialize/srv_conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/log/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/log/log.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/model/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/model/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/proto/user.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/user/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/proto/user/user.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/proto/user/user_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/proto/user/user_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/tests/image_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/tests/image_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/tests/readImage_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/tests/readImage_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/tests/redis_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/tests/redis_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/tests/user_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/tests/user_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/utils/addr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/srv/user_srv/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/utils/ser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/store_web.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/store_web.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_srv.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/user_srv.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_web.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/user_web.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/.idea/game_web.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/.idea/game_web.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/api/file.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/api/file.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/api/oss.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/api/oss.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/global/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/initialize/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/initialize/srv_conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/middlewares/cors.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/middlewares/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/model/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/model/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/proto/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/proto/user.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/proto/user/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_srv/proto/user/user.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/proto/user/user_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/proto/user/user_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/router/file.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/router/file.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/router/oss.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/router/oss.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/utils/addr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/utils/ser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/file_web/utils/uitils.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/file_web/utils/uitils.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/.idea/game_web.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/.idea/game_web.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/api/ranks.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/api/ranks.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/api/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/cache/config/game_web.json@@dev@@d57ea382-6b60-4022-8c3f-58e7dbcf3ba4" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/cache/config/game_web.json@@dev@@d57ea382-6b60-4022-8c3f-58e7dbcf3ba4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/cache/config/game_web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/cache/config/game_web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/forms/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/forms/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/global/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/consul_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/initialize/consul_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/flow.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/initialize/flow.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/initialize/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/initialize/srv_conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/middlewares/cors.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/middlewares/flow.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/middlewares/flow.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/middlewares/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/model/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/model/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/router/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/router/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/router/ranks.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/router/ranks.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/router/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/router/room.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/chan_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/chan_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/consul_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/consul_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/copy_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/copy_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/dial_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/dial_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/int_string_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/int_string_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/json_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/json_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/main/chan.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/main/chan.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/main/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/map_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/map_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/marshal_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/marshal_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/tests/system_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/tests/system_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/utils/addr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/utils/ser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/game_web/utils/uitils.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/game_web/utils/uitils.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/api/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/forms/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/forms/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/global/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/global/websocket.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/global/websocket.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/initialize/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/initialize/srv_conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/middlewares/cors.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/middlewares/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/game_data..go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/my_struct/game_data..go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/my_struct/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/message.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/my_struct/message.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/response/game_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/my_struct/response/game_resp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/response/message_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/my_struct/response/message_resp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/response/room_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/my_struct/response/room_resp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/my_struct/room_data.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/my_struct/room_data.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/router/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/router/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/router/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/router/room.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/server/game.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/server/game.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/server/handle_game_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/server/handle_game_msg.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/server/handle_room_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/server/handle_room_msg.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/server/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/server/room.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/server/run_thread.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/server/run_thread.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/chan_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/chan_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/copy_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/copy_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/dial_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/dial_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/json_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/json_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/main/chan.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/main/chan.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/main/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/map_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/map_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/marshal_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/marshal_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/quitroom_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/quitroom_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/request_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/request_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/tests/system_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/tests/system_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/utils/addr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/utils/bind.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/utils/bind.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/utils/ser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/process_web/utils/uitils.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/process_web/utils/uitils.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/cache/config/store-web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/cache/config/store-web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/global/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/initialize/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/initialize/db.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/initialize/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/middlewares/cors.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/middlewares/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/model/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/model/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/apis/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/apis/shop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/apis/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/apis/trade.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/dao/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/dao/shop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/dao/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/dao/trade.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/domains/good.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/domains/good.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/domains/item.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/domains/item.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/domains/trade_item.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/domains/trade_item.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/domains/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/domains/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/dto/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/dto/shop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/dto/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/dto/trade.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/service/router/store.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/service/router/store.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/tests/bind_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/tests/bind_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/tests/raw_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/tests/raw_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_srv/utils/addr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/utils/ser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/store_web/utils/uitils.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/store_web/utils/uitils.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/.idea/user_web.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/.idea/user_web.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/api/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/forms/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/forms/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/global/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/global/response/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/global/response/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/initialize/flow.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/initialize/flow.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/initialize/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/initialize/srv_conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/middlewares/cors.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/middlewares/flow.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/middlewares/flow.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/middlewares/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/models/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/models/jwt.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/proto/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/proto/user.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/proto/user/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/proto/user/user.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/proto/user/user_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/proto/user/user_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/router/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/router/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/tests/make_file_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/tests/make_file_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/tests/register_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/tests/register_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/utils/addr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/user_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/user_web/utils/ser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/接口.md" beforeDir="false" afterPath="$PROJECT_DIR$/接口.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/.idea/game_web.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/.idea/game_web.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/api/file.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/api/file.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/api/oss.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/api/oss.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/cache/config/file-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/cache/config/file-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/config-pro.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/global/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/initialize/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/initialize/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/initialize/srv_conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/middlewares/cors.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/middlewares/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/model/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/model/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/proto/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/proto/user.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/proto/user/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/proto/user/user.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/proto/user/user_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/proto/user/user_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/router/file.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/router/file.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/router/oss.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/router/oss.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/utils/addr.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/utils/ser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/file_web/utils/uitils.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/utils/uitils.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/.idea/game_srv.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/.idea/game_srv.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/cache/config/game-srv.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/cache/config/game-srv.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/config-pro.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/global/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/handler/conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/handler/conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/handler/ranks.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/handler/ranks.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/handler/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/handler/room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/handler/room_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/handler/room_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/initialize/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/srv_conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/model/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/model/model.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/proto/game/game_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/proto/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/proto/user.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/proto/user/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/proto/user/user.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/proto/user/user_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/proto/user/user_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/tests/item_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/tests/item_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/tests/ranks_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/tests/ranks_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/utils/addr.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/utils/room_tool.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/utils/room_tool.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_srv/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/utils/ser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/.idea/game_web.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/.idea/game_web.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/api/ranks.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/api/ranks.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/api/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/cache/config/game-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/cache/config/game-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/cache/config/game_web.json@@dev@@d57ea382-6b60-4022-8c3f-58e7dbcf3ba4" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/cache/config/game_web.json@@dev@@d57ea382-6b60-4022-8c3f-58e7dbcf3ba4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/cache/config/game_web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/cache/config/game_web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/config-pro.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/forms/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/forms/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/global/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/initialize/consul_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/consul_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/initialize/flow.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/flow.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/srv_conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/middlewares/cors.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/middlewares/flow.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/middlewares/flow.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/middlewares/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/model/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/model/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/proto/game/game_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/router/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/router/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/router/ranks.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/router/ranks.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/router/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/router/room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/chan_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/chan_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/consul_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/consul_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/copy_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/copy_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/dial_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/dial_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/int_string_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/int_string_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/json_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/json_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/main/chan.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/main/chan.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/main/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/map_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/map_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/marshal_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/marshal_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/tests/system_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/system_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/utils/addr.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/utils/ser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/game_web/utils/uitils.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/utils/uitils.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/api/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/cache/config/process-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/cache/config/process-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/config-pro.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/forms/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/forms/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/global/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/global/websocket.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/global/websocket.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/srv_conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/middlewares/cors.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/middlewares/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/my_struct/game_data..go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/game_data..go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/my_struct/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/my_struct/message.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/message.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/my_struct/response/game_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/response/game_resp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/my_struct/response/message_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/response/message_resp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/my_struct/response/room_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/response/room_resp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/my_struct/room_data.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/room_data.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/proto/game/game_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/router/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/router/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/router/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/router/room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/server/game.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/server/game.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/server/handle_game_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/server/handle_game_msg.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/server/handle_room_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/server/handle_room_msg.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/server/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/server/room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/server/run_thread.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/server/run_thread.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/chan_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/chan_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/copy_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/copy_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/dial_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/dial_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/json_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/json_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/main/chan.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/main/chan.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/main/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/map_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/map_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/marshal_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/marshal_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/quitroom_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/quitroom_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/request_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/request_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/tests/system_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/tests/system_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/utils/addr.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/utils/bind.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/utils/bind.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/utils/ser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/process_web/utils/uitils.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/utils/uitils.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/cache/config/store-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/cache/config/store-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/cache/config/store-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e2" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/cache/config/store-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/cache/config/store-web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/cache/config/store-web.json@@pro@@b8269140-ced0-4bae-9862-2297682d49c2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/config-pro.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/global/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/initialize/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/initialize/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/initialize/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/initialize/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/middlewares/cors.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/middlewares/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/model/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/model/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/apis/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/apis/shop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/apis/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/apis/trade.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/dao/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/dao/shop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/dao/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/dao/trade.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/domains/good.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/domains/good.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/domains/item.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/domains/item.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/domains/trade_item.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/domains/trade_item.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/domains/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/domains/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/dto/shop.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/dto/shop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/dto/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/dto/trade.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/service/router/store.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/service/router/store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/tests/bind_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/tests/bind_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/tests/raw_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/tests/raw_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/utils/addr.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/utils/ser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/store_web/utils/uitils.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/utils/uitils.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/.idea/sshConfigs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/.idea/sshConfigs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/.idea/user_srv.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/.idea/user_srv.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/.idea/webServers.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/cache/config/user-srv.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/cache/config/user-srv.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config-pro.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/global/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/handler/image.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/handler/image.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/handler/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/handler/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/initialize/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/srv_conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/log/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/log/log.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/model/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/model/model.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/proto/game.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/proto/game/game.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/proto/game/game_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/proto/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/proto/user.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/proto/user/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/proto/user/user.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/proto/user/user_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/proto/user/user_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/tests/image_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/tests/image_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/tests/readImage_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/tests/readImage_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/tests/redis_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/tests/redis_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/tests/user_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/tests/user_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/utils/addr.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_srv/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/utils/ser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/.idea/user_web.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/.idea/user_web.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/api/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/cache/config/user-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/cache/config/user-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/config-debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/config-pro.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/forms/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/forms/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/global/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/global/response/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/global/response/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/initialize/flow.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/flow.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/initialize/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/srv_conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/middlewares/cors.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/middlewares/cors.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/middlewares/flow.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/middlewares/flow.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/middlewares/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/middlewares/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/models/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/models/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/proto/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/proto/user.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/proto/user/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/proto/user/user.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/proto/user/user_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/proto/user/user_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/router/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/router/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/tests/make_file_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/tests/make_file_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/tests/register_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/tests/register_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/utils/addr.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/utils/addr.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/user_web/utils/ser.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/utils/ser.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -334,24 +331,16 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\web\store_web" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build main.go">
+  <component name="RunManager" selected="Go 构建.go build main.go (2)">
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/web/store_web" />
+      <working_directory value="$PROJECT_DIR$/cmd/process_web" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/web/store_web/main.go" />
+      <filePath value="$PROJECT_DIR$/cmd/process_web/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build main.go (4)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/web/process_web" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/web/process_web/main.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="go build main.go (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/user_web" />
       <kind value="FILE" />
@@ -359,37 +348,37 @@
       <filePath value="$PROJECT_DIR$/cmd/user_web/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="store_web/service/tests 中的 TestRaw3" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="go build main.go (4)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/web/store_web/service/tests" />
-      <root_directory value="$PROJECT_DIR$/web/store_web" />
-      <kind value="PACKAGE" />
-      <package value="store_web/service/tests" />
+      <working_directory value="$PROJECT_DIR$/cmd/store_web" />
+      <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestRaw3\E$" />
+      <filePath value="$PROJECT_DIR$/cmd/store_web/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="store_web/tests 中的 TestRaw3" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="go build main.go (5)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/web/store_web/tests" />
-      <root_directory value="$PROJECT_DIR$/web/store_web" />
-      <kind value="PACKAGE" />
-      <package value="store_web/tests" />
+      <working_directory value="$PROJECT_DIR$/cmd/game_web" />
+      <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestRaw3\E$" />
+      <filePath value="$PROJECT_DIR$/cmd/game_web/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/cmd/user_srv" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/user_srv/main.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build main.go (2)" />
         <item itemvalue="Go 构建.go build main.go" />
         <item itemvalue="Go 构建.go build main.go (4)" />
         <item itemvalue="Go 构建.go build main.go (1)" />
-        <item itemvalue="Go 测试.store_web/tests 中的 TestRaw3" />
-        <item itemvalue="Go 测试.store_web/service/tests 中的 TestRaw3" />
+        <item itemvalue="Go 构建.go build main.go (5)" />
       </list>
     </recent_temporary>
   </component>
@@ -420,7 +409,7 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/cmd/store_web/service/apis/shop.go</url>
+          <url>file://$PROJECT_DIR$/cmd/Game-store_web/service/apis/shop.go</url>
           <line>34</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
