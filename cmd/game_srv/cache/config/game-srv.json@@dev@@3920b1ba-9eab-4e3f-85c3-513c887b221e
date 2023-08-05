@@ -1,0 +1,24 @@
+{
+    "host":"127.0.0.1",
+    "mysql":{
+        "host":"139.159.234.134",
+        "port":3306,
+        "database":"game",
+        "user":"root",
+        "password":"518888"
+    },
+    "consul":{
+        "host":"139.159.234.134",
+        "port":8500,
+        "name":"game-srv-dev"
+    },
+    "redis":{
+        "host":"139.159.234.134",
+        "port":6379,
+        "password":"518888",
+        "database":0
+    },
+    "user_srv":{
+        "name":"user-srv-dev"
+    }
+}
