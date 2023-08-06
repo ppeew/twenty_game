@@ -28,3 +28,4 @@ go build -o store_web main.go
 nohup ./store_web > ../../sw.log 2>&1 &
 
 echo "build finish"
+export BUILD_ID=dontKillMe
