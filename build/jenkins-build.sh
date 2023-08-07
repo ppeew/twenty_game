@@ -1,3 +1,5 @@
+echo "jenkins-build"
+
 cd /var/jenkins_home/workspace/twenty_game/cmd/Game-user_srv
 go build -o user_srv main.go 
 nohup ./user_srv > ../../us.log 2>&1 &
