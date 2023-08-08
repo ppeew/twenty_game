@@ -43,7 +43,7 @@ func main() {
 	//服务注册及健康检查
 	consulClient, serverID := utils.RegistAndHealthCheck()
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, os.Kill, os.Interrupt)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Kill, os.Interrupt)
 	sig := <-quit
 	zap.S().Infof("接收到退出信号 %+v\n", sig)
 	// 资源释放
