@@ -24,6 +24,10 @@ ps -ef | grep srv
 ps -ef | grep web
 
 cd ../../
+ls
 cat ./us.log
 cat ./uw.log
+
+cat /go/src/twenty_game/us.log
+cat /go/src/twenty_game/uw.log
 echo "finish"
