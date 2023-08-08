@@ -12,8 +12,8 @@ WORKDIR $GOPATH/src
 RUN mkdir twenty_game && cd twenty_game
 COPY . twenty_game
 RUN pwd
-RUN ls
+RUN cd twenty_game && ls
 
-ENTRYPOINT ["twenty_game/build/zeabur.sh"]
+CMD ["twenty_game/build/zeabur.sh"]
 
 
