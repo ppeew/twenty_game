@@ -1,3 +1,4 @@
+killall game_web store_web file_web process_web user_web game_srv user_srv
 
 cd ./twenty_game/cmd/Game-user_srv
 nohup ./user_srv > ../../us.log &
@@ -25,7 +26,6 @@ ps -ef | grep web
 sleep 10s
 
 cd ../../
-ls
 cat ./us.log
 cat ./uw.log
 
