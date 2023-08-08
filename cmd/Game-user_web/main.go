@@ -41,8 +41,10 @@ func main() {
 	consulClient, serverID := utils.RegistAndHealthCheck()
 	//终止信号
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-	<-quit
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Kill, os.Interrupt)
+	sig := <-quit
+	zap.S().Infof("接收到退出信号 %+v\n", sig)
+
 	go func() {
 		<-quit
 		zap.S().Info("两次ctrl+c强制退出")
