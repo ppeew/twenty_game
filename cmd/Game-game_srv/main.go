@@ -47,8 +47,10 @@ func main() {
 	zap.S().Info("启动服务成功")
 	//优雅退出
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, os.Kill, os.Interrupt)
-	<-quit
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Kill, os.Interrupt)
+	sig := <-quit
+	zap.S().Infof("接收到退出信号 %+v\n", sig)
+
 	go func() {
 		<-quit
 		zap.S().Info("两次ctrl+c强制退出")
