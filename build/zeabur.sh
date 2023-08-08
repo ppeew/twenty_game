@@ -22,12 +22,11 @@ nohup ./file_web &
 
 ps -ef | grep srv
 ps -ef | grep web
+sleep 10s
 
 cd ../../
 ls
 cat ./us.log
 cat ./uw.log
 
-cat /go/src/twenty_game/us.log
-cat /go/src/twenty_game/uw.log
 echo "finish"
