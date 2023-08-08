@@ -4,7 +4,7 @@ echo "jenkins-build start"
 cd ~/twenty_game/cmd/Game-user_srv
 go build -o user_srv main.go
 sleep 2s
-nohup ./user_srv > ../../us.log 2>&1 &
+nohup ./user_srv &> ../../us.log &
 
 cd ~/twenty_game/cmd/Game-game_srv
 go build -o game_srv main.go
