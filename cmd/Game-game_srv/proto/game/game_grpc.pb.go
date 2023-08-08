@@ -35,8 +35,8 @@ type GameClient interface {
 	GetRanks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RanksResponse, error)
 	// 更新排行榜
 	UpdateRanks(ctx context.Context, in *UpdateRanksInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// 查询所有房间
-	SearchAllRoom(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllRoomInfo, error)
+	// 查询所有房间(分页)
+	SearchAllRoom(ctx context.Context, in *GetPageInfo, opts ...grpc.CallOption) (*AllRoomInfo, error)
 	// 设置全局房间
 	SetGlobalRoom(ctx context.Context, in *RoomInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 删除房间
@@ -125,7 +125,7 @@ func (c *gameClient) UpdateRanks(ctx context.Context, in *UpdateRanksInfo, opts 
 	return out, nil
 }
 
-func (c *gameClient) SearchAllRoom(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllRoomInfo, error) {
+func (c *gameClient) SearchAllRoom(ctx context.Context, in *GetPageInfo, opts ...grpc.CallOption) (*AllRoomInfo, error) {
 	out := new(AllRoomInfo)
 	err := c.cc.Invoke(ctx, "/game.Game/SearchAllRoom", in, out, opts...)
 	if err != nil {
@@ -181,8 +181,8 @@ type GameServer interface {
 	GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error)
 	// 更新排行榜
 	UpdateRanks(context.Context, *UpdateRanksInfo) (*emptypb.Empty, error)
-	// 查询所有房间
-	SearchAllRoom(context.Context, *emptypb.Empty) (*AllRoomInfo, error)
+	// 查询所有房间(分页)
+	SearchAllRoom(context.Context, *GetPageInfo) (*AllRoomInfo, error)
 	// 设置全局房间
 	SetGlobalRoom(context.Context, *RoomInfo) (*emptypb.Empty, error)
 	// 删除房间
@@ -220,7 +220,7 @@ func (UnimplementedGameServer) GetRanks(context.Context, *emptypb.Empty) (*Ranks
 func (UnimplementedGameServer) UpdateRanks(context.Context, *UpdateRanksInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateRanks not implemented")
 }
-func (UnimplementedGameServer) SearchAllRoom(context.Context, *emptypb.Empty) (*AllRoomInfo, error) {
+func (UnimplementedGameServer) SearchAllRoom(context.Context, *GetPageInfo) (*AllRoomInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchAllRoom not implemented")
 }
 func (UnimplementedGameServer) SetGlobalRoom(context.Context, *RoomInfo) (*emptypb.Empty, error) {
@@ -390,7 +390,7 @@ func _Game_UpdateRanks_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Game_SearchAllRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(GetPageInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -402,7 +402,7 @@ func _Game_SearchAllRoom_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/game.Game/SearchAllRoom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).SearchAllRoom(ctx, req.(*emptypb.Empty))
+		return srv.(GameServer).SearchAllRoom(ctx, req.(*GetPageInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }

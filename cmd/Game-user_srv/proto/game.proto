@@ -23,15 +23,21 @@ service Game{
   //更新排行榜
   rpc UpdateRanks(UpdateRanksInfo)returns(google.protobuf.Empty);
 
-
-  //查询所有房间
-  rpc SearchAllRoom(google.protobuf.Empty)returns(AllRoomInfo);
+  //查询所有房间(分页)
+  rpc SearchAllRoom(GetPageInfo)returns(AllRoomInfo);
   //设置全局房间
   rpc SetGlobalRoom(RoomInfo)returns (google.protobuf.Empty);
   //删除房间
   rpc DeleteRoom(RoomIDInfo)returns (google.protobuf.Empty);
   //查询房间
   rpc SearchRoom(RoomIDInfo)returns (RoomInfo);
+
+  // TODO 添加用户使用道具(扣减user_and_item表道具数量)
+}
+
+message GetPageInfo{
+  uint32 PageIndex=1;
+  uint32 pageSize=2;
 }
 
 message RecordRoomServerInfo{

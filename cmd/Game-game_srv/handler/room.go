@@ -8,6 +8,8 @@ import (
 	"game_srv/global"
 	"game_srv/model"
 	"game_srv/proto/game"
+	"strconv"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 
@@ -17,16 +19,19 @@ import (
 var RoomKey = "Game:Room"
 
 // 查询所有房间
-func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*game.AllRoomInfo, error) {
+func (s *GameServer) SearchAllRoom(ctx context.Context, in *game.GetPageInfo) (*game.AllRoomInfo, error) {
 	ret := &game.AllRoomInfo{}
 	//keys := global.RedisDB.Keys(ctx, "Game:roomID*")
-	keys := global.RedisDB.HGetAll(ctx, RoomKey)
-	if keys.Err() != nil {
-		return nil, keys.Err()
-	}
-	for _, value := range keys.Val() {
+	//keys := global.RedisDB.HGetAll(ctx, RoomKey)
+	off := (in.PageIndex - 1) * in.PageSize
+	end := off + in.PageSize - 1
+	zRange := global.RedisDB.ZRange(ctx, RoomKey, int64(off), int64(end)) //分页[off,end]，按照需求取
+	for _, data := range zRange.Val() {
+		id, _ := strconv.Atoi(data)
+		get := global.RedisDB.Get(ctx, NameRoom(uint32(id)))
+
 		room := model.Room{}
-		_ = json.Unmarshal([]byte(value), &room)
+		_ = json.Unmarshal([]byte(get.Val()), &room)
 		var users []*game.RoomUser
 		for _, u := range room.Users {
 			users = append(users, &game.RoomUser{
@@ -51,8 +56,8 @@ func (s *GameServer) SearchAllRoom(ctx context.Context, in *emptypb.Empty) (*gam
 
 // 查询某一房间
 func (s *GameServer) SearchRoom(ctx context.Context, in *game.RoomIDInfo) (*game.RoomInfo, error) {
-	//get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
-	get := global.RedisDB.HGet(ctx, RoomKey, NameRoom(in.RoomID))
+	get := global.RedisDB.Get(ctx, NameRoom(in.RoomID))
+	//get := global.RedisDB.HGet(ctx, RoomKey, NameRoom(in.RoomID))
 	if get.Err() == redis.Nil {
 		return nil, errors.New("记录没找到")
 	}
@@ -94,15 +99,20 @@ func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emp
 		RoomName:      in.RoomName,
 	}
 	marshal, _ := json.Marshal(room)
-	//global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
-	global.RedisDB.HSet(ctx, RoomKey, NameRoom(in.RoomID), marshal)
+	//global.RedisDB.HSet(ctx, RoomKey, NameRoom(in.RoomID), marshal)
+	global.RedisDB.ZAdd(ctx, RoomKey, redis.Z{
+		Score:  float64(in.UserNumber) + 1000000.0/float64(time.Now().Unix()), //人数优先，其次先创房先更新
+		Member: in.RoomID,                                                     //存储ID，根据ID去找value
+	})
+	global.RedisDB.Set(ctx, NameRoom(in.RoomID), marshal, 0)
 	return &emptypb.Empty{}, nil
 }
 
 // 删除房间
 func (s *GameServer) DeleteRoom(ctx context.Context, in *game.RoomIDInfo) (*emptypb.Empty, error) {
-	//global.RedisDB.Del(ctx, NameRoom(in.RoomID))
-	global.RedisDB.HDel(ctx, RoomKey, NameRoom(in.RoomID))
+	global.RedisDB.Del(ctx, NameRoom(in.RoomID))
+	global.RedisDB.ZRem(ctx, RoomKey, in.RoomID) //删除
+	//global.RedisDB.HDel(ctx, RoomKey, NameRoom(in.RoomID))
 	return &emptypb.Empty{}, nil
 }
 

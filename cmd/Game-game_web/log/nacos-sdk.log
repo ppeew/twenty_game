@@ -147,3 +147,4 @@
 2023-08-03T23:42:12.105+0800	[31mERROR[0m	security/security_proxy.go:84	login has error Post "http://192.168.159.134:8848/nacos/v1/auth/users/login": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
 2023-08-03T23:46:08.263+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\game_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\game_web\cache>
 2023-08-06T00:55:40.356+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\game_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\game_web\cache>
+2023-08-08T14:53:06.401+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\Game-game_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\Game-game_web\cache>

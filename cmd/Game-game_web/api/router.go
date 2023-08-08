@@ -15,7 +15,6 @@ import (
 	"github.com/go-resty/resty/v2"
 
 	"github.com/gin-gonic/gin"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // CHAN 房间号对应创建读取协程的管道
@@ -39,7 +38,12 @@ func GetConnInfo(ctx *gin.Context) {
 
 // GetRoomList 获取所有的房间
 func GetRoomList(ctx *gin.Context) {
-	allRoom, err := global.GameSrvClient.SearchAllRoom(context.Background(), &emptypb.Empty{})
+	index, _ := strconv.Atoi(ctx.DefaultQuery("pageIndex", "1"))
+	size, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "5"))
+	allRoom, err := global.GameSrvClient.SearchAllRoom(context.Background(), &game_proto.GetPageInfo{
+		PageIndex: uint32(index),
+		PageSize:  uint32(size),
+	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"err": err.Error(),
