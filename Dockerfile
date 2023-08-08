@@ -35,5 +35,5 @@ RUN cd twenty_game/cmd/Game-process_web \
 RUN cd twenty_game/cmd/Game-store_web  \
     && go build -o store_web main.go
 
-CMD ["twenty_game/build/zeabur.sh"]
+#CMD ["sh", "twenty_game/build/zeabur.sh"]
 
