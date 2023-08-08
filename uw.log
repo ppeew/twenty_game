@@ -1,0 +1,16 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /health                   --> user_web/initialize.InitRouters.func1 (3 handlers)
+[GIN-debug] POST   /v1/register              --> user_web/api.UserRegister (4 handlers)
+[GIN-debug] POST   /v1/login                 --> user_web/api.UserLogin (4 handlers)
+[GIN-debug] PUT    /v1/modify                --> user_web/api.UserUpdate (5 handlers)
+[GIN-debug] GET    /v1/search                --> user_web/api.GetUserInfo (4 handlers)
+[GIN-debug] GET    /v1/getNickname           --> user_web/api.GetRandomNickName (4 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :45759
+2023-08-08T12:22:46.535+0800	INFO	Game-user_web/main.go:55	释放资源完毕，退出

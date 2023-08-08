@@ -20,6 +20,6 @@
     "consul":{
         "host":"139.159.234.134",
         "port":8500,
-        "name":"process-web"
+        "name":"store-web"
     }
 }

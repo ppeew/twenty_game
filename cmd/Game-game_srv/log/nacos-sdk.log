@@ -71,3 +71,17 @@
 2023-08-03T23:44:26.926+0800	[31mERROR[0m	config_client/config_client.go:216	get config from cache  error:failed to read config cache file:C:\Users\22378\GolandProjects\twenty-game\srv\game_srv\cache\config\game-srv.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e,err:open C:\Users\22378\GolandProjects\twenty-game\srv\game_srv\cache\config\game-srv.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e: The system cannot find the path specified.  
 2023-08-03T23:45:03.430+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\srv\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\srv\game_srv\cache>
 2023-08-06T00:55:31.693+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\game_srv\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\game_srv\cache>
+2023-08-07T13:18:04.544+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-07T13:19:22.357+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-07T13:20:44.052+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-07T13:26:20.817+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-07T13:33:48.112+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-07T15:35:50.900+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-07T22:22:46.907+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-07T22:26:38.449+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-08T00:33:38.840+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-08T00:37:08.895+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-08T11:51:00.144+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-08T11:55:21.605+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-08T12:10:04.301+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>
+2023-08-08T12:22:19.918+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-game_srv/log>   cacheDir:</root/twenty_game/cmd/Game-game_srv/cache>

@@ -1,2 +1,16 @@
 2023-08-03T23:45:50.889+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\web\file_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\web\file_web\cache>
 2023-08-06T00:55:24.065+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\file_web\log>   cacheDir:<C:\Users\22378\GolandProjects\twenty-game\cmd\file_web\cache>
+2023-08-07T13:18:21.457+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-07T13:19:24.356+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-07T13:20:45.037+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-07T13:26:21.799+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-07T13:33:49.081+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-07T15:35:51.907+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-07T22:22:54.970+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-07T22:26:45.443+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-08T00:33:46.729+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-08T00:37:16.029+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-08T11:51:07.479+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-08T11:55:28.568+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-08T12:10:11.404+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
+2023-08-08T12:22:26.949+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:</root/twenty_game/cmd/Game-file_web/log>   cacheDir:</root/twenty_game/cmd/Game-file_web/cache>
