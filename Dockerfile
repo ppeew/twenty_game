@@ -15,22 +15,22 @@ RUN pwd
 RUN cd twenty_game && ls
 
 RUN cd twenty_game/cmd/Game-user_srv  \
-    && go build -o user_srv main.go  \
+    && go build -o user_srv main.go
 
 RUN cd twenty_game/cmd/Game-game_srv  \
-    && go build -o game_srv main.go  \
+    && go build -o game_srv main.go
 
 RUN cd twenty_game/cmd/Game-game_web  \
-    && go build -o game_web main.go  \
+    && go build -o game_web main.go
 
 RUN cd twenty_game/cmd/Game-user_web  \
-    && go build -o user_web main.go  \
+    && go build -o user_web main.go
 
 RUN cd twenty_game/cmd/Game-file_web \
-    && go build -o file_web main.go \
+    && go build -o file_web main.go
 
 RUN cd twenty_game/cmd/Game-process_web \
-    && go build -o process_web main.go \
+    && go build -o process_web main.go
 
 RUN cd twenty_game/cmd/Game-store_web  \
     && go build -o store_web main.go
