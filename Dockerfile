@@ -10,14 +10,15 @@ ENV GOPROXY https://goproxy.io
 
 WORKDIR $GOPATH/src
 COPY . .
-RUN go mod tidy
+RUN pwd
+RUN ls
+#RUN go mod init
+#RUN go mod tidy
 
 #RUN go build -o main .
 #CMD ["./main", "&"]
 
 RUN echo "zeabur-build start"
-RUN pwd
-RUN ls
 RUN cd cmd/Game-user_srv
 RUN go build -o user_srv main.go
 CMD nohup ./user_srv > ../../us.log 2>&1 &
