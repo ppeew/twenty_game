@@ -24,6 +24,6 @@ ps -ef | grep srv
 ps -ef | grep web
 
 cd ../../
-cat ./twenty_game/us.log
-cat ./twenty_game/uw.log
+cat ./us.log
+cat ./uw.log
 echo "finish"
