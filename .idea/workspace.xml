@@ -5,24 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="优化用户体验">
-      <change afterPath="$PROJECT_DIR$/cmd/Game-game_srv/tests/redis_room_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-file_web/config-pro2.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-game_srv/config-pro2.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-game_web/config-pro2.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-process_web/config-pro2.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-store_web/config-pro2.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config-pro2.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-user_web/config-pro2.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/handler/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/handler/room.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/api/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/proto/game/game_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/proto/game/game.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/proto/game/game.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/proto/game/game_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/proto/game/game_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/log/nacos-sdk.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/config.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,31 +46,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/22378/GolandProjects/twenty-game/cmd/Game-user_srv/proto",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "settings.editor.selected.configurable": "preferences.externalDependencies",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/22378/GolandProjects/twenty-game/cmd/Game-file_web&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.externalDependencies&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-user_srv\proto" />
-      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-process_web\proto" />
-      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-game_web\proto" />
-      <recent name="C:\Users\22378\GolandProjects\twenty-game\web\process_web\proto" />
-      <recent name="C:\Users\22378\GolandProjects\twenty-game\web\game_web\proto" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-file_web" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-game_srv" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-game_web" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-process_web" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-user_web" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\22378\GolandProjects\twenty-game\build" />
@@ -82,7 +80,15 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\web\store_web" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 测试.game_srv/tests 中的 TestUpdateRedisRoom">
+  <component name="RunManager" selected="Go 构建.go build main.go (1)">
+    <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/cmd/Game-process_web" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/Game-process_web/main.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build main.go (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/user_web" />
@@ -107,14 +113,6 @@
       <filePath value="$PROJECT_DIR$/cmd/Game-game_web/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/cmd/user_srv" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/cmd/user_srv/main.go" />
-      <method v="2" />
-    </configuration>
     <configuration name="game_srv/tests 中的 TestUpdateRedisRoom" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/Game-game_srv/tests" />
@@ -129,11 +127,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build main.go (1)" />
         <item itemvalue="Go 测试.game_srv/tests 中的 TestUpdateRedisRoom" />
         <item itemvalue="Go 构建.go build main.go (3)" />
         <item itemvalue="Go 构建.go build main.go (5)" />
         <item itemvalue="Go 构建.go build main.go (2)" />
-        <item itemvalue="Go 构建.go build main.go" />
       </list>
     </recent_temporary>
   </component>
@@ -146,7 +144,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>

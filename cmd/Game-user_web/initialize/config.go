@@ -16,10 +16,21 @@ func GetEnvInfo(env string) bool {
 	return viper.GetBool(env)
 }
 
+func GetEnvToInt(env string) int {
+	viper.AutomaticEnv()
+	return viper.GetInt(env)
+}
+
 func InitConfig() {
 	v := viper.New()
 	global.DEBUG = GetEnvInfo("PPEEW_DEBUG")
-	fileName := "config-pro.yaml"
+	var fileName string
+	switch GetEnvToInt("Server") {
+	case 1:
+		fileName = "config-pro.yaml"
+	case 2:
+		fileName = "config-pro.yaml"
+	}
 	if global.DEBUG {
 		fileName = "config-debug.yaml"
 	}
