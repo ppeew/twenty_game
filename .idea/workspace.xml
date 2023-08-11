@@ -4,23 +4,16 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="优化用户体验">
-      <change afterPath="$PROJECT_DIR$/cmd/Game-file_web/config-pro2.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-game_srv/config-pro2.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-game_web/config-pro2.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-process_web/config-pro2.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-store_web/config-pro2.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config-pro2.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-user_web/config-pro2.yaml" afterDir="false" />
+    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="优化">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/log/nacos-sdk.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/jenkins-build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/jenkins-build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fw.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gs.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gw.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pw.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sw.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/us.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uw.log" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +73,7 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\web\store_web" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build main.go (1)">
+  <component name="RunManager" selected="Go 构建.go build main.go">
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/Game-process_web" />
@@ -91,10 +84,10 @@
     </configuration>
     <configuration name="go build main.go (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/cmd/user_web" />
+      <working_directory value="$PROJECT_DIR$/cmd/Game-store_web" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/cmd/user_web/main.go" />
+      <filePath value="$PROJECT_DIR$/cmd/Game-store_web/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build main.go (3)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -105,12 +98,12 @@
       <filePath value="$PROJECT_DIR$/cmd/Game-game_srv/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build main.go (5)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/cmd/Game-game_web" />
+      <working_directory value="$PROJECT_DIR$/cmd/Game-hall_web" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/cmd/Game-game_web/main.go" />
+      <filePath value="$PROJECT_DIR$/cmd/Game-hall_web/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="game_srv/tests 中的 TestUpdateRedisRoom" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -127,11 +120,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build main.go" />
+        <item itemvalue="Go 构建.go build main.go (2)" />
         <item itemvalue="Go 构建.go build main.go (1)" />
         <item itemvalue="Go 测试.game_srv/tests 中的 TestUpdateRedisRoom" />
         <item itemvalue="Go 构建.go build main.go (3)" />
-        <item itemvalue="Go 构建.go build main.go (5)" />
-        <item itemvalue="Go 构建.go build main.go (2)" />
       </list>
     </recent_temporary>
   </component>
@@ -165,7 +158,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="逻辑修改" />
     <MESSAGE value="优化用户体验" />
-    <option name="LAST_COMMIT_MESSAGE" value="优化用户体验" />
+    <MESSAGE value="优化" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

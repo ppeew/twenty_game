@@ -1,2 +1,0 @@
-2023/08/08 12:22:46 ERROR: [Consul resolver] Couldn't update client connection. error={bad resolver state}
-2023-08-08T12:22:46.534+0800	INFO	Game-process_web/main.go:65	释放资源完毕，退出
