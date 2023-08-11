@@ -29,6 +29,10 @@ cd ~/twenty_game/cmd/Game-store_web
 go build -o store_web main.go
 nohup ./store_web > ../../sw.log 2>&1 &
 
+cd ~/twenty_game/cmd/Game-hall_web
+go build -o hall_web main.go
+nohup ./hall_web > ../../hw.log 2>&1 &
+
 echo "jenkis-build finish"
 
 
