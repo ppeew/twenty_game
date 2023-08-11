@@ -20,7 +20,7 @@ func main() {
 	initialize.InitConfig()
 	initialize.InitSrvConn()
 	initialize.InitSentinel()
-	initialize.GetConsulServer()
+	go initialize.GetConsulServer()
 	routers := initialize.InitRouters()
 	//utils.CheckGoRoutines()
 
