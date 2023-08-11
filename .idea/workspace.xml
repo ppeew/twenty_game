@@ -7,13 +7,8 @@
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="优化">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/jenkins-build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/jenkins-build.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fw.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gs.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gw.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pw.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sw.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/us.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uw.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/initialize/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/initialize/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/log/nacos-sdk.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/log/nacos-sdk.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +68,7 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\web\store_web" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build main.go">
+  <component name="RunManager" selected="Go 构建.go build main.go (2)">
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/Game-process_web" />
@@ -120,8 +115,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 构建.go build main.go" />
         <item itemvalue="Go 构建.go build main.go (2)" />
+        <item itemvalue="Go 构建.go build main.go" />
         <item itemvalue="Go 构建.go build main.go (1)" />
         <item itemvalue="Go 测试.game_srv/tests 中的 TestUpdateRedisRoom" />
         <item itemvalue="Go 构建.go build main.go (3)" />
