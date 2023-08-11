@@ -29,7 +29,7 @@ func InitConfig() {
 	case 1:
 		fileName = "config-pro.yaml"
 	case 2:
-		fileName = "config-pro.yaml"
+		fileName = "config-pro2.yaml"
 	}
 	if global.DEBUG {
 		fileName = "config-debug.yaml"
