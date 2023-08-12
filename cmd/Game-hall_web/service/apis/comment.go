@@ -43,7 +43,7 @@ func AddComment(ctx *gin.Context) {
 
 	c := domains.Comments{
 		UserID:  int(userID),
-		Time:    time.Now(),
+		Time:    time.Now().Format("2006-01-02 15:04"),
 		Content: content,
 	}
 	commentDao := dao.CommentDao{}
@@ -69,7 +69,7 @@ func UpdateComment(ctx *gin.Context) {
 	c := domains.Comments{
 		ID:      req.ID,
 		UserID:  int(userID),
-		Time:    time.Now(),
+		Time:    time.Now().Format("2006-01-02 15:04"),
 		Content: req.Content,
 	}
 	commentDao := dao.CommentDao{}
