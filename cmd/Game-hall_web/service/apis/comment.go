@@ -36,15 +36,17 @@ func AddComment(ctx *gin.Context) {
 	userID := claims.(*model.CustomClaims).ID
 
 	content := ctx.PostForm("content")
-	if content == "" {
-		ctx.Status(http.StatusBadRequest)
+	nickName := ctx.PostForm("nickName")
+	if content == "" || nickName == "" {
+		ctx.JSON(http.StatusBadRequest, "请求参数错误")
 		return
 	}
 
 	c := domains.Comments{
-		UserID:  int(userID),
-		Time:    time.Now().Format("2006-01-02 15:04"),
-		Content: content,
+		UserID:   int(userID),
+		NickName: nickName,
+		Time:     time.Now().Format("2006-01-02 15:04"),
+		Content:  content,
 	}
 	commentDao := dao.CommentDao{}
 	err := commentDao.AddComment(&c)
