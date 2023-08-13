@@ -14,33 +14,30 @@ type BaseModel struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-type Items struct {
-	Apple  uint32
-	Banana uint32
-}
-
-type UserItem struct {
-	BaseModel
-	UserID  uint32 `gorm:"index;unique"` //外键，对应用户id
-	Gold    uint32
-	Diamond uint32
-	Apple   uint32
-	Banana  uint32
-}
-
 // redis存储
-type User struct {
+type RoomUser struct {
 	ID    uint32 `json:"ID"`
 	Ready bool   `json:"Ready"`
 }
 
 type Room struct {
-	RoomID        uint32  `json:"roomID"`
-	MaxUserNumber uint32  `json:"maxUserNumber"`
-	GameCount     uint32  `json:"gameCount"`
-	UserNumber    uint32  `json:"userNumber"`
-	RoomOwner     uint32  `json:"roomOwner"`
-	RoomWait      bool    `json:"roomWait"`
-	Users         []*User `json:"users"`
-	RoomName      string  `json:"roomName"`
+	RoomID        uint32      `json:"roomID"`
+	MaxUserNumber uint32      `json:"maxUserNumber"`
+	GameCount     uint32      `json:"gameCount"`
+	UserNumber    uint32      `json:"userNumber"`
+	RoomOwner     uint32      `json:"roomOwner"`
+	RoomWait      bool        `json:"roomWait"`
+	Users         []*RoomUser `json:"users"`
+	RoomName      string      `json:"roomName"`
+}
+
+type User struct {
+	BaseModel
+	UserName string `gorm:"index;unique;not null"`
+	Password string
+	Nickname string `gorm:"index;not null"`
+	Gender   bool
+	Image    string `gorm:"not null;default: /"` //路径存储
+	Good     int    `gorm:"not null;comment:金币"`
+	Diamond  int    `gorm:"not null;comment:钻石"`
 }
