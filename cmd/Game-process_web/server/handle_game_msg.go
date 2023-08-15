@@ -265,6 +265,12 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 				//物品信息发到物品管道
 				message.UserID = userID
 				game.ItemChan <- message
+			case my_struct.GetState:
+				//获取状态
+				global.UsersConn[userID].OutChanWrite(response.MessageResponse{
+					MsgType:      response.GetStateResponseType,
+					GetStateInfo: &response.GetStateResponse{State: 1},
+				})
 			//case model.CheckHealthMsg:
 			//	//心脏包
 			//	message.UserID = ShopID

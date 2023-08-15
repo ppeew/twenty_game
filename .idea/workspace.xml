@@ -6,8 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="优化">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/initialize/consul_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/consul_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/message.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/message.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/response/message_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/my_struct/response/message_resp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/server/handle_game_msg.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/server/handle_game_msg.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/server/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/server/room.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +46,7 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
     &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/22378/GolandProjects/twenty-game/cmd/Game-file_web&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/22378/GolandProjects/twenty-game/cmd/Game-game_web/proto&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.externalDependencies&quot;,
@@ -53,11 +55,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-game_web\proto" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-process_web\proto" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-user_srv\proto" />
       <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-file_web" />
       <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-game_srv" />
-      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-game_web" />
-      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-process_web" />
-      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-user_web" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\22378\GolandProjects\twenty-game\build" />
@@ -67,7 +69,7 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\web\store_web" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build main.go (2)">
+  <component name="RunManager" selected="Go 构建.go build main.go (4)">
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/Game-process_web" />
@@ -92,6 +94,14 @@
       <filePath value="$PROJECT_DIR$/cmd/Game-game_srv/main.go" />
       <method v="2" />
     </configuration>
+    <configuration name="go build main.go (4)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/cmd/Game-game_web" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/Game-game_web/main.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/Game-hall_web" />
@@ -100,25 +110,13 @@
       <filePath value="$PROJECT_DIR$/cmd/Game-hall_web/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="game_srv/tests 中的 TestUpdateRedisRoom" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/cmd/Game-game_srv/tests" />
-      <root_directory value="$PROJECT_DIR$/cmd/Game-game_srv" />
-      <kind value="PACKAGE" />
-      <package value="game_srv/tests" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestUpdateRedisRoom\E$" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build main.go (4)" />
+        <item itemvalue="Go 构建.go build main.go (3)" />
         <item itemvalue="Go 构建.go build main.go (2)" />
         <item itemvalue="Go 构建.go build main.go" />
         <item itemvalue="Go 构建.go build main.go (1)" />
-        <item itemvalue="Go 测试.game_srv/tests 中的 TestUpdateRedisRoom" />
-        <item itemvalue="Go 构建.go build main.go (3)" />
       </list>
     </recent_temporary>
   </component>

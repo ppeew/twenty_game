@@ -28,6 +28,7 @@ const (
 	// 通用的消息
 	CheckHealthMsg = 100 + iota //健康检查消息
 	ChatMsg                     //聊天消息
+	GetState                    //重连查看状态
 )
 
 const (
