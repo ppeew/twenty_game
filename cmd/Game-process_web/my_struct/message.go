@@ -45,6 +45,7 @@ const (
 	ItemMsg           = 300 + iota //使用游戏道具消息
 	GrabCardMsg                    //抢卡消息
 	UseSpecialCardMsg              //使用特殊卡消息
+	GetGameMsg
 )
 
 type ChatMsgData struct {

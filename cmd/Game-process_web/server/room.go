@@ -150,7 +150,7 @@ func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 			//zap.S().Infof("[ReadRoomUserMsg]:读到%d用户信息了", userID)
 			if message.Type == my_struct.GetState {
 				//获取状态
-				global.UsersConn[userID].OutChanWrite(response.MessageResponse{
+				global.SendMsgToUser(global.UsersConn[userID], response.MessageResponse{
 					MsgType:      response.GetStateResponseType,
 					GetStateInfo: &response.GetStateResponse{State: 0},
 				})
