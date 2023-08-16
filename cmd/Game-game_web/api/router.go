@@ -26,7 +26,10 @@ func GetConnInfo(ctx *gin.Context) {
 	userID := claims.(*model.CustomClaims).ID
 	info, err := global.GameSrvClient.GetConnData(context.Background(), &game_proto.UserIDInfo{Id: userID})
 	if err != nil {
-		ctx.Status(http.StatusInternalServerError)
+		ctx.JSON(http.StatusOK, gin.H{
+			"serverInfo": "",
+			"roomID":     "",
+		})
 		return
 	}
 	split := strings.Split(info.ServerInfo, "?")
