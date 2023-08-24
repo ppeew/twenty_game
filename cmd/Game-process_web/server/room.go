@@ -103,6 +103,7 @@ func (room *RoomStruct) RunRoom() (*Data, bool) {
 				for id := range room.Users {
 					global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{Id: id})
 				}
+				global.ConnectCHAN[room.RoomID] = nil
 				return nil, true
 			} else if msg == GameStart {
 				room.RoomWait = false

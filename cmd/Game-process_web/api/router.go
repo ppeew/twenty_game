@@ -130,6 +130,11 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		return
 	}
+	//记录用户连接信息
+	global.GameSrvClient.RecordConnData(context.Background(), &game.RecordConnInfo{
+		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
+		Id:         userID,
+	})
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "进房成功",
 	})
