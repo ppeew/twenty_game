@@ -182,7 +182,6 @@ func (room *RoomStruct) CheckClientHealth(ctx context.Context) {
 			for _, info := range room.Users {
 				value, ok := global.UsersConn.Load(info.ID)
 				if ok {
-
 					ws := value.(*global.WSConn)
 					err := ws.OutChanWrite(response.MessageResponse{MsgType: response.CheckHealthType})
 					//检查用户连接，断开则自动离开房间
@@ -192,6 +191,12 @@ func (room *RoomStruct) CheckClientHealth(ctx context.Context) {
 							UserID:       info.ID,
 							QuitRoomData: my_struct.QuitRoomData{},
 						}
+					}
+				} else {
+					room.MsgChan <- my_struct.Message{
+						Type:         my_struct.QuitRoomMsg,
+						UserID:       info.ID,
+						QuitRoomData: my_struct.QuitRoomData{},
 					}
 				}
 				//if global.UsersConn[info.ID] != nil {

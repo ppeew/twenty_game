@@ -51,7 +51,9 @@ func (ws *WSConn) readMsgLoop() {
 			if data.Type == my_struct.UserIntoMsg {
 				continue
 			}
-			ws.inChan <- data
+			if !ws.isClose {
+				ws.inChan <- data //注意不能往close chan send!
+			}
 		}
 	}
 }
