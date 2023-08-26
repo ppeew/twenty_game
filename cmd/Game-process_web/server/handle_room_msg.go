@@ -37,7 +37,9 @@ func NewDealFunc(room *RoomStruct) map[uint32]dealFunc {
 
 // RoomInfo 房间信息
 func (room *RoomStruct) RoomInfo(message my_struct.Message) {
-	global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
+	value, _ := global.UsersConn.Load(message.UserID)
+	ws := value.(*global.WSConn)
+	global.SendMsgToUser(ws, response.MessageResponse{
 		MsgType:  response.RoomInfoResponseType,
 		RoomInfo: room.MakeRoomResponse(),
 	})
@@ -46,11 +48,13 @@ func (room *RoomStruct) RoomInfo(message my_struct.Message) {
 // QuitRoom 退出房间（房主退出会房主转移）
 func (room *RoomStruct) QuitRoom(message my_struct.Message) {
 	delete(room.Users, message.UserID)
+	value, _ := global.UsersConn.Load(message.UserID)
+	ws := value.(*global.WSConn)
 	//玩家退出，应该从redis删除其服务器连接信息
 	global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
 		Id: message.UserID,
 	})
-	global.UsersConn[message.UserID].CloseConn()
+	ws.CloseConn()
 	room.UserNumber--
 	if room.UserNumber == 0 {
 		//没人了，销毁房间
@@ -63,7 +67,7 @@ func (room *RoomStruct) QuitRoom(message my_struct.Message) {
 		for _, data := range room.Users {
 			if num <= 0 {
 				room.RoomOwner = data.ID
-				global.SendMsgToUser(global.UsersConn[data.ID], response.MessageResponse{
+				global.SendMsgToUser(ws, response.MessageResponse{
 					MsgType: response.MsgResponseType,
 					MsgInfo: &response.MsgResponse{MsgData: "房主是你的了"},
 				})
@@ -99,7 +103,9 @@ func (room *RoomStruct) UpdateRoom(message my_struct.Message) {
 		//先t人
 		if _, ok := room.Users[data.Kicker]; ok {
 			//找到人
-			global.SendMsgToUser(global.UsersConn[data.Kicker], response.MessageResponse{
+			value, _ := global.UsersConn.Load(data.Kicker)
+			ws := value.(*global.WSConn)
+			global.SendMsgToUser(ws, response.MessageResponse{
 				MsgType: response.KickerResponseType,
 				KickerInfo: &response.KickerResponse{
 					ID: data.Kicker,
@@ -124,8 +130,9 @@ func (room *RoomStruct) UpdateRoom(message my_struct.Message) {
 			room.RoomOwner = data.Owner
 		}
 	}
-
-	global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
+	value, _ := global.UsersConn.Load(message.UserID)
+	ws := value.(*global.WSConn)
+	global.SendMsgToUser(ws, response.MessageResponse{
 		MsgType: response.MsgResponseType,
 		MsgInfo: &response.MsgResponse{
 			MsgData: "更新房间成功",
@@ -151,8 +158,10 @@ func (room *RoomStruct) UpdateUserReadyState(message my_struct.Message) {
 
 // BeginGame 开始游戏
 func (room *RoomStruct) BeginGame(message my_struct.Message) {
+	value, _ := global.UsersConn.Load(message.UserID)
+	ws := value.(*global.WSConn)
 	if message.UserID != room.RoomOwner {
-		global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
+		global.SendMsgToUser(ws, response.MessageResponse{
 			MsgType: response.MsgResponseType,
 			MsgInfo: &response.MsgResponse{
 				MsgData: fmt.Sprintf("玩家%d不是房主，不能开始游戏", message.UserID),
@@ -161,7 +170,7 @@ func (room *RoomStruct) BeginGame(message my_struct.Message) {
 		return
 	}
 	if room.UserNumber != room.MaxUserNumber {
-		global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
+		global.SendMsgToUser(ws, response.MessageResponse{
 			MsgType: response.MsgResponseType,
 			MsgInfo: &response.MsgResponse{
 				MsgData: "房间没满人,请改房间人数开始游戏",
@@ -171,7 +180,7 @@ func (room *RoomStruct) BeginGame(message my_struct.Message) {
 	}
 	for _, data := range room.Users {
 		if data.Ready == false && data.ID != room.RoomOwner {
-			global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
+			global.SendMsgToUser(ws, response.MessageResponse{
 				MsgType: response.MsgResponseType,
 				MsgInfo: &response.MsgResponse{
 					MsgData: "还有玩家未准备，快T了他",
@@ -204,7 +213,9 @@ func (room *RoomStruct) ChatProcess(message my_struct.Message) {
 }
 
 func (room *RoomStruct) CheckHealth(message my_struct.Message) {
-	global.SendMsgToUser(global.UsersConn[message.UserID], response.MessageResponse{
+	value, _ := global.UsersConn.Load(message.UserID)
+	ws := value.(*global.WSConn)
+	global.SendMsgToUser(ws, response.MessageResponse{
 		MsgType:         response.CheckHealthType,
 		HealthCheckInfo: &response.HealthCheck{},
 	})

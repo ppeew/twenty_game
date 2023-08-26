@@ -41,7 +41,9 @@ func (game *GameStruct) HandleAddCard(msg my_struct.Message) {
 }
 
 func (game *GameStruct) HandleUpdateCard(msg my_struct.Message) {
-	ws := global.UsersConn[msg.UserID]
+	//ws := global.UsersConn[msg.UserID]
+	value, _ := global.UsersConn.Load(msg.UserID)
+	ws := value.(*global.WSConn)
 	data := msg.UseSpecialData.UpdateCardData
 	findUpdateCard := false
 	var findCardNum uint32
@@ -72,12 +74,13 @@ func (game *GameStruct) HandleUpdateCard(msg my_struct.Message) {
 }
 
 func (game *GameStruct) HandleDeleteCard(msg my_struct.Message) {
-	ws := global.UsersConn[msg.UserID]
+	//ws := global.UsersConn[msg.UserID]
+	value, _ := global.UsersConn.Load(msg.UserID)
+	ws := value.(*global.WSConn)
 	data := msg.UseSpecialData.DeleteCardData
 	findDelCard := false
-	//zap.S().Infof("[HandleDeleteCard]:被删除卡的玩家是%d", data.TargetUserID)
 	if game.Users[data.TargetUserID] == nil {
-		global.SendErrToUser(global.UsersConn[msg.UserID], "[HandleDeleteCard]", errors.New("未知的玩家"))
+		global.SendErrToUser(ws, "[HandleDeleteCard]", errors.New("未知的玩家"))
 		return
 	}
 	var delCardNum uint32
@@ -112,7 +115,9 @@ func (game *GameStruct) HandleDeleteCard(msg my_struct.Message) {
 }
 
 func (game *GameStruct) HandleChangeCard(msg my_struct.Message) {
-	ws := global.UsersConn[msg.UserID]
+	//ws := global.UsersConn[msg.UserID]
+	value, _ := global.UsersConn.Load(msg.UserID)
+	ws := value.(*global.WSConn)
 	data := msg.UseSpecialData.ChangeCardData
 	//先找到两卡
 	findUserCard := false
@@ -171,7 +176,9 @@ func (game *GameStruct) ProcessHealthMsg(todo context.Context) {
 			game.wg.Done()
 			return
 		case msg := <-game.HealthChan:
-			global.SendMsgToUser(global.UsersConn[msg.UserID], response.MessageResponse{
+			value, _ := global.UsersConn.Load(msg.UserID)
+			ws := value.(*global.WSConn)
+			global.SendMsgToUser(ws, response.MessageResponse{
 				MsgType:         response.CheckHealthType,
 				HealthCheckInfo: &response.HealthCheck{},
 			})
@@ -251,11 +258,13 @@ func (game *GameStruct) ForUserIntoRoom(ctx context.Context) {
 // 读取用户信息协程
 func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 	for true {
+		value, _ := global.UsersConn.Load(userID)
+		ws := value.(*global.WSConn)
 		select {
 		case <-ctx.Done():
 			game.wg.Done()
 			return
-		case message := <-global.UsersConn[userID].InChanRead():
+		case message := <-ws.InChanRead():
 			switch message.Type {
 			case my_struct.ChatMsg:
 				//聊天信息发到聊天管道
@@ -266,10 +275,10 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 				message.UserID = userID
 				game.ItemChan <- message
 			case my_struct.GetGameMsg:
-				global.SendMsgToUser(global.UsersConn[userID], CardModelToResponse(game))
+				global.SendMsgToUser(ws, CardModelToResponse(game))
 			case my_struct.GetState:
 				//获取状态
-				global.SendMsgToUser(global.UsersConn[userID], response.MessageResponse{
+				global.SendMsgToUser(ws, response.MessageResponse{
 					MsgType:      response.GetStateResponseType,
 					GetStateInfo: &response.GetStateResponse{State: 1},
 				})
@@ -307,7 +316,9 @@ func (game *GameStruct) DropSpecialCard(userID uint32, specialID uint32) (bool, 
 
 func BroadcastToAllGameUsers(game *GameStruct, msg response.MessageResponse) {
 	for userID := range game.Users {
-		err := global.UsersConn[userID].OutChanWrite(msg)
+		value, _ := global.UsersConn.Load(userID)
+		ws := value.(*global.WSConn)
+		err := ws.OutChanWrite(msg)
 		if err != nil {
 			//global.UsersConn[ShopID].CloseConn()
 		}

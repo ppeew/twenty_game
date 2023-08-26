@@ -169,7 +169,9 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 	for true {
 		select {
 		case msg := <-game.CommonChan:
-			userInfo := global.UsersConn[msg.UserID]
+			//userInfo := global.UsersConn[msg.UserID]
+			value, _ := global.UsersConn.Load(msg.UserID)
+			userInfo := value.(*global.WSConn)
 			if msg.Type == my_struct.GrabCardMsg {
 				data := msg.GetCardData
 				isOK := false
@@ -237,7 +239,9 @@ func (game *GameStruct) DoHandleSpecialCard(min, max int) {
 	for true {
 		select {
 		case msg := <-game.CommonChan:
-			userInfo := global.UsersConn[msg.UserID]
+			value, _ := global.UsersConn.Load(msg.UserID)
+			userInfo := value.(*global.WSConn)
+			//userInfo := global.UsersConn[msg.UserID]
 			if msg.Type == my_struct.UseSpecialCardMsg {
 				//只有这类型的消息才处理
 				isFind, cardType := game.DropSpecialCard(msg.UserID, msg.UseSpecialData.SpecialCardID)
@@ -260,7 +264,9 @@ func (game *GameStruct) DoScoreCount() {
 		total := len(info.BaseCards)
 		if total > 6 {
 			info.BaseCards = info.BaseCards[total-6:]
-			global.SendMsgToUser(global.UsersConn[id], response.MessageResponse{
+			value, _ := global.UsersConn.Load(id)
+			ws := value.(*global.WSConn)
+			global.SendMsgToUser(ws, response.MessageResponse{
 				MsgType: response.MsgResponseType,
 				MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("卡没了噢爆了！")},
 			})
@@ -272,9 +278,11 @@ func (game *GameStruct) DoScoreCount() {
 		}
 		if sum/20 == 1 {
 			info.BaseCards = make([]*my_struct.BaseCard, 0)
+			value, _ := global.UsersConn.Load(id)
+			ws := value.(*global.WSConn)
 			if sum%20 == 0 {
 				info.Score += TwentyAddScore
-				global.SendMsgToUser(global.UsersConn[id], response.MessageResponse{
+				global.SendMsgToUser(ws, response.MessageResponse{
 					MsgType: response.MsgResponseType,
 					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("得分啦！")},
 				})
@@ -285,7 +293,7 @@ func (game *GameStruct) DoScoreCount() {
 					CardID: game.MakeCardID,
 					Number: sum % 20,
 				})
-				global.SendMsgToUser(global.UsersConn[id], response.MessageResponse{
+				global.SendMsgToUser(ws, response.MessageResponse{
 					MsgType: response.MsgResponseType,
 					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("超出20了！")},
 				})

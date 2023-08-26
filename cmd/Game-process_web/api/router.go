@@ -44,10 +44,13 @@ func ConnSocket(ctx *gin.Context) {
 		})
 		return
 	}
-	if global.UsersConn[userID] != nil {
-		global.UsersConn[userID].CloseConn()
-	}
-	global.UsersConn[userID] = global.InitWebSocket(conn, userID)
+	value, _ := global.UsersConn.LoadAndDelete(userID)
+	value.(*global.WSConn).CloseConn()
+	//if global.UsersConn[userID] != nil {
+	//	global.UsersConn[userID].CloseConn()
+	//}
+	global.UsersConn.Store(userID, global.InitWebSocket(conn, userID))
+	//global.UsersConn[userID] = global.InitWebSocket(conn, userID)
 	global.ConnectCHAN[uint32(roomID)] <- userID
 }
 
