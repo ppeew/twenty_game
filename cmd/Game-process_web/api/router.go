@@ -44,8 +44,10 @@ func ConnSocket(ctx *gin.Context) {
 		})
 		return
 	}
-	value, _ := global.UsersConn.LoadAndDelete(userID)
-	value.(*global.WSConn).CloseConn()
+	value, ok := global.UsersConn.LoadAndDelete(userID)
+	if ok {
+		value.(*global.WSConn).CloseConn()
+	}
 	//if global.UsersConn[userID] != nil {
 	//	global.UsersConn[userID].CloseConn()
 	//}
