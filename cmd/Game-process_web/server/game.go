@@ -200,7 +200,7 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 				} else {
 					global.SendMsgToUser(userInfo, response.MessageResponse{
 						MsgType: response.MsgResponseType,
-						MsgInfo: &response.MsgResponse{MsgData: "没抢到卡~~~"},
+						MsgInfo: &response.MsgResponse{StateType: 1, MsgData: "没抢到卡~~~"},
 					})
 				}
 			} else {
@@ -268,7 +268,7 @@ func (game *GameStruct) DoScoreCount() {
 			ws := value.(*global.WSConn)
 			global.SendMsgToUser(ws, response.MessageResponse{
 				MsgType: response.MsgResponseType,
-				MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("卡没了噢爆了！")},
+				MsgInfo: &response.MsgResponse{StateType: 1, MsgData: fmt.Sprintf("卡没了噢爆了！")},
 			})
 		}
 		//处理分数
@@ -284,7 +284,7 @@ func (game *GameStruct) DoScoreCount() {
 				info.Score += TwentyAddScore
 				global.SendMsgToUser(ws, response.MessageResponse{
 					MsgType: response.MsgResponseType,
-					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("得分啦！")},
+					MsgInfo: &response.MsgResponse{StateType: 1, MsgData: fmt.Sprintf("得分啦！")},
 				})
 			} else {
 				//生成多的数字
@@ -295,7 +295,7 @@ func (game *GameStruct) DoScoreCount() {
 				})
 				global.SendMsgToUser(ws, response.MessageResponse{
 					MsgType: response.MsgResponseType,
-					MsgInfo: &response.MsgResponse{MsgData: fmt.Sprintf("超出20了！")},
+					MsgInfo: &response.MsgResponse{StateType: 1, MsgData: fmt.Sprintf("超出20了！")},
 				})
 			}
 		}
@@ -354,7 +354,7 @@ func (game *GameStruct) RunGame() {
 	//等待用户页面初始化完成
 	BroadcastToAllGameUsers(game, response.MessageResponse{
 		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{MsgData: "游戏2秒后开始！"},
+		MsgInfo: &response.MsgResponse{StateType: 1, MsgData: "游戏2秒后开始！"},
 	})
 	time.Sleep(time.Second * 2)
 	//游戏初始化阶段
@@ -362,14 +362,14 @@ func (game *GameStruct) RunGame() {
 		game.DoFlush()
 		BroadcastToAllGameUsers(game, response.MessageResponse{
 			MsgType: response.MsgResponseType,
-			MsgInfo: &response.MsgResponse{MsgData: "进入抢卡阶段"},
+			MsgInfo: &response.MsgResponse{StateType: 1, MsgData: "进入抢卡阶段"},
 		})
 		time.Sleep(time.Second * 2)
 		game.DoDistributeCard()
 		game.DoListenDistributeCard(10, 14)
 		BroadcastToAllGameUsers(game, response.MessageResponse{
 			MsgType: response.MsgResponseType,
-			MsgInfo: &response.MsgResponse{MsgData: "进入出牌阶段"},
+			MsgInfo: &response.MsgResponse{StateType: 1, MsgData: "进入出牌阶段"},
 		})
 		time.Sleep(time.Second * 2)
 		game.DoHandleSpecialCard(14, 18)

@@ -69,7 +69,7 @@ func (room *RoomStruct) QuitRoom(message my_struct.Message) {
 				room.RoomOwner = data.ID
 				global.SendMsgToUser(ws, response.MessageResponse{
 					MsgType: response.MsgResponseType,
-					MsgInfo: &response.MsgResponse{MsgData: "房主是你的了"},
+					MsgInfo: &response.MsgResponse{StateType: 0, MsgData: "房主是你的了"},
 				})
 				break
 			}
@@ -135,7 +135,8 @@ func (room *RoomStruct) UpdateRoom(message my_struct.Message) {
 	global.SendMsgToUser(ws, response.MessageResponse{
 		MsgType: response.MsgResponseType,
 		MsgInfo: &response.MsgResponse{
-			MsgData: "更新房间成功",
+			StateType: 0,
+			MsgData:   "更新房间成功",
 		},
 	})
 	//更新房间，发送广播
@@ -164,7 +165,8 @@ func (room *RoomStruct) BeginGame(message my_struct.Message) {
 		global.SendMsgToUser(ws, response.MessageResponse{
 			MsgType: response.MsgResponseType,
 			MsgInfo: &response.MsgResponse{
-				MsgData: fmt.Sprintf("玩家%d不是房主，不能开始游戏", message.UserID),
+				StateType: 0,
+				MsgData:   fmt.Sprintf("玩家%d不是房主，不能开始游戏", message.UserID),
 			},
 		})
 		return
@@ -173,7 +175,8 @@ func (room *RoomStruct) BeginGame(message my_struct.Message) {
 		global.SendMsgToUser(ws, response.MessageResponse{
 			MsgType: response.MsgResponseType,
 			MsgInfo: &response.MsgResponse{
-				MsgData: "房间没满人,请改房间人数开始游戏",
+				StateType: 0,
+				MsgData:   "房间没满人,请改房间人数开始游戏",
 			},
 		})
 		return
@@ -183,7 +186,8 @@ func (room *RoomStruct) BeginGame(message my_struct.Message) {
 			global.SendMsgToUser(ws, response.MessageResponse{
 				MsgType: response.MsgResponseType,
 				MsgInfo: &response.MsgResponse{
-					MsgData: "还有玩家未准备，快T了他",
+					StateType: 0,
+					MsgData:   "还有玩家未准备，快T了他",
 				},
 			})
 			return

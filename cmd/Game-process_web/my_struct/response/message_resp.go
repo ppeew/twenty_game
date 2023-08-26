@@ -70,5 +70,6 @@ type HealthCheck struct {
 
 // 用于给前端返回服务器操作的事情，前端显示给用户出来即可
 type MsgResponse struct {
-	MsgData string `json:"msgData"` //消息内容
+	StateType int    `json:"stateType"`
+	MsgData   string `json:"msgData"` //消息内容
 }
