@@ -155,7 +155,11 @@ func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 			return
 		case <-ws.IsDisConn():
 			return
-		case message := <-ws.InChanRead():
+		case message, ok := <-ws.InChanRead():
+			if !ok {
+				//说明close了
+				return
+			}
 			//zap.S().Infof("[ReadRoomUserMsg]:读到%d用户信息了", userID)
 			if message.Type == my_struct.GetState {
 				//获取状态
