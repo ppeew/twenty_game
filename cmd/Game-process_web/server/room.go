@@ -148,6 +148,8 @@ func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 		select {
 		case <-ctx.Done():
 			return
+		case <-ws.IsDisConn():
+			return
 		case message := <-ws.InChanRead():
 			//zap.S().Infof("[ReadRoomUserMsg]:读到%d用户信息了", userID)
 			if message.Type == my_struct.GetState {
@@ -160,8 +162,6 @@ func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 				message.UserID = userID //添加标识，能够识别用户
 				room.MsgChan <- message
 			}
-		case <-ws.IsDisConn():
-			return
 		}
 	}
 }

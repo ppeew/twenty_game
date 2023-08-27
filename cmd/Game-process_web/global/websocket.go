@@ -62,6 +62,8 @@ func (ws *WSConn) readMsgLoop() {
 func (ws *WSConn) writeMsgLoop() {
 	for true {
 		select {
+		case <-ws.closeChan:
+			return
 		case data := <-ws.outChan:
 			err := ws.conn.WriteJSON(data)
 			if err != nil {
