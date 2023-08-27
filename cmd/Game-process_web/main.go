@@ -19,7 +19,7 @@ func main() {
 	initialize.InitConfig()
 	initialize.InitSrvConn()
 	routers := initialize.InitRouters()
-	//utils.CheckGoRoutines()
+	utils.CheckGoRoutines()
 
 	//自动获取可用端口号
 	port, err := utils.GetFreePort()

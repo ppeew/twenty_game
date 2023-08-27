@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 	"net/http"
 	"process_web/forms"
 	"process_web/global"
@@ -45,11 +44,11 @@ func ConnSocket(ctx *gin.Context) {
 		})
 		return
 	}
-	value, ok := global.UsersConn.Load(userID)
-	if ok {
-		zap.S().Infof("[ConnSocket]:正在close用户%d ws", userID)
-		value.(*global.WSConn).CloseConn()
-	}
+	//value, ok := global.UsersConn.Load(userID)
+	//if ok {
+	//	zap.S().Infof("[ConnSocket]:正在close用户%d ws", userID)
+	//	value.(*global.WSConn).CloseConn()
+	//}
 	//if global.UsersConn[userID] != nil {
 	//	global.UsersConn[userID].CloseConn()
 	//}
