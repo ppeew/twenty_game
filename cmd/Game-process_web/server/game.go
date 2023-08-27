@@ -380,7 +380,9 @@ func (game *GameStruct) RunGame() {
 		GameOverInfo: &response.GameOverResponse{},
 	})
 	cancelFunc() //关闭子协程
+	zap.S().Info("[RunGame]:正在等待游戏协程全部关闭")
 	game.wg.Wait()
+	zap.S().Info("[RunGame]:游戏相关协程已全部关闭")
 	//游戏计算排名发奖励阶段
 	game.DoEndGame()
 

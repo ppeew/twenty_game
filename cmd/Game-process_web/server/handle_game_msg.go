@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"go.uber.org/zap"
 	"process_web/global"
 	"process_web/my_struct"
 	"process_web/my_struct/response"
@@ -260,8 +261,10 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 	for true {
 		value, _ := global.UsersConn.Load(userID)
 		ws := value.(*global.WSConn)
+		zap.S().Info("[ReadGameUserMsg]:等待ws信息中")
 		select {
 		case <-ctx.Done():
+			zap.S().Info("[ReadGameUserMsg]:收到退出信号")
 			game.wg.Done()
 			return
 		case message := <-ws.InChanRead():
