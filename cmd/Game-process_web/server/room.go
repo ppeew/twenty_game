@@ -134,19 +134,13 @@ func (room *RoomStruct) RunRoom() (*Data, bool) {
 
 // ReadRoomUserMsg 读取发送到房间的信息入管道
 func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
-	//当用户连接还没建立直接return，直到客户端调用连接
-	_, ok := global.UsersConn.Load(userID)
-	if !ok {
-		return
-	}
-	//if global.UsersConn[userID] == nil {
-	//zap.S().Info("[ReadRoomUserMsg]]:用户连接没建立return")
-	//return
-	//}
 	room.wg.Add(1)
 	defer room.wg.Done()
 	for true {
-		value, _ := global.UsersConn.Load(userID)
+		value, ok := global.UsersConn.Load(userID)
+		if !ok {
+			return
+		}
 		ws := value.(*global.WSConn)
 		select {
 		case <-ctx.Done():
@@ -220,6 +214,7 @@ func (room *RoomStruct) ForUserConn(ctx context.Context) {
 		select {
 		case userID := <-global.ConnectCHAN[room.RoomID]:
 			//TODO 可能会出现并发问题 因此采用单线程处理
+			zap.S().Info("[ForUserConn]:收到连接请求")
 			go room.ReadRoomUserMsg(ctx, userID)
 		case <-ctx.Done():
 			return

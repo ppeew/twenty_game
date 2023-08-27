@@ -8,6 +8,7 @@ import (
 	"process_web/my_struct"
 	"process_web/my_struct/response"
 	"sort"
+	"time"
 )
 
 type HandlerCard func(my_struct.Message)
@@ -268,7 +269,8 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 			return
 		case message, ok := <-ws.InChanRead():
 			if !ok {
-				zap.S().Info("[ReadGameUserMsg]:ws已经关闭")
+				//zap.S().Info("[ReadGameUserMsg]:ws已经关闭")
+				time.Sleep(time.Second)
 				continue
 			}
 			switch message.Type {
