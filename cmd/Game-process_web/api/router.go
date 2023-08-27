@@ -31,17 +31,11 @@ func ConnSocket(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*my_struct.CustomClaims).ID
 	if global.ConnectCHAN[uint32(roomID)] == nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "传入room_id错误",
-		})
 		return
 	}
 	// 建立websocket连接
 	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "无法连接房间服务器",
-		})
 		return
 	}
 	//value, ok := global.UsersConn.Load(userID)

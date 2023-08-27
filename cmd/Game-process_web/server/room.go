@@ -89,9 +89,14 @@ func (room *RoomStruct) RunRoom() (*Data, bool) {
 	for {
 		select {
 		case msg := <-room.MsgChan:
-			if dealFunc[msg.Type] != nil {
-				dealFunc[msg.Type](msg)
+			zap.S().Infof("[RunRoom]:正在处理%d", msg.Type)
+			f, ok := dealFunc[msg.Type]
+			if ok {
+				f(msg)
 			}
+			//if dealFunc[msg.Type] != nil {
+			//	dealFunc[msg.Type](msg)
+			//}
 		case msg := <-room.ExitChan:
 			cancel()
 			zap.S().Infof("[RunRoom]:等待房间协程销毁")

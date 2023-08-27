@@ -47,6 +47,7 @@ func (room *RoomStruct) RoomInfo(message my_struct.Message) {
 
 // QuitRoom 退出房间（房主退出会房主转移）
 func (room *RoomStruct) QuitRoom(message my_struct.Message) {
+	zap.S().Infof("[QuitRoom]:处理房间玩家退出")
 	delete(room.Users, message.UserID)
 	value, _ := global.UsersConn.Load(message.UserID)
 	ws := value.(*global.WSConn)
@@ -103,14 +104,16 @@ func (room *RoomStruct) UpdateRoom(message my_struct.Message) {
 		//先t人
 		if _, ok := room.Users[data.Kicker]; ok {
 			//找到人
-			value, _ := global.UsersConn.Load(data.Kicker)
-			ws := value.(*global.WSConn)
-			global.SendMsgToUser(ws, response.MessageResponse{
-				MsgType: response.KickerResponseType,
-				KickerInfo: &response.KickerResponse{
-					ID: data.Kicker,
-				},
-			})
+			value, ok := global.UsersConn.Load(data.Kicker)
+			if ok {
+				ws := value.(*global.WSConn)
+				global.SendMsgToUser(ws, response.MessageResponse{
+					MsgType: response.KickerResponseType,
+					KickerInfo: &response.KickerResponse{
+						ID: data.Kicker,
+					},
+				})
+			}
 			delete(room.Users, data.Kicker)
 			room.UserNumber--
 			//if global.UsersConn[data.Kicker] != nil {

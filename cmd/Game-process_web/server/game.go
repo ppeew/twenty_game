@@ -351,10 +351,6 @@ func (game *GameStruct) RunGame() {
 		game.wg.Add(1)
 	}
 	//等待用户页面初始化完成
-	BroadcastToAllGameUsers(game, response.MessageResponse{
-		MsgType: response.MsgResponseType,
-		MsgInfo: &response.MsgResponse{StateType: 1, MsgData: "游戏2秒后开始！"},
-	})
 	time.Sleep(time.Second * 2)
 	//游戏初始化阶段
 	for i := uint32(0); i < game.GameCount; i++ {
