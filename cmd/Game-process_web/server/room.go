@@ -94,7 +94,9 @@ func (room *RoomStruct) RunRoom() (*Data, bool) {
 			}
 		case msg := <-room.ExitChan:
 			cancel()
+			zap.S().Infof("[RunRoom]:等待房间协程销毁")
 			room.wg.Wait()
+			zap.S().Infof("[RunRoom]:房间协程已经销毁")
 			if msg == RoomQuit {
 				global.GameSrvClient.DeleteRoom(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
 				global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
@@ -173,9 +175,9 @@ func (room *RoomStruct) CheckClientHealth(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-tick:
-			zap.S().Infof("[CheckClientHealth]:正在检查房间用户是否离线")
 			for _, info := range room.Users {
 				value, ok := global.UsersConn.Load(info.ID)
+				zap.S().Infof("[CheckClientHealth]:正在检查房间%d用户是否离线,sync map是否存在:%v", info.ID, ok)
 				if ok {
 					ws := value.(*global.WSConn)
 					err := ws.OutChanWrite(response.MessageResponse{MsgType: response.CheckHealthType})

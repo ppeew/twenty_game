@@ -50,11 +50,11 @@ func (room *RoomStruct) QuitRoom(message my_struct.Message) {
 	delete(room.Users, message.UserID)
 	value, _ := global.UsersConn.Load(message.UserID)
 	ws := value.(*global.WSConn)
+	ws.CloseConn()
 	//玩家退出，应该从redis删除其服务器连接信息
 	global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
 		Id: message.UserID,
 	})
-	ws.CloseConn()
 	room.UserNumber--
 	if room.UserNumber == 0 {
 		//没人了，销毁房间
