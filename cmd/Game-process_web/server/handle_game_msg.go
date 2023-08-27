@@ -261,13 +261,16 @@ func (game *GameStruct) ReadGameUserMsg(ctx context.Context, userID uint32) {
 	for true {
 		value, _ := global.UsersConn.Load(userID)
 		ws := value.(*global.WSConn)
-		zap.S().Info("[ReadGameUserMsg]:等待ws信息中")
 		select {
 		case <-ctx.Done():
 			zap.S().Info("[ReadGameUserMsg]:收到退出信号")
 			game.wg.Done()
 			return
-		case message := <-ws.InChanRead():
+		case message, ok := <-ws.InChanRead():
+			if !ok {
+				zap.S().Info("[ReadGameUserMsg]:ws已经关闭")
+				continue
+			}
 			switch message.Type {
 			case my_struct.ChatMsg:
 				//聊天信息发到聊天管道
