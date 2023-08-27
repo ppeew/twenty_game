@@ -142,6 +142,7 @@ func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 			return
 		}
 		ws := value.(*global.WSConn)
+		zap.S().Info("[ReadRoomUserMsg]:等待ws信息中")
 		select {
 		case <-ctx.Done():
 			return
@@ -166,11 +167,13 @@ func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 func (room *RoomStruct) CheckClientHealth(ctx context.Context) {
 	room.wg.Add(1)
 	defer room.wg.Done()
+	tick := time.Tick(time.Second * 30)
 	for true {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.Tick(time.Second * 30):
+		case <-tick:
+			zap.S().Infof("[CheckClientHealth]:正在检查房间用户是否离线")
 			for _, info := range room.Users {
 				value, ok := global.UsersConn.Load(info.ID)
 				if ok {
@@ -191,17 +194,6 @@ func (room *RoomStruct) CheckClientHealth(ctx context.Context) {
 						QuitRoomData: my_struct.QuitRoomData{},
 					}
 				}
-				//if global.UsersConn[info.ID] != nil {
-				//	err := global.UsersConn[info.ID].OutChanWrite(response.MessageResponse{MsgType: response.CheckHealthType})
-				//	if err != nil {
-				//		检查用户连接，断开则自动离开房间
-				//room.MsgChan <- my_struct.Message{
-				//	Type:         my_struct.QuitRoomMsg,
-				//	UserID:       info.ID,
-				//	QuitRoomData: my_struct.QuitRoomData{},
-				//}
-				//}
-				//}
 			}
 		}
 	}
