@@ -84,9 +84,9 @@ func (s *GameServer) SearchRoom(ctx context.Context, in *game.RoomIDInfo) (*game
 
 // 创建房间
 func (s *GameServer) SetGlobalRoom(ctx context.Context, in *game.RoomInfo) (*emptypb.Empty, error) {
-	var users []*model.User
+	var users []*model.RoomUser
 	for _, user := range in.Users {
-		users = append(users, &model.User{ID: user.ID, Ready: user.Ready})
+		users = append(users, &model.RoomUser{ID: user.ID, Ready: user.Ready})
 	}
 	room := model.Room{
 		RoomID:        in.RoomID,

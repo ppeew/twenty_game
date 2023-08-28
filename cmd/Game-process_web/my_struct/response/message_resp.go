@@ -4,10 +4,11 @@ package response
 type MessageResponse struct {
 	MsgType uint32 `json:"msgType"`
 	//通用信息
-	HealthCheckInfo *HealthCheck  `json:"healthCheckInfo,omitempty"` //服务器发送的健康检查包
-	ChatInfo        *ChatResponse `json:"chatInfo,omitempty"`
-	ErrInfo         *ErrResponse  `json:"errInfo,omitempty"`
-	MsgInfo         *MsgResponse  `json:"msgInfo,omitempty"`
+	HealthCheckInfo *HealthCheck      `json:"healthCheckInfo,omitempty"` //服务器发送的健康检查包\
+	ChatInfo        *ChatResponse     `json:"chatInfo,omitempty"`
+	ErrInfo         *ErrResponse      `json:"errInfo,omitempty"`
+	MsgInfo         *MsgResponse      `json:"msgInfo,omitempty"`
+	GetStateInfo    *GetStateResponse `json:"getStateInfo,omitempty"`
 	//游戏信息
 	GameStateInfo        *GameStateResponse        `json:"gameStateInfo,omitempty"`
 	UserGameInfo         *UserGameInfoResponse     `json:"userGameInfo,omitempty"`
@@ -25,10 +26,11 @@ type MessageResponse struct {
 
 const (
 	//通用
-	CheckHealthType    = 100 + iota //心脏包消息
-	ChatResponseType                //用户聊天信息
-	MsgResponseType                 //服务器处理完成的消息（打印给用户看即可）
-	ErrResponseMsgType              //错误返回消息
+	CheckHealthType      = 100 + iota //心脏包消息
+	ChatResponseType                  //用户聊天信息
+	MsgResponseType                   //服务器处理完成的消息（打印给用户看即可）
+	ErrResponseMsgType                //错误返回消息
+	GetStateResponseType              //获取重连状态信息
 )
 
 const (
@@ -49,6 +51,10 @@ const (
 	SpecialCardRoundResponseType              //特殊卡回合时间信息
 )
 
+type GetStateResponse struct {
+	State int `json:"state"` //0:在房间 1:在单人对战游戏
+}
+
 // 返回的聊天信息（通用）
 type ChatResponse struct {
 	UserID      uint32 `json:"userID"`
@@ -64,5 +70,6 @@ type HealthCheck struct {
 
 // 用于给前端返回服务器操作的事情，前端显示给用户出来即可
 type MsgResponse struct {
-	MsgData string `json:"msgData"` //消息内容
+	StateType int    `json:"stateType"`
+	MsgData   string `json:"msgData"` //消息内容
 }

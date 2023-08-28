@@ -19,7 +19,7 @@ service Game{
   rpc RecordRoomServer(RecordRoomServerInfo)returns(google.protobuf.Empty);
 
   //获得排行榜信息
-  rpc GetRanks(google.protobuf.Empty)returns(RanksResponse);
+  rpc GetRanks(GetPageInfo)returns(RanksResponse);
   //更新排行榜
   rpc UpdateRanks(UpdateRanksInfo)returns(google.protobuf.Empty);
 
@@ -66,6 +66,8 @@ message UserRankInfo{
   uint32 id=1;
   uint64 score=2;
   uint64 gametimes=3;
+  string nickName=4;
+  string image=5;
 }
 
 message RanksResponse{
@@ -76,6 +78,9 @@ message UpdateRanksInfo{
   uint32 userID=1;
   uint32 addScore=2;
   uint32 addGametimes=3;
+
+  uint32 pageIndex=4;
+  uint32 pageSize=5;
 }
 
 message IsOK{

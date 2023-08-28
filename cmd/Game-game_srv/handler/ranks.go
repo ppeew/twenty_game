@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"game_srv/global"
+	"game_srv/model"
 	"game_srv/proto/game"
 	"strconv"
 
@@ -17,9 +18,11 @@ import (
 var ranks string = "Game:ranks"
 
 // 获得排行榜信息
-func (s *GameServer) GetRanks(ctx context.Context, in *emptypb.Empty) (*game.RanksResponse, error) {
+func (s *GameServer) GetRanks(ctx context.Context, in *game.GetPageInfo) (*game.RanksResponse, error) {
 	//1.用redis的zset直接取出排行榜内容，zrange key 获取到排行榜key
-	zRange := global.RedisDB.ZRevRange(ctx, ranks, 0, 100)
+	off := (in.PageIndex - 1) * in.PageSize
+	end := off + in.PageSize - 1
+	zRange := global.RedisDB.ZRevRange(ctx, ranks, int64(off), int64(end))
 	if zRange.Err() == redis.Nil {
 		zap.S().Info("[GetRanks]:%s", zRange.Err())
 		return &game.RanksResponse{}, nil
@@ -32,8 +35,13 @@ func (s *GameServer) GetRanks(ctx context.Context, in *emptypb.Empty) (*game.Ran
 		score, _ := strconv.Atoi(scoreCmd.Val())
 		gametimesCmd := global.RedisDB.Get(ctx, NameUserGametimes(uint32(id)))
 		gametimes, _ := strconv.Atoi(gametimesCmd.Val())
+		//查询用户昵称和图像
+		var user model.User
+		global.MysqlDB.First(&user, id)
 		info = append(info, &game.UserRankInfo{
 			Id:        uint32(id),
+			Image:     user.Image,
+			NickName:  user.Nickname,
 			Score:     uint64(score),
 			Gametimes: uint64(gametimes),
 		})
@@ -50,9 +58,9 @@ func (s *GameServer) UpdateRanks(ctx context.Context, in *game.UpdateRanksInfo) 
 	//1.从redis中变更用户的信息（包含总得分+总游戏次数）
 	times := global.RedisDB.IncrBy(ctx, NameUserGametimes(in.UserID), int64(in.AddGametimes))
 	score := global.RedisDB.IncrBy(ctx, NameUserScore(in.UserID), int64(in.AddScore))
-	//2.给redis同步数据更新,且更新排行榜zset的key
+	//2.给redis同步数据更新,且更新排行榜zset的key 按照分数比较，其次游戏次数
 	global.RedisDB.ZAdd(ctx, ranks, redis.Z{
-		Score:  float64(score.Val()) / float64(times.Val()),
+		Score:  float64(score.Val()) + float64(times.Val())/100,
 		Member: in.UserID, //key:数字，userID
 	})
 	return &emptypb.Empty{}, nil

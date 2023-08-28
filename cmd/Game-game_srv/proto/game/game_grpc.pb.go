@@ -32,7 +32,7 @@ type GameClient interface {
 	// 创建房间对应处理服务器信息
 	RecordRoomServer(ctx context.Context, in *RecordRoomServerInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 获得排行榜信息
-	GetRanks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RanksResponse, error)
+	GetRanks(ctx context.Context, in *GetPageInfo, opts ...grpc.CallOption) (*RanksResponse, error)
 	// 更新排行榜
 	UpdateRanks(ctx context.Context, in *UpdateRanksInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 查询所有房间(分页)
@@ -107,7 +107,7 @@ func (c *gameClient) RecordRoomServer(ctx context.Context, in *RecordRoomServerI
 	return out, nil
 }
 
-func (c *gameClient) GetRanks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RanksResponse, error) {
+func (c *gameClient) GetRanks(ctx context.Context, in *GetPageInfo, opts ...grpc.CallOption) (*RanksResponse, error) {
 	out := new(RanksResponse)
 	err := c.cc.Invoke(ctx, "/game.Game/GetRanks", in, out, opts...)
 	if err != nil {
@@ -178,7 +178,7 @@ type GameServer interface {
 	// 创建房间对应处理服务器信息
 	RecordRoomServer(context.Context, *RecordRoomServerInfo) (*emptypb.Empty, error)
 	// 获得排行榜信息
-	GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error)
+	GetRanks(context.Context, *GetPageInfo) (*RanksResponse, error)
 	// 更新排行榜
 	UpdateRanks(context.Context, *UpdateRanksInfo) (*emptypb.Empty, error)
 	// 查询所有房间(分页)
@@ -214,7 +214,7 @@ func (UnimplementedGameServer) DelRoomServer(context.Context, *RoomIDInfo) (*emp
 func (UnimplementedGameServer) RecordRoomServer(context.Context, *RecordRoomServerInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RecordRoomServer not implemented")
 }
-func (UnimplementedGameServer) GetRanks(context.Context, *emptypb.Empty) (*RanksResponse, error) {
+func (UnimplementedGameServer) GetRanks(context.Context, *GetPageInfo) (*RanksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRanks not implemented")
 }
 func (UnimplementedGameServer) UpdateRanks(context.Context, *UpdateRanksInfo) (*emptypb.Empty, error) {
@@ -354,7 +354,7 @@ func _Game_RecordRoomServer_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _Game_GetRanks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(GetPageInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -366,7 +366,7 @@ func _Game_GetRanks_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/game.Game/GetRanks",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).GetRanks(ctx, req.(*emptypb.Empty))
+		return srv.(GameServer).GetRanks(ctx, req.(*GetPageInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -28,6 +28,7 @@ const (
 	// 通用的消息
 	CheckHealthMsg = 100 + iota //健康检查消息
 	ChatMsg                     //聊天消息
+	GetState                    //重连查看状态
 )
 
 const (
@@ -44,6 +45,7 @@ const (
 	ItemMsg           = 300 + iota //使用游戏道具消息
 	GrabCardMsg                    //抢卡消息
 	UseSpecialCardMsg              //使用特殊卡消息
+	GetGameMsg
 )
 
 type ChatMsgData struct {

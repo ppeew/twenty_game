@@ -43,10 +43,8 @@ func NewRoomStruct(data *Data) RoomStruct {
 		//查询API用户信息
 		var res utils.UserInfo
 		//协程查询
-		rsp, _, errors := gorequest.New().TLSClientConfig(&tls.Config{InsecureSkipVerify: true}).Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(userID))).
+		gorequest.New().TLSClientConfig(&tls.Config{InsecureSkipVerify: true}).Get("http://139.159.234.134:8000/user/v1/search").Param("id", strconv.Itoa(int(userID))).
 			Retry(5, time.Second, http.StatusInternalServerError, http.StatusNotFound).EndStruct(&res)
-		zap.S().Infof("%v", errors)
-		zap.S().Infof("%v", rsp.StatusCode)
 		zap.S().Infof("[NewRoomStruct]查询用户%d:%v", userID, res)
 		users[userID] = my_struct.UserRoomData{
 			ID:           userID,
@@ -91,18 +89,26 @@ func (room *RoomStruct) RunRoom() (*Data, bool) {
 	for {
 		select {
 		case msg := <-room.MsgChan:
-			if dealFunc[msg.Type] != nil {
-				dealFunc[msg.Type](msg)
+			zap.S().Infof("[RunRoom]:正在处理%d", msg.Type)
+			f, ok := dealFunc[msg.Type]
+			if ok {
+				f(msg)
 			}
+			//if dealFunc[msg.Type] != nil {
+			//	dealFunc[msg.Type](msg)
+			//}
 		case msg := <-room.ExitChan:
 			cancel()
+			zap.S().Infof("[RunRoom]:等待房间协程销毁")
 			room.wg.Wait()
+			zap.S().Infof("[RunRoom]:房间协程已经销毁")
 			if msg == RoomQuit {
 				global.GameSrvClient.DeleteRoom(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
 				global.GameSrvClient.DelRoomServer(context.Background(), &game.RoomIDInfo{RoomID: room.RoomID})
 				for id := range room.Users {
 					global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{Id: id})
 				}
+				global.ConnectCHAN[room.RoomID] = nil
 				return nil, true
 			} else if msg == GameStart {
 				room.RoomWait = false
@@ -135,23 +141,36 @@ func (room *RoomStruct) RunRoom() (*Data, bool) {
 
 // ReadRoomUserMsg 读取发送到房间的信息入管道
 func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
-	//当用户连接还没建立直接return，直到客户端调用连接
-	if global.UsersConn[userID] == nil {
-		//zap.S().Info("[ReadRoomUserMsg]]:用户连接没建立return")
-		return
-	}
 	room.wg.Add(1)
 	defer room.wg.Done()
 	for true {
+		value, ok := global.UsersConn.Load(userID)
+		if !ok {
+			return
+		}
+		ws := value.(*global.WSConn)
+		zap.S().Info("[ReadRoomUserMsg]:等待ws信息中")
 		select {
 		case <-ctx.Done():
 			return
-		case message := <-global.UsersConn[userID].InChanRead():
-			//zap.S().Infof("[ReadRoomUserMsg]:读到%d用户信息了", userID)
-			message.UserID = userID //添加标识，能够识别用户
-			room.MsgChan <- message
-		case <-global.UsersConn[userID].IsDisConn():
+		case <-ws.IsDisConn():
 			return
+		case message, ok := <-ws.InChanRead():
+			if !ok {
+				//说明close了
+				return
+			}
+			//zap.S().Infof("[ReadRoomUserMsg]:读到%d用户信息了", userID)
+			if message.Type == my_struct.GetState {
+				//获取状态
+				global.SendMsgToUser(ws, response.MessageResponse{
+					MsgType:      response.GetStateResponseType,
+					GetStateInfo: &response.GetStateResponse{State: 0},
+				})
+			} else {
+				message.UserID = userID //添加标识，能够识别用户
+				room.MsgChan <- message
+			}
 		}
 	}
 }
@@ -159,21 +178,31 @@ func (room *RoomStruct) ReadRoomUserMsg(ctx context.Context, userID uint32) {
 func (room *RoomStruct) CheckClientHealth(ctx context.Context) {
 	room.wg.Add(1)
 	defer room.wg.Done()
+	tick := time.Tick(time.Second * 30)
 	for true {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.Tick(time.Second * 30):
+		case <-tick:
 			for _, info := range room.Users {
-				if global.UsersConn[info.ID] != nil {
-					err := global.UsersConn[info.ID].OutChanWrite(response.MessageResponse{MsgType: response.CheckHealthType})
+				value, ok := global.UsersConn.Load(info.ID)
+				zap.S().Infof("[CheckClientHealth]:正在检查房间%d用户是否离线,sync map是否存在:%v", info.ID, ok)
+				if ok {
+					ws := value.(*global.WSConn)
+					err := ws.OutChanWrite(response.MessageResponse{MsgType: response.CheckHealthType})
+					//检查用户连接，断开则自动离开房间
 					if err != nil {
-						//检查用户连接，断开则自动离开房间
 						room.MsgChan <- my_struct.Message{
 							Type:         my_struct.QuitRoomMsg,
 							UserID:       info.ID,
 							QuitRoomData: my_struct.QuitRoomData{},
 						}
+					}
+				} else {
+					room.MsgChan <- my_struct.Message{
+						Type:         my_struct.QuitRoomMsg,
+						UserID:       info.ID,
+						QuitRoomData: my_struct.QuitRoomData{},
 					}
 				}
 			}
@@ -188,6 +217,7 @@ func (room *RoomStruct) ForUserConn(ctx context.Context) {
 		select {
 		case userID := <-global.ConnectCHAN[room.RoomID]:
 			//TODO 可能会出现并发问题 因此采用单线程处理
+			zap.S().Info("[ForUserConn]:收到连接请求")
 			go room.ReadRoomUserMsg(ctx, userID)
 		case <-ctx.Done():
 			return
@@ -243,11 +273,16 @@ func (room *RoomStruct) ForUserIntoRoom(ctx context.Context) {
 
 func BroadcastToAllRoomUsers(roomInfo *RoomStruct, message response.MessageResponse) {
 	for _, info := range roomInfo.Users {
-		if global.UsersConn[info.ID] != nil {
-			err := global.UsersConn[info.ID].OutChanWrite(message)
-			if err != nil {
-				//zap.S().Infof("ID为%d的用户掉线了", info.ShopID)
-			}
+		value, ok := global.UsersConn.Load(info.ID)
+		if ok {
+			ws := value.(*global.WSConn)
+			ws.OutChanWrite(message)
 		}
+		//if global.UsersConn[info.ID] != nil {
+		//	err := global.UsersConn[info.ID].OutChanWrite(message)
+		//	if err != nil {
+		//		zap.S().Infof("ID为%d的用户掉线了", info.ShopID)
+		//}
+		//}
 	}
 }

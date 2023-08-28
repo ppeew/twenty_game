@@ -31,23 +31,23 @@ func ConnSocket(ctx *gin.Context) {
 	claims, _ := ctx.Get("claims")
 	userID := claims.(*my_struct.CustomClaims).ID
 	if global.ConnectCHAN[uint32(roomID)] == nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "传入room_id错误",
-		})
 		return
 	}
 	// 建立websocket连接
 	conn, err := upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "无法连接房间服务器",
-		})
 		return
 	}
-	if global.UsersConn[userID] != nil {
-		global.UsersConn[userID].CloseConn()
-	}
-	global.UsersConn[userID] = global.InitWebSocket(conn, userID)
+	//value, ok := global.UsersConn.Load(userID)
+	//if ok {
+	//	zap.S().Infof("[ConnSocket]:正在close用户%d ws", userID)
+	//	value.(*global.WSConn).CloseConn()
+	//}
+	//if global.UsersConn[userID] != nil {
+	//	global.UsersConn[userID].CloseConn()
+	//}
+	global.UsersConn.Store(userID, global.InitWebSocket(conn, userID))
+	//global.UsersConn[userID] = global.InitWebSocket(conn, userID)
 	global.ConnectCHAN[uint32(roomID)] <- userID
 }
 
@@ -130,6 +130,11 @@ func UserIntoRoom(ctx *gin.Context) {
 		})
 		return
 	}
+	//记录用户连接信息
+	global.GameSrvClient.RecordConnData(context.Background(), &game.RecordConnInfo{
+		ServerInfo: fmt.Sprintf("%s:%d?%d", global.ServerConfig.Host, global.ServerConfig.Port, roomID),
+		Id:         userID,
+	})
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": "进房成功",
 	})

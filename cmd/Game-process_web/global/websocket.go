@@ -51,7 +51,9 @@ func (ws *WSConn) readMsgLoop() {
 			if data.Type == my_struct.UserIntoMsg {
 				continue
 			}
-			ws.inChan <- data
+			if !ws.isClose {
+				ws.inChan <- data //注意不能往close chan send!
+			}
 		}
 	}
 }
@@ -60,6 +62,8 @@ func (ws *WSConn) readMsgLoop() {
 func (ws *WSConn) writeMsgLoop() {
 	for true {
 		select {
+		case <-ws.closeChan:
+			return
 		case data := <-ws.outChan:
 			err := ws.conn.WriteJSON(data)
 			if err != nil {
@@ -87,9 +91,11 @@ func (ws *WSConn) OutChanWrite(data response.MessageResponse) error {
 
 // 关闭websocket
 func (ws *WSConn) CloseConn() {
-	ws.isClose = true
 	ws.once.Do(func() {
+		ws.isClose = true
 		close(ws.closeChan)
+		close(ws.inChan)
+		close(ws.outChan)
 	})
 	_ = ws.conn.Close()
 }
