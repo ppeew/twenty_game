@@ -41,7 +41,8 @@ func TestSystem(t *testing.T) {
 }
 
 func Test1(t *testing.T) {
-	RegistUser(1)
+	fmt.Println("SFO" > "ALT")
+	//RegistUser(1)
 }
 
 func RegistUser(i int) (string, error) {
