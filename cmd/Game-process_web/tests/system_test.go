@@ -22,9 +22,32 @@ import (
 var isLocal = false
 
 func Test1(t *testing.T) {
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTU2LCJleHAiOjE2OTA4MDM0NjUsImlzcyI6InBwZWV3IiwibmJmIjoxNjkwMzcxNDY1fQ.hZt6hWO7Hb-7NvoSKInKA1qy_OOvC5qv2r0M6QHGmHY"
-	roomID := "11"
-	EnterRoom(token, roomID)
+	testNum := 100
+	wg := sync.WaitGroup{}
+	wg.Add(testNum)
+	for i := 0; i < testNum; i++ {
+		go func(i int) {
+			defer wg.Done()
+			//token, err := RegisterUser(fmt.Sprintf("test%d", i))
+			//if err != nil {
+			//	fmt.Printf("%d用户注册失败\n", i)
+			//	return
+			//}
+			token, err := Login(fmt.Sprintf("test%d", i))
+			if err != nil {
+				fmt.Println(err)
+			}
+			//进入房间
+			ws, err := EnterRoom2(token, "666")
+			if err != nil {
+				fmt.Printf("%d用户进房失败\n", i)
+				return
+			}
+			UserReady(ws)
+			EndGame(ws, fmt.Sprintf("user-%d", i))
+		}(i)
+	}
+	wg.Wait()
 }
 
 type Record struct {
@@ -63,7 +86,6 @@ func TestSystem(t *testing.T) {
 					return
 				}
 			}
-
 			//token, err := Login(userName)
 			if err != nil {
 				fmt.Printf("[Login] %s登录失败\n", userName)
@@ -115,7 +137,6 @@ func countNum(counter *int64) {
 	// 启动定时器
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
-
 	// 定时器的回调函数
 	go func() {
 		for range ticker.C {
@@ -158,7 +179,7 @@ func Host() string {
 
 func RegisterUser(i string) (string, error) {
 	url := Host() + "/user/v1/register"
-	url = "http://139.159.234.134:9000/v1/register"
+	url = "http://139.159.234.134:8000/user/v1/register"
 	method := "POST"
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
@@ -193,7 +214,7 @@ func RegisterUser(i string) (string, error) {
 	if res.StatusCode != http.StatusOK {
 		return "", errors.New("注册失败")
 	}
-	fmt.Printf("[Register] %s注册成功\n", i)
+	//fmt.Printf("[Register] %s注册成功\n", i)
 	return m["token"].(string), nil
 }
 
@@ -302,7 +323,7 @@ func getTargetAddress(token string, roomID string) (string, error) {
 	defer res.Body.Close()
 
 	m, _ := getBody(res.Body)
-	fmt.Printf("[EnterRoom] %+v\n", m)
+	//fmt.Printf("[EnterRoom] %+v\n", m)
 	if res.StatusCode != http.StatusOK {
 		return "", errors.New("获取远程服务器失败")
 	}
@@ -366,6 +387,17 @@ func beginGameMsg() []byte {
 	return res
 }
 
+func readyMsg() []byte {
+	d := map[string]interface{}{
+		"isReady": true,
+	}
+	res, _ := json.Marshal(map[string]interface{}{
+		"type":           203,
+		"readyStateData": d,
+	})
+	return res
+}
+
 func quitRoomMsg() []byte {
 	res, _ := json.Marshal(map[string]interface{}{
 		"type": 200,
@@ -373,6 +405,7 @@ func quitRoomMsg() []byte {
 	return res
 }
 
+// 用于单人创房之后的调用
 func EnterRoom(token string, roomID string) (*websocket.Conn, error) {
 	if roomID == "" {
 		return nil, errors.New("[EnterRoom] roomID为空")
@@ -380,6 +413,45 @@ func EnterRoom(token string, roomID string) (*websocket.Conn, error) {
 	targetURL, err := getTargetAddress(token, roomID)
 	wsConn := connectSocket(targetURL, token, roomID)
 	return wsConn, err
+}
+
+// 加入其他人的房间
+func EnterRoom2(token string, roomID string) (*websocket.Conn, error) {
+	if roomID == "" {
+		return nil, errors.New("[EnterRoom] roomID为空")
+	}
+	targetURL, err := getTargetAddress(token, roomID)
+	TryToEnter(roomID, token, targetURL)
+	wsConn := connectSocket(targetURL, token, roomID)
+	return wsConn, err
+}
+
+func TryToEnter(roomID string, token string, server string) {
+	url := fmt.Sprintf("http://%s/v1/userIntoRoom?room_id=%s", server, roomID)
+	method := "PUT"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	req.Header.Add("token", token)
+	req.Header.Add("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer res.Body.Close()
+
+	_, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 func BeginGame(wsConn *websocket.Conn) {
@@ -408,4 +480,8 @@ func QuitRoom(wsConn *websocket.Conn, userName string) {
 	msg := quitRoomMsg()
 	fmt.Printf("[QuitRoom] %s退出房间\n", userName)
 	wsConn.WriteMessage(websocket.TextMessage, msg)
+}
+
+func UserReady(wsConn *websocket.Conn) {
+	wsConn.WriteMessage(websocket.TextMessage, readyMsg())
 }

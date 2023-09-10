@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"github.com/wagslane/go-rabbitmq"
 	"log"
 	"testing"
@@ -9,8 +8,7 @@ import (
 )
 
 func publisher() {
-	conn, err := rabbitmq.NewConn(
-		"amqp://guest:guest@localhost",
+	conn, err := rabbitmq.NewConn("amqp://guest:guest@localhost",
 		rabbitmq.WithConnectionOptionsLogging,
 	)
 	if err != nil {
@@ -18,30 +16,18 @@ func publisher() {
 	}
 	defer conn.Close()
 
-	publisher, err := rabbitmq.NewPublisher(
-		conn,
-		rabbitmq.WithPublisherOptionsLogging,
+	newPublisher, err := rabbitmq.NewPublisher(conn, rabbitmq.WithPublisherOptionsLogging,
 		rabbitmq.WithPublisherOptionsExchangeName("events"),
 		rabbitmq.WithPublisherOptionsExchangeDeclare,
-		//rabbitmq.WithPublisherOptionsExchangeKind("fanout"),
 	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer publisher.Close()
+	defer newPublisher.Close()
 
 	for {
-		err = publisher.Publish(
-			[]byte(fmt.Sprintf("hello, rabbitmq | %s", time.Now().String())),
-			[]string{"my_routing_key"},
-			rabbitmq.WithPublishOptionsContentType("application/json"),
-			rabbitmq.WithPublishOptionsExchange("events"),
-		)
-		if err != nil {
-			log.Println(err)
-			break
-		}
 		time.Sleep(time.Second * 3)
+		newPublisher.Publish([]byte("hello rabbitmq"),
+			[]string{"mykey"},
+			rabbitmq.WithPublishOptionsContentType("app"),
+			rabbitmq.WithPublishOptionsExchange("evebts"))
 	}
 }
 
@@ -54,12 +40,10 @@ func consumer() {
 		log.Fatal(err)
 	}
 	defer conn.Close()
-
 	consumer, err := rabbitmq.NewConsumer(
 		conn,
 		func(d rabbitmq.Delivery) rabbitmq.Action {
 			log.Printf("consumed: %v", string(d.Body))
-
 			// rabbitmq.Ack, rabbitmq.NackDiscard, rabbitmq.NackRequeue
 			return rabbitmq.NackRequeue
 		},
