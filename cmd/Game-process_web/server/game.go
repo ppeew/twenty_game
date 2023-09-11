@@ -168,9 +168,8 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 	for true {
 		select {
 		case msg := <-game.CommonChan:
-			//userInfo := global.UsersConn[msg.UserID]
-			value, _ := global.UsersConn.Load(msg.UserID)
-			userInfo := value.(*global.WSConn)
+			//value, _ := global.UsersConn.Load(msg.UserID)
+			//userInfo := value.(*global.WSConn)
 			if msg.Type == my_struct.GrabCardMsg {
 				data := msg.GetCardData
 				isOK := false
@@ -196,14 +195,7 @@ func (game *GameStruct) DoListenDistributeCard(min, max int) {
 				}
 				if isOK {
 					BroadcastToAllGameUsers(game, CardModelToResponse(game))
-				} else {
-					global.SendMsgToUser(userInfo, response.MessageResponse{
-						MsgType: response.MsgResponseType,
-						MsgInfo: &response.MsgResponse{StateType: 1, MsgData: "没抢到卡~~~"},
-					})
 				}
-			} else {
-
 			}
 		case <-after:
 			//超时处理,超时就直接返回了
