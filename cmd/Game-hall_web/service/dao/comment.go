@@ -11,7 +11,7 @@ type CommentDao struct {
 }
 
 func (CommentDao) CommentList(req *dto.CommentListReq) (res []domains.Comments, err error) {
-	err = global.MysqlDB.Model(&domains.Comments{}).Offset((req.Page - 1) * req.Size).Limit(req.Size).Find(&res).Error
+	err = global.MysqlDB.Model(&domains.Comments{}).Offset((req.Page - 1) * req.Size).Limit(req.Size).Order("time desc").Find(&res).Error
 	return
 }
 

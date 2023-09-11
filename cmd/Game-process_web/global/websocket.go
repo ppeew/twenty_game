@@ -82,17 +82,17 @@ func (ws *WSConn) InChanRead() chan my_struct.Message {
 
 // 写出outChan
 func (ws *WSConn) OutChanWrite(data response.MessageResponse) error {
-	//if ws.isClose {
-	//	return errors.New("连接已断开")
-	//}
-	// 这里会panic，closeChan <- 多协程下 ws.outChan<- panic
-	select {
-	case <-ws.closeChan:
+	if ws.isClose {
 		return errors.New("连接已断开")
-	default:
-		ws.outChan <- data
 	}
-	//ws.outChan <- data
+	//这里会panic，closeChan <- 多协程下 ws.outChan<- panic
+	//select {
+	//case <-ws.closeChan:
+	//	return errors.New("连接已断开")
+	//default:
+	//	ws.outChan <- data
+	//}
+	ws.outChan <- data
 	return nil
 }
 
@@ -102,7 +102,7 @@ func (ws *WSConn) CloseConn() {
 		ws.isClose = true
 		close(ws.closeChan)
 		close(ws.inChan)
-		close(ws.outChan) //注意
+		//close(ws.outChan) //注意
 	})
 	_ = ws.conn.Close()
 }
