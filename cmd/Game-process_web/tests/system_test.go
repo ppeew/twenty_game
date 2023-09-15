@@ -21,6 +21,7 @@ import (
 
 var isLocal = false
 
+// 测试单房间人数（保证不卡顿情况下）
 func Test1(t *testing.T) {
 	testNum := 100
 	wg := sync.WaitGroup{}
@@ -61,8 +62,8 @@ type Record struct {
 
 var record = new(Record)
 
+// 测试系统并发情况，支持10000+并发
 func TestSystem(t *testing.T) {
-	//测试系统并发情况，支持10000并发
 	group := sync.WaitGroup{}
 	testNum := 10000
 	group.Add(testNum)

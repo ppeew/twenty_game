@@ -1,7 +1,10 @@
-# snatch_card游戏介绍
-snatch_card game
-前端使用flutter开发
-后端使用go开发
+# snatch_card游戏介绍   (前端使用flutter开发 后端使用go开发)
+
+## 服务测试（测试文件路径：cmd/Game-process_web/tests目录）
+#### QPS：500+
+#### 最大房间并发游戏: 10000+
+#### 单房间容纳并发连接量：50+ (TCP，过多人数会由于网络带宽，cpu处理速度导致消息不及时)
+
 
 # (游戏已部署，访问: 139.159.234.134)
 ## 介绍
