@@ -47,11 +47,13 @@ func (room *RoomStruct) RoomInfo(message my_struct.Message) {
 
 // QuitRoom 退出房间（房主退出会房主转移）
 func (room *RoomStruct) QuitRoom(message my_struct.Message) {
-	zap.S().Infof("[QuitRoom]:处理房间玩家退出")
+	//zap.S().Infof("[QuitRoom]:处理房间玩家退出")
 	delete(room.Users, message.UserID)
-	value, _ := global.UsersConn.Load(message.UserID)
-	ws := value.(*global.WSConn)
-	ws.CloseConn()
+	value, ok := global.UsersConn.Load(message.UserID)
+	if ok {
+		ws := value.(*global.WSConn)
+		ws.CloseConn()
+	}
 	//玩家退出，应该从redis删除其服务器连接信息
 	global.GameSrvClient.DelConnData(context.Background(), &game.DelConnInfo{
 		Id: message.UserID,
@@ -68,10 +70,6 @@ func (room *RoomStruct) QuitRoom(message my_struct.Message) {
 		for _, data := range room.Users {
 			if num <= 0 {
 				room.RoomOwner = data.ID
-				global.SendMsgToUser(ws, response.MessageResponse{
-					MsgType: response.MsgResponseType,
-					MsgInfo: &response.MsgResponse{StateType: 0, MsgData: "房主是你的了"},
-				})
 				break
 			}
 			num--
