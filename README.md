@@ -1,8 +1,29 @@
 游戏介绍：
 
 # snatch_card
-snatch_card game
-使用flutter开发
+go后端
+
+核心：
+
+微服务（consul+grpc)，kong网关，gin，redis，mysql
+
+其它：zap日志，viper，nacos，jwt，gorm，sentinal
+
+同时设计了诸多管道以及协程，保证抢卡游戏的并发及安全
+
+github地址：https://github.com/ppeew/twenty_game
+
+
+前端
+
+flutter以及一些插件。
+
+UI用masterGo设计出来，然后手写页面并封装组件。下次再用flutter，就不手写了，整上别人的组件库。
+
+github地址：https://github.com/unitiny/snatch-card
+
+
+游戏已部署，访问: [网址](http://139.159.234.134)
 
 ## 介绍
 
@@ -27,7 +48,7 @@ snatch_card game
 
 #### 3) 当玩家的卡堆大于6张，则会先删除之前抢的卡，直到卡牌不超过6张
 
-[//]: # (游戏已部署，访问: 8.134.163.22:8001)
+
 
 ## 游戏流程
 
@@ -51,14 +72,6 @@ snatch_card game
 5 结算游戏
 
 游戏结束，计算排名，分发奖励
-
-## task
-
-- [] 路由
-- [] 画出静态页面
-- [] 完善动态功能
-- [] 随机生成数据模拟
-- [] 添加网络请求，建立websocket
 
 
 ## 分布式难点（跨IP服务调用）

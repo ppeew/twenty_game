@@ -20,5 +20,6 @@ func InitStoreRouter(r *gin.RouterGroup) {
 	chat := r.Group("/chat")
 	chat.GET("/chatList", apis.ChatList)
 	chat.POST("/addChat", apis.AddChat)
+	chat.POST("/sendChat", apis.SendChat)
 	chat.GET("/listen", apis.Listen)
 }

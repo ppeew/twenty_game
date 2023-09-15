@@ -5,8 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="优化">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/api/router.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-hall_web/cache/config/hall-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/consul_server.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/dao/chat.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/global/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/global/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/service/apis/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/apis/chat.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/service/router/hall.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/router/hall.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +26,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files/Go" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -43,7 +49,7 @@
     "WebServerToolWindowFactoryState": "false",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/22378/GolandProjects/twenty-game/cmd/Game-game_web/proto",
+    "last_opened_file_path": "D:/GOPATH/src/ItemArea/PersonProject/twenty_game",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "settings.editor.selected.configurable": "ssh.settings",

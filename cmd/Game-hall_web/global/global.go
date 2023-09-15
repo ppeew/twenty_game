@@ -1,6 +1,7 @@
 package global
 
 import (
+	"github.com/hashicorp/consul/api"
 	"hall_web/config"
 
 	"github.com/go-redsync/redsync/v4"
@@ -9,10 +10,11 @@ import (
 )
 
 var (
-	DEBUG        bool
-	MysqlDB      *gorm.DB
-	RedisDB      *redis.Client
-	RedSync      *redsync.Redsync
-	NacosConfig  *config.NacosConfig  = &config.NacosConfig{}
-	ServerConfig *config.ServerConfig = &config.ServerConfig{}
+	DEBUG                 bool
+	MysqlDB               *gorm.DB
+	RedisDB               *redis.Client
+	RedSync               *redsync.Redsync
+	NacosConfig           *config.NacosConfig  = &config.NacosConfig{}
+	ServerConfig          *config.ServerConfig = &config.ServerConfig{}
+	ConsulHallWebServices []*api.CatalogService
 )

@@ -16,6 +16,7 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	initialize.InitDB()
+	go initialize.GetConsulServer()
 	routers := initialize.InitRouters()
 	//utils.CreateTable()
 	//自动获取可用端口号
