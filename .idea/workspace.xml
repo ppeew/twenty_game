@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="优化">
+    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="chat_distribute">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/consul_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/consul_server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/service/apis/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/apis/chat.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -153,7 +151,8 @@
     <MESSAGE value="逻辑修改" />
     <MESSAGE value="优化用户体验" />
     <MESSAGE value="优化" />
-    <option name="LAST_COMMIT_MESSAGE" value="优化" />
+    <MESSAGE value="chat_distribute" />
+    <option name="LAST_COMMIT_MESSAGE" value="chat_distribute" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
