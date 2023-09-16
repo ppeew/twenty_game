@@ -1,22 +1,21 @@
 游戏介绍：
 
 # snatch_card
-go后端
+### go后端
 
 核心：
 
 微服务（consul+grpc)，kong网关，gin，redis，mysql
 
-其它：zap日志，viper，nacos，jwt，gorm，sentinal
+其它：
+
+zap日志，viper，nacos，jwt，gorm，sentinal
 
 同时设计了诸多管道以及协程，保证抢卡游戏的并发及安全
 
 github地址：https://github.com/ppeew/twenty_game
 
-
-前端
-
-flutter以及一些插件。
+### flutter前端
 
 UI用masterGo设计出来，然后手写页面并封装组件。下次再用flutter，就不手写了，整上别人的组件库。
 
@@ -24,6 +23,16 @@ github地址：https://github.com/unitiny/snatch-card
 
 
 游戏已部署，访问: [网址](http://139.159.234.134)
+
+## 服务测试
+
+测试文件路径：cmd/Game-process_web/tests目录
+
+QPS：500+
+
+最大房间并发游戏: 10000+
+
+单房间容纳并发连接量：50+ (TCP，过多人数会由于网络带宽，cpu处理速度导致消息不及时)
 
 ## 介绍
 
@@ -74,20 +83,9 @@ github地址：https://github.com/unitiny/snatch-card
 游戏结束，计算排名，分发奖励
 
 
-## 分布式难点（跨IP服务调用）
+## 分布式项目难点
 
-- 购买商城系统物品：
+- 购买商城系统物品,购买交易系统商品都需要事务操作
+- Mysql+Redis更新同步
+- 游戏重连实现
 
-1）扣减商城物品库存（本地调用，用mysql的回滚）
-
-2）扣减用户金币（跨服务，失败可能是金币不够，也可能是网络问题导致其实已经成功扣减，回滚用消息队列MQ，保证金币一定增加回来！这块要设置幂等性，因为是可能重复的）
-
-3）然后增加用户商品（跨服务）（该操作一定成功，消息队列MQ）
-
-- 购买交易系统商品：
-
-1）锁定交易商品（本地）
-
-2）扣减购买者金币（跨服务）
-
-3）增加售卖者金币+增加购买者物品表（MQ一致性） 12要设计回滚方案，幂等性保证

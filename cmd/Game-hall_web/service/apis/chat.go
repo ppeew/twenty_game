@@ -124,8 +124,8 @@ func SendChat(ctx *gin.Context) {
 	form.Set("content", chat.Content)
 
 	for _, service := range global.ConsulHallWebServices {
-		targetUrl := fmt.Sprintf("http://%s:%d/v1/chat/addChat", service.ServiceAddress, service.ServicePort)
-		zap.S().Infof("[SendChat]: targetUrl %s", targetUrl)
+		targetUrl := fmt.Sprintf("http://%s:%d/hall/v1/chat/addChat", service.ServiceAddress, service.ServicePort)
+		//zap.S().Infof("[SendChat]: targetUrl %s", targetUrl)
 
 		// 可考虑重试机制
 		client := new(http.Client)
@@ -133,7 +133,6 @@ func SendChat(ctx *gin.Context) {
 		if err != nil {
 			zap.S().Infof("[SendChat]: post err: %v %v", resp, err)
 		}
-		break
 	}
 }
 

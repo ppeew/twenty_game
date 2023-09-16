@@ -7,14 +7,14 @@ import (
 )
 
 func GetConsulServer() {
-	tick := time.Tick(time.Second * 3)
+	tick := time.Tick(time.Second * 10)
 	config := api.DefaultConfig()
 	config.Address = "139.159.234.134:8500"
 	c, _ := api.NewClient(config)
 	for {
 		select {
 		case <-tick:
-			services, _, err := c.Catalog().Service("hall-web-dev", "", nil)
+			services, _, err := c.Catalog().Service("hall-web", "", nil)
 			if err == nil {
 				global.ConsulHallWebServices = services
 			}
