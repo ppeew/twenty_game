@@ -25,4 +25,4 @@ jobs:
       run: go version
 
     - name: Test
-      run: go ls
+      run: ls
