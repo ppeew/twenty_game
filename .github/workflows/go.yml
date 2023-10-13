@@ -1,22 +1,16 @@
-name: SSH Connection and Build
-
-on:
-  push:
-    branches:
-      - master  # 替换为你希望触发工作流的分支
-
+name: remote ssh command
+on: [push]
 jobs:
+
   build:
+    name: Build
     runs-on: ubuntu-latest
-
     steps:
-    - name: Start SSH
-      uses: Tofandel/ssh-server-action@v1.0.0
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@v1.0.0
       with:
-        hostname: 139.159.234.134 # Optional, the display hostname of the server
-        port: 22 # Optional, default value is 22. The exposed ssh port
-        user_name: root # Optional, default value is ssh-user
-        user_password: a15767798035HYJ # Optional
-        sudo_access: true # Optional, allow user to use sudo without password, default: false
-
-
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.PASS }}
+        port: ${{ secrets.PORT }}
+        script: ls
