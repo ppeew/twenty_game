@@ -13,11 +13,8 @@ jobs:
       - name: Set up SSH connection
         uses: webfactory/ssh-agent@v0.5.2
         with:
-          ssh-private-key: ${{ secrets.jenkins }}
-
-      - name: Clone repository
-        uses: actions/checkout@v2
+          ssh-private-key: ${{ secrets.go-jks }}
 
       - name: Run build.sh script
         run: |
-          ssh root@139.159.234.134 "ls && cd /path/to/repository && sh build.sh"
+          ssh root@139.159.234.134 "ls && cd / && sh jks.sh && sleep 60s"
