@@ -11,18 +11,9 @@ jobs:
 
     steps:
       - name: ssh scp ssh pipelines
-        uses: cross-the-world/ssh-scp-ssh-pipelines@latest
-        env:
-          WELCOME: "ssh scp ssh pipelines"
-          LASTSSH: "Doing something after copying"
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1
         with:
-          host: ${{ secrets.DC_HOST }}
-          user: ${{ secrets.DC_USER }}
-          pass: ${{ secrets.DC_PASS }}
-          port: 22
-          connect_timeout: 10s
-          first_ssh: |
-            echo "test"
-            ls
+          ssh-private-key: ${{ secrets.PRIVATE_ACTION }}
+          ssh-host: 139.159.234.134
 
 
