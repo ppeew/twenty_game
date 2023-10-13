@@ -17,4 +17,4 @@ jobs:
 
       - name: Run build.sh script
         run: |
-          ssh root@139.159.234.134 "ls && cd / && sh jks.sh && sleep 60s"
+          ssh root@139.159.234.134 "ls && sleep 60s"
