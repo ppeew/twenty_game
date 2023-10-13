@@ -13,7 +13,7 @@ jobs:
       - name: Set up SSH connection
         uses: webfactory/ssh-agent@v0.5.2
         with:
-          ssh-private-key: ${{ secrets.ACTION }}
+          ssh-private-key: ${{ secrets.PRIVATE_ACTION }}
 
       - name: Run build.sh script
         run: |
