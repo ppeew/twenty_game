@@ -13,4 +13,8 @@ jobs:
         username: ${{ secrets.USER }}
         password: ${{ secrets.PASS }}
         port: ${{ secrets.PORT }}
-        script: ls
+        script: |
+          cd /
+          sh jks-build.sh
+          sleep 30s
+        
