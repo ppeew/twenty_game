@@ -10,11 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up SSH connection
-        uses: webfactory/ssh-agent@v0.5.2
-        with:
-          ssh-private-key: ${{ secrets.PRIVATE_ACTION }}
-
       - name: Run build.sh script
         run: |
           ssh root@139.159.234.134 "ls && sleep 60s"
