@@ -41,5 +41,14 @@ type ServerConfig struct {
 	MysqlInfo   MysqlConfig   `json:"mysql"`
 	ConsulInfo  ConsulConfig  `json:"consul"`
 	RedisInfo   RedisConfig   `json:"redis"`
+	MongoInfo   MongoConfig   `json:"mongo"`
 	UserSrvInfo UserSrvConfig `json:"user_srv"`
+}
+
+type MongoConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+	Database string `json:"database"`
 }

@@ -1,6 +1,7 @@
 package global
 
 import (
+	"go.mongodb.org/mongo-driver/mongo"
 	"process_web/config"
 	game_proto "process_web/proto/game"
 	"sync"
@@ -21,6 +22,7 @@ var UsersConn = sync.Map{}
 
 var (
 	DEBUG         bool
+	MongoDB       *mongo.Database
 	NacosConfig   *config.NacosConfig  = &config.NacosConfig{}
 	ServerConfig  *config.ServerConfig = &config.ServerConfig{}
 	GameSrvClient game_proto.GameClient

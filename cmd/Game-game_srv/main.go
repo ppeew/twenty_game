@@ -17,9 +17,10 @@ import (
 )
 
 func main() {
-	initialize.InitLogger()
 	initialize.InitConfig()
+	initialize.InitLogger()
 	initialize.InitDB()
+	initialize.InitTasks()
 	//initialize.InitSrvConn()
 
 	server := grpc.NewServer()

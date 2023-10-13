@@ -5,7 +5,8 @@ taskkill /F /IM user_srv_win.exe `
 /IM game_web_win.exe `
 /IM process_web_win.exe `
 /IM store_web_win.exe `
-/IM file_web_win.exe
+/IM file_web_win.exe `
+/IM admin_web_win.exe
 
 
 $currentFolder = Get-Item -Path "." | Select-Object -ExpandProperty Name
@@ -46,5 +47,9 @@ Start-Process -FilePath "./store_web_win.exe" -NoNewWindow
 cd ../Game-file_web
 go build -o file_web_win.exe main.go
 Start-Process -FilePath "./file_web_win.exe" -NoNewWindow
+
+cd ../Game-admin_web
+go build -o admin_web_win.exe main.go
+Start-Process -FilePath "./admin_web_win.exe" -NoNewWindow
 
 cd ../../

@@ -13,9 +13,10 @@ import (
 )
 
 func main() {
-	initialize.InitLogger()
 	initialize.InitConfig()
+	initialize.InitLogger()
 	initialize.InitDB()
+	initialize.InitTasks()
 	routers := initialize.InitRouters()
 	//utils.CreateTable()
 	//自动获取可用端口号

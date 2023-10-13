@@ -17,6 +17,7 @@ type ServerConfig struct {
 	ConsulInfo ConsulConfig `json:"consul"`
 	MysqlInfo  MysqlConfig  `json:"mysql"`
 	RedisInfo  RedisConfig  `json:"redis"`
+	MongoInfo  MongoConfig  `json:"mongo"`
 }
 
 type NacosConfig struct {
@@ -42,4 +43,12 @@ type MysqlConfig struct {
 	Database string `json:"database"`
 	User     string `json:"user"`
 	Password string `json:"password"`
+}
+
+type MongoConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+	Database string `json:"database"`
 }

@@ -41,4 +41,13 @@ type ServerConfig struct {
 	ConsulInfo  ConsulConfig  `json:"consul"`
 	GameSrvInfo GameSrvConfig `json:"game_srv"`
 	RedisInfo   RedisConfig   `json:"redis"`
+	MongoInfo   MongoConfig   `json:"mongo"`
+}
+
+type MongoConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+	Database string `json:"database"`
 }

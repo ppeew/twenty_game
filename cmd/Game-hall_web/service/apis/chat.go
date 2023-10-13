@@ -18,7 +18,8 @@ import (
 需求：
 分布式大厅聊天
 前端先获取聊天列表，再开启长轮询
-每个用户发送信息时，会触发长轮询后续获取消息操作，使其它用户收到消息
+每个用户发送信息时，会转发到各个聊天服务，
+然后触发长轮询后续获取消息操作，使服务中在线用户收到消息
 
 设计思路：
 1 redis储存消息列表，并使用发布订阅，需要websocket
@@ -106,7 +107,6 @@ func (mq *MessageQueue) Push(m *domains.Message) {
 
 var MQ *MessageQueue
 
-// 目前还是本地接口，需要更改为线上的
 func SendChat(ctx *gin.Context) {
 	chat := &domains.Chat{}
 	err := ctx.Bind(chat)

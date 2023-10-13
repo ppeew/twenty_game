@@ -2,6 +2,7 @@ package global
 
 import (
 	"github.com/hashicorp/consul/api"
+	"go.mongodb.org/mongo-driver/mongo"
 	"hall_web/config"
 
 	"github.com/go-redsync/redsync/v4"
@@ -11,6 +12,7 @@ import (
 
 var (
 	DEBUG                 bool
+	MongoDB               *mongo.Database
 	MysqlDB               *gorm.DB
 	RedisDB               *redis.Client
 	RedSync               *redsync.Redsync

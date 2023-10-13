@@ -20,6 +20,7 @@ type ServerConfig struct {
 	JWTInfo     JWTConfig     `json:"jwt"`
 	ConsulInfo  ConsulConfig  `json:"consul"`
 	UserSrvInfo UserSrvConfig `json:"user_srv"`
+	MongoInfo   MongoConfig   `json:"mongo"`
 	//OssInfo    OssConfig    `json:"ossInfo"`
 }
 
@@ -38,4 +39,12 @@ type NacosConfig struct {
 	Password  string `mapstructure:"password"`
 	DataId    string `mapstructure:"dataid"`
 	Group     string `mapstructure:"group"`
+}
+
+type MongoConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+	Database string `json:"database"`
 }

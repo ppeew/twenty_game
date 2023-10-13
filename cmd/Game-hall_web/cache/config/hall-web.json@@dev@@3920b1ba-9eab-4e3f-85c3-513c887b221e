@@ -21,5 +21,12 @@
         "host":"139.159.234.134",
         "port":8500,
         "name":"hall-web-dev"
+    },
+    "mongo":{
+        "host":"139.159.234.134",
+        "port":27017,
+        "database":"game",
+        "user":"root",
+        "password":"root"
     }
 }
