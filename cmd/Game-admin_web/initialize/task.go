@@ -28,10 +28,10 @@ func InitTasks() {
 	go func() {
 		// 隔天创建新日志
 		createLogTask := time.NewTicker(time.Hour * 24)
-
-		// admin专门任务
 		deleteOldLogTask := time.NewTicker(time.Hour * 24 * 7)
 		saveLogTask := time.NewTicker(time.Hour*24 + time.Minute)
+
+		// admin专门任务
 		monitorServiceTask := time.NewTicker(time.Second * 30)
 		monitorHostTask := time.NewTicker(time.Minute * 15)
 		resetTask := time.NewTicker(time.Minute * 20)

@@ -6,6 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="admin_web and initTask">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/initialize/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/initialize/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/initialize/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/task.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
