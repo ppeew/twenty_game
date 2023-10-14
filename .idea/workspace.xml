@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="initTask">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/jenkins-build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/jenkins-build.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
