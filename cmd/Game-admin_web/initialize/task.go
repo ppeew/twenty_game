@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/hashicorp/consul/api"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/mem"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.uber.org/zap"
 	"os"
@@ -33,7 +33,7 @@ func InitTasks() {
 
 		// admin专门任务
 		monitorServiceTask := time.NewTicker(time.Second * 30)
-		monitorHostTask := time.NewTicker(time.Minute * 15)
+		monitorHostTask := time.NewTicker(time.Second * 5)
 		resetTask := time.NewTicker(time.Minute * 20)
 		for {
 			select {

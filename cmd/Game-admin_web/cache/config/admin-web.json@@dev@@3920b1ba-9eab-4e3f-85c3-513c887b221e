@@ -29,6 +29,9 @@
         "port":8500,
         "name":"admin-web-dev"
     },
+    "sendMailBox": [
+        "3194044365@qq.com"
+    ],
     "checkServices": [
         {
             "name": "hall-web",

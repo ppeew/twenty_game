@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/tls"
+	"errors"
 	"github.com/jordan-wright/email"
 	"net/smtp"
 )
@@ -12,7 +13,7 @@ func CreateTable() {
 // SendMessage 发送消息
 func SendMessage(toEmail []string, msg string) error {
 	if msg == "" {
-		return nil
+		return errors.New("msg is empty")
 	}
 	e := email.NewEmail()
 	e.From = "<2069234934@qq.com>"
