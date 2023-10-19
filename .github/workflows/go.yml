@@ -14,7 +14,7 @@ jobs:
         password: ${{ secrets.PASS }}
         port: ${{ secrets.PORT }}
         script: |
-          cd /
-          sh jks-build.sh
-          sleep 30s
+          cd /root/twenty_game/build
+          sh ssh-build.sh
+          sleep 20s
         
