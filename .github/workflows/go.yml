@@ -14,8 +14,12 @@ jobs:
         password: ${{ secrets.PASS }}
         port: ${{ secrets.PORT }}
         script: |
-          cd /
+          cd /usr/local/go
+          ls
+          cd bin
           ls
           cat ~/.bash_profile
+          go env
+          export PATH=$PATH:/usr/local/go/bin
           go env
         
