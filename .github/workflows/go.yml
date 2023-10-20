@@ -14,7 +14,8 @@ jobs:
         password: ${{ secrets.PASS }}
         port: ${{ secrets.PORT }}
         script: |
-          cd /root/twenty_game/build
-          sh ssh-build.sh
-          sleep 20s
+          cd /
+          ls
+          cat ~/.bash_profile
+          go env
         
