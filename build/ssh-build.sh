@@ -8,6 +8,9 @@ else
         cd /root/twenty_game
 fi
 
+cat ~/.bash_profile
+go version
+
 echo 清理程序
 killall game_web store_web file_web process_web user_web hall_web
 echo 等待srv资源释放
