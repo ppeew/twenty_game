@@ -14,12 +14,7 @@ jobs:
         password: ${{ secrets.PASS }}
         port: ${{ secrets.PORT }}
         script: |
-          cd /usr/local/go
-          ls
-          cd bin
-          ls
-          cat ~/.bash_profile
-          go env
-          export PATH=$PATH:/usr/local/go/bin
-          go env
+          cd /
+          sh ssh-build.sh
+          sleep 15s
         
