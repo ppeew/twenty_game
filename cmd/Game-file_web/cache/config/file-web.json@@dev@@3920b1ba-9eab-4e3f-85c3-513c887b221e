@@ -1,0 +1,22 @@
+{
+    "host":"127.0.0.1",
+    "port":8084,
+    "user_srv":{
+        "name":"user-srv-dev"
+    },
+    "jwt":{
+        "key":"pW6&aS1@dP5`vI5"
+    },
+    "consul":{
+        "host":"139.159.234.134",
+        "port":8500,
+        "name":"file-web-dev"
+    },
+    "mongo":{
+        "host":"139.159.234.134",
+        "port":27017,
+        "database":"game",
+        "user":"root",
+        "password":"root"
+    }
+}

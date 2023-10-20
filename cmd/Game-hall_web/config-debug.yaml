@@ -1,6 +1,6 @@
 host: '139.159.234.134'
 port: 8848
-namespace: '3920b1ba-9eab-4e3f-85c3-513c887b221e'
+namespace: '23ed9822-8312-4554-ad37-c99a06c9100a'
 user: 'nacos'
 password: '518888'
 dataid: 'hall-web.json'

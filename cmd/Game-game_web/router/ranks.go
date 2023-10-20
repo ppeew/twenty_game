@@ -8,5 +8,5 @@ import (
 )
 
 func InitRanksRouter(group *gin.RouterGroup) {
-	group.GET("getRanks", middlewares.JWTAuth(), api.GetRanks, middlewares.FlowEnd())
+	group.GET("getRanks", middlewares.Jaeger(), api.GetRanks, middlewares.FlowEnd())
 }

@@ -60,5 +60,5 @@ func main() {
 	if err := consulClient.Agent().ServiceDeregister(serverID); err != nil {
 		zap.S().Info("注销服务失败")
 	}
-	zap.S().Info("注册服务成功")
+	zap.S().Info("注销服务成功")
 }
