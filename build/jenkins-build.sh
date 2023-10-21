@@ -32,9 +32,9 @@ cd ~/twenty_game/cmd/Game-hall_web
 go build -o hall_web main.go
 nohup ./hall_web > /dev/null 2>&1 &
 
-cd ~/twenty_game/cmd/Game-admin_web
-go build -o admin_web main.go
-nohup ./admin_web > /dev/null 2>&1 &
+# cd ~/twenty_game/cmd/Game-admin_web
+# go build -o admin_web main.go
+# nohup ./admin_web > /dev/null 2>&1 &
 
 sleep 2s
 echo "jenkis-build finish"
