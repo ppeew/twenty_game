@@ -5,46 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="monitorHost">
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/_2023-10-13_22_42____.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/_2023-10-20_17_31____.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2023-10-13_22_42_取消提交了变更_[更改]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2023-10-20_17_31_取消提交了变更_[更改]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-file_web/cache/config/file-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-game_srv/cache/config/game-srv.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-game_web/cache/config/game-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-game_web/middlewares/jaeger.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/jaeger_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-store_web/cache/config/store-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-user_srv/cache/config/user-srv.json@@dev@@23ed9822-8312-4554-ad37-c99a06c9100a" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-user_srv/cache/config/user-srv.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-user_web/cache/config/user-web.json@@dev@@3920b1ba-9eab-4e3f-85c3-513c887b221e" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/docker-compose.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/docker_build.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-admin_web/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-file_web/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-game_srv/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-game_web/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-hall_web/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-process_web/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-store_web/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-user_srv/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/Game-user_web/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2023-10-13_22_42____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2023-10-13_22_42____.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2023-10-20_17_31____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2023-10-20_17_31____.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/srv_conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/router/ranks.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/router/ranks.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/tests/int_string_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/tests/int_string_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config-pro.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/config-debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/config-debug.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/config-pro.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/config-pro.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/srv_conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/srv_conn.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,13 +38,17 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Go" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files (x86)/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 6
+}]]></component>
   <component name="ProjectId" id="2THaGYstFNpfjx0wT3kdeoe1Rmc" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -73,35 +57,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/GOPATH/src/ItemArea/PersonProject/twenty_game&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ssh.settings&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "C:/Users/22378/GolandProjects/twenty-game/cmd/Game-user_web",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ssh.settings",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\GOPATH\src\ItemArea\PersonProject\twenty_game\cmd\Game-user_web\utils" />
-      <recent name="D:\GOPATH\src\ItemArea\PersonProject\twenty_game\cmd\Game-user_web\initialize" />
-      <recent name="D:\GOPATH\src\ItemArea\PersonProject\twenty_game\cmd\Game-user_srv\utils" />
-      <recent name="D:\GOPATH\src\ItemArea\PersonProject\twenty_game\cmd\Game-process_web\initialize" />
-      <recent name="D:\GOPATH\src\ItemArea\PersonProject\twenty_game\cmd\Game-game_web\initialize" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-user_web" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-user_srv" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-store_web" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-process_web" />
+      <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-hall_web" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\GOPATH\src\ItemArea\PersonProject\twenty_game" />
