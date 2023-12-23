@@ -6,13 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="docker指定端口运行">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/redis.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/server1.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/server2.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/ssh-build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/ssh-build.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/initialize/task.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/游戏文档.docx" beforeDir="false" afterPath="$PROJECT_DIR$/docs/游戏文档.docx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

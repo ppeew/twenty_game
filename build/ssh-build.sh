@@ -32,7 +32,7 @@ cd build
 #sh jenkins-build.sh
 
 #重新构建容器
-docker-compsoe up --build -d
+docker-compsoe up --build -d > docker_compose.log
 
 sleep 4s 
-echo 执行远程脚本成功
+echo 正在执行重新构建容器
