@@ -37,6 +37,7 @@ type RedisConfig struct {
 
 type ServerConfig struct {
 	Host        string        `json:"host"`
+	Port        int           `json:"port"`
 	MysqlInfo   MysqlConfig   `json:"mysql"`
 	ConsulInfo  ConsulConfig  `json:"consul"`
 	GameSrvInfo GameSrvConfig `json:"game_srv"`

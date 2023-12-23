@@ -10,7 +10,7 @@ import (
 func InitStoreRouter(r *gin.RouterGroup) {
 	// 留言榜
 	comment := r.Group("/comment")
-	comment.GET("", middlewares.JWTAuth(), apis.CommentList)
+	comment.GET("", apis.CommentList)
 	comment.POST("/add", middlewares.JWTAuth(), apis.AddComment)
 	comment.PUT("/update", middlewares.JWTAuth(), apis.UpdateComment)
 	comment.DELETE("/del/:id", middlewares.JWTAuth(), apis.DelComment)

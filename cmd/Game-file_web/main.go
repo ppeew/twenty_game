@@ -21,11 +21,11 @@ func main() {
 
 	routers := initialize.InitRouters()
 	//自动找可用端口
-	port, err := utils.GetFreePort()
-	if err != nil {
-		panic(err)
-	}
-	global.ServerConfig.Port = port
+	//port, err := utils.GetFreePort()
+	//if err != nil {
+	//	panic(err)
+	//}
+	//global.ServerConfig.Port = port
 	if global.DEBUG {
 		//是debug
 		global.ServerConfig.Port = 9004

@@ -1,6 +1,6 @@
 {
     "host":"127.0.0.1",
-    "port":6101,
+    "port":6102,
     "mysql":{
         "host":"139.159.234.134",
         "port":3306,
@@ -11,9 +11,6 @@
     "consul":{
         "host":"139.159.234.134",
         "port":8500,
-        "name":"user-srv-dev"
-    },
-    "game_srv":{
         "name":"game-srv-dev"
     },
     "redis":{
@@ -21,6 +18,9 @@
         "port":6379,
         "password":"518888",
         "database":0
+    },
+    "user_srv":{
+        "name":"user-srv-dev"
     },
     "mongo":{
         "host":"139.159.234.134",

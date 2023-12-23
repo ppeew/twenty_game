@@ -5,26 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="monitorHost">
-      <change afterPath="$PROJECT_DIR$/build/docker-compose.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/docker_build.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-admin_web/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-file_web/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-game_srv/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-game_web/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-hall_web/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-process_web/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-store_web/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-user_srv/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/Game-user_web/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2023-10-13_22_42____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2023-10-13_22_42____.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2023-10-20_17_31____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2023-10-20_17_31____.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2023-10-13_22_42____.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2023-10-20_17_31____.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2023-10-13_22_42_取消提交了变更_[更改]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2023-10-20_17_31_取消提交了变更_[更改]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/srv_conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/srv_conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/initialize/srv_conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/srv_conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/service/apis/comment.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/apis/comment.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/service/dto/comment.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/dto/comment.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/service/router/hall.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/router/hall.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/cache/config/user-srv.json@@dev@@23ed9822-8312-4554-ad37-c99a06c9100a" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/cache/config/user-srv.json@@dev@@23ed9822-8312-4554-ad37-c99a06c9100a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,9 +46,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2THaGYstFNpfjx0wT3kdeoe1Rmc" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -60,10 +60,16 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "DefaultGoTemplateProperty": "Go File",
+    "Go 构建.go build main.go (1).executor": "Debug",
+    "Go 构建.go build main.go (2).executor": "Run",
+    "Go 构建.go build main.go (3).executor": "Run",
+    "Go 构建.go build main.go.executor": "Run",
+    "Go 构建.go build user_srv.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
     "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.automatic.dependencies.download": "true",
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
     "WebServerToolWindowFactoryState": "false",
@@ -96,22 +102,29 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build user_srv">
-    <configuration name="go build config.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go 构建.go build main.go (3)">
+    <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/cmd/Game-hall_web" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/Game-hall_web/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build main.go (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/cmd/Game-game_srv" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/Game-game_srv/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build main.go (3)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/Game-user_srv" />
       <kind value="FILE" />
-      <package value="ItemArea/PersonProject/twenty_game" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/cmd/Game-user_srv/initialize/config.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build main.go (4)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/cmd/Game-game_web" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/cmd/Game-game_web/main.go" />
+      <filePath value="$PROJECT_DIR$/cmd/Game-user_srv/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -132,25 +145,13 @@
       <filePath value="$PROJECT_DIR$/cmd/Game-user_srv/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="game_web/tests 中的 TestJaeger" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/cmd/Game-game_web/tests" />
-      <root_directory value="$PROJECT_DIR$/cmd/Game-game_web" />
-      <kind value="PACKAGE" />
-      <package value="game_web/tests" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestJaeger\E$" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build main.go (3)" />
+        <item itemvalue="Go 构建.go build main.go (2)" />
         <item itemvalue="Go 构建.go build user_srv" />
-        <item itemvalue="Go 构建.go build config.go" />
-        <item itemvalue="Go 构建.go build main.go (4)" />
+        <item itemvalue="Go 构建.go build main.go (1)" />
         <item itemvalue="Go 构建.go build main.go" />
-        <item itemvalue="Go 测试.game_web/tests 中的 TestJaeger" />
       </list>
     </recent_temporary>
   </component>
@@ -195,6 +196,15 @@
     <settings-migrated>true</settings-migrated>
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/cmd/Game-hall_web/service/apis/comment.go</url>
+          <line>14</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
         <watch expression="global.ServerConfig" language="go" />

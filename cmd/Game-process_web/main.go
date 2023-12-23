@@ -24,11 +24,11 @@ func main() {
 	utils.CheckGoRoutines()
 
 	//自动获取可用端口号
-	port, err := utils.GetFreePort()
-	if err != nil {
-		panic(err)
-	}
-	global.ServerConfig.Port = port
+	//port, err := utils.GetFreePort()
+	//if err != nil {
+	//	panic(err)
+	//}
+	//global.ServerConfig.Port = port
 	if global.DEBUG {
 		//是debug
 		global.ServerConfig.Port = 9002

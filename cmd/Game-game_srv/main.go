@@ -26,11 +26,13 @@ func main() {
 	server := grpc.NewServer()
 	game.RegisterGameServer(server, &handler.GameServer{})
 
-	port, err := utils.GetFreePort()
-	global.ServerConfig.Port = port
-	if err != nil {
-		zap.S().Fatalf("无法找到适用的端口号:%s", err)
-	}
+	//port, err := utils.GetFreePort()
+	//global.ServerConfig.Port = port
+	//if err != nil {
+	//	zap.S().Fatalf("无法找到适用的端口号:%s", err)
+	//}
+	port := global.ServerConfig.Port
+	zap.S().Infof("开启端口是:%d", port)
 
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {

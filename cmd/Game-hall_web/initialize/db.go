@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"hall_web/global"
+	"hall_web/service/domains"
 
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
@@ -23,6 +24,9 @@ func InitDB() {
 	global.MysqlDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		zap.S().Fatalf("[InitDB]打开mysql错误:%s", err.Error())
+	}
+	if err := global.MysqlDB.AutoMigrate(&domains.Comments{}); err != nil {
+		zap.S().Infof("[InitDB]:%s", err)
 	}
 
 	//Redis

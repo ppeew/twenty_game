@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"user_srv/global"
 	"user_srv/handler"
 	"user_srv/initialize"
 	"user_srv/proto/user"
@@ -25,10 +26,13 @@ func main() {
 	user.RegisterUserServer(server, &handler.UserServer{})
 
 	//自动获取可用端口号
-	port, err := utils.GetFreePort()
-	if err != nil {
-		zap.S().Fatalf("无法找到适用的端口号:%s", err)
-	}
+	//port, err := utils.GetFreePort()
+	//if err != nil {
+	//	zap.S().Fatalf("无法找到适用的端口号:%s", err)
+	//}
+
+	port := global.ServerConfig.Port
+	zap.S().Infof("开启端口是:%d", port)
 
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {

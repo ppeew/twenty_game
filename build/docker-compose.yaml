@@ -3,43 +3,43 @@ version: "3"
 # 定义服务
 services:
 
-  redis:
-    # 服务的镜像名称或镜像ID。如果镜像在本地不存在，Compose将会尝试拉取镜像
-    image: redis:4.0
-    # 配置端口 - "宿主机端口:容器暴露端口"
-    ports:
-      - 6379:6379
-    # 挂载
-    volumes:
-      - "/docker/redis/conf/redis.conf:/etc/redis/redis.conf"
-      - "/docker/redis/data:/data"
-    # 容器总是重新启动
-    restart: always
-    # 相当于执行一些命令
-    command:
-      redis-server /etc/redis/redis.conf --appendonly yes
-    # 指定一个自定义容器名称，而不是生成的默认名称。
-    container_name: redis
-    # 使用该参数，container内的root拥有真正的root权限。
-    privileged: true
-
-  mysql:
-    image: mysql:5.7
-    ports:
-      - 3306:3306
-    # 添加环境变量
-    environment:
-      MYSQL_ROOT_PASSWORD: "518888"
-    volumes:
-      - "/docker/mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf"
-      - "/docker/mysql/logs:/var/log/mysql"
-      - "/docker/mysql/data:/var/lib/mysql"
-      - "/docker/mysql/sql/init.sql:/docker-entrypoint-initdb.d/init.sql"
-      - "/etc/localtime:/etc/localtime"
-    restart: always
-    command: --init-file /docker-entrypoint-initdb.d/init.sql
-    container_name: mysql
-    privileged: true
+#  redis:
+#    # 服务的镜像名称或镜像ID。如果镜像在本地不存在，Compose将会尝试拉取镜像
+#    image: redis:4.0
+#    # 配置端口 - "宿主机端口:容器暴露端口"
+#    ports:
+#      - 6379:6379
+#    # 挂载
+#    volumes:
+#      - "/docker/redis/conf/redis.conf:/etc/redis/redis.conf"
+#      - "/docker/redis/data:/data"
+#    # 容器总是重新启动
+#    restart: always
+#    # 相当于执行一些命令
+#    command:
+#      redis-server /etc/redis/redis.conf --appendonly yes
+#    # 指定一个自定义容器名称，而不是生成的默认名称。
+#    container_name: redis
+#    # 使用该参数，container内的root拥有真正的root权限。
+#    privileged: true
+#
+#  mysql:
+#    image: mysql:5.7
+#    ports:
+#      - 3306:3306
+#    # 添加环境变量
+#    environment:
+#      MYSQL_ROOT_PASSWORD: "518888"
+#    volumes:
+#      - "/docker/mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf"
+#      - "/docker/mysql/logs:/var/log/mysql"
+#      - "/docker/mysql/data:/var/lib/mysql"
+#      - "/docker/mysql/sql/init.sql:/docker-entrypoint-initdb.d/init.sql"
+#      - "/etc/localtime:/etc/localtime"
+#    restart: always
+#    command: --init-file /docker-entrypoint-initdb.d/init.sql
+#    container_name: mysql
+#    privileged: true
 
   admin_web:
     # 服务的镜像名称或镜像ID。如果镜像在本地不存在，Compose将会尝试拉取镜像
@@ -52,6 +52,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8100:8100
+    volumes:
+      - /root/game_log:/app/log
     privileged: true
     restart: always
     container_name: admin_web
@@ -67,9 +69,29 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8084:8084
+    volumes:
+      - /root/game_log:/app/log
     privileged: true
     restart: always
     container_name: file_web
+
+  user_srv:
+  # 服务的镜像名称或镜像ID。如果镜像在本地不存在，Compose将会尝试拉取镜像
+    image: user_srv:1.0
+    # 构建镜像
+    build:
+      # 指定项目的地址
+      context: /root/twenty_game/cmd/Game-user_srv
+      # 指定Dockerfile
+      dockerfile: Dockerfile
+
+    ports:
+      - 6101:6101
+    volumes:
+      - /root/game_log:/app/log
+    privileged: true
+    restart: always
+    container_name: user_srv
 
   game_srv:
   # 服务的镜像名称或镜像ID。如果镜像在本地不存在，Compose将会尝试拉取镜像
@@ -80,8 +102,11 @@ services:
       context: /root/twenty_game/cmd/Game-game_srv
       # 指定Dockerfile
       dockerfile: Dockerfile
+
     ports:
-      -
+      - 6102:6102
+    volumes:
+      - /root/game_log:/app/log
     privileged: true
     restart: always
     container_name: game_srv
@@ -95,8 +120,11 @@ services:
       context: /root/twenty_game/cmd/Game-game_web
       # 指定Dockerfile
       dockerfile: Dockerfile
+
     ports:
       - 8083:8083
+    volumes:
+      - /root/game_log:/app/log
     privileged: true
     restart: always
     container_name: game_web
@@ -112,6 +140,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8086:8086
+    volumes:
+      - /root/game_log:/app/log
     privileged: true
     restart: always
     container_name: hall_web
@@ -127,6 +157,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8085:8085
+    volumes:
+      - /root/game_log:/app/log
     privileged: true
     restart: always
     container_name: process_web
@@ -142,24 +174,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8086:8086
+    volumes:
+      - /root/game_log:/app/log
     privileged: true
     restart: always
     container_name: store_web
-
-  user_srv:
-  # 服务的镜像名称或镜像ID。如果镜像在本地不存在，Compose将会尝试拉取镜像
-    image: user_srv:1.0
-    # 构建镜像
-    build:
-      # 指定项目的地址
-      context: /root/twenty_game/cmd/Game-user_srv
-      # 指定Dockerfile
-      dockerfile: Dockerfile
-    ports:
-      -
-    privileged: true
-    restart: always
-    container_name: user_srv
 
   user_web:
   # 服务的镜像名称或镜像ID。如果镜像在本地不存在，Compose将会尝试拉取镜像
@@ -172,6 +191,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8081:8081
+    volumes:
+      - /root/game_log:/app/log
     privileged: true
     restart: always
     container_name: user_web
