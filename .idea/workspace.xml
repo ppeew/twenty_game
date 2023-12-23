@@ -4,27 +4,15 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="monitorHost">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2023-10-13_22_42____.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2023-10-20_17_31____.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2023-10-13_22_42_取消提交了变更_[更改]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2023-10-20_17_31_取消提交了变更_[更改]/shelved.patch" beforeDir="false" />
+    <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="docker指定端口运行">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/db.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/service/apis/comment.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/apis/comment.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/service/dto/comment.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/dto/comment.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/service/router/hall.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/service/router/hall.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/cache/config/user-srv.json@@dev@@23ed9822-8312-4554-ad37-c99a06c9100a" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/cache/config/user-srv.json@@dev@@23ed9822-8312-4554-ad37-c99a06c9100a" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/redis.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/server1.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/server2.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/ssh-build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build/ssh-build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/initialize/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/initialize/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/游戏文档.docx" beforeDir="false" afterPath="$PROJECT_DIR$/docs/游戏文档.docx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,35 +45,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "Go 构建.go build main.go (1).executor": "Debug",
-    "Go 构建.go build main.go (2).executor": "Run",
-    "Go 构建.go build main.go (3).executor": "Run",
-    "Go 构建.go build main.go.executor": "Run",
-    "Go 构建.go build user_srv.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.automatic.dependencies.download": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/22378/GolandProjects/twenty-game/cmd/Game-user_web",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ssh.settings",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;Go 构建.go build main.go (1).executor&quot;: &quot;Debug&quot;,
+    &quot;Go 构建.go build main.go (2).executor&quot;: &quot;Run&quot;,
+    &quot;Go 构建.go build main.go (3).executor&quot;: &quot;Run&quot;,
+    &quot;Go 构建.go build main.go.executor&quot;: &quot;Run&quot;,
+    &quot;Go 构建.go build user_srv.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.automatic.dependencies.download&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/22378/GolandProjects/twenty-game/cmd/Game-user_web&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ssh.settings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd\Game-user_web" />
@@ -190,7 +178,8 @@
     <MESSAGE value="admin_web and initTask" />
     <MESSAGE value="initTask" />
     <MESSAGE value="monitorHost" />
-    <option name="LAST_COMMIT_MESSAGE" value="monitorHost" />
+    <MESSAGE value="docker指定端口运行" />
+    <option name="LAST_COMMIT_MESSAGE" value="docker指定端口运行" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

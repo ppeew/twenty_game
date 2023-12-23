@@ -202,7 +202,7 @@ func monitorHost() {
 	}
 
 	err = utils.SendMessage(global.ServerConfig.SendMailBox, msg)
-	if err != nil {
+	if err != nil && msg != "" {
 		zap.S().Infof("[notifyMailBox] 发送邮箱信息失败 %s", err.Error())
 	} else {
 		hasNotify[global.ServerConfig.Host] = true

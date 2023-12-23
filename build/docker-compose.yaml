@@ -173,7 +173,7 @@ services:
       # 指定Dockerfile
       dockerfile: Dockerfile
     ports:
-      - 8086:8086
+      - 8082:8082
     volumes:
       - /root/game_log:/app/log
     privileged: true
