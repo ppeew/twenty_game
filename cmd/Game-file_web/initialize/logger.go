@@ -22,6 +22,7 @@ func InitLogger() {
 	logName := getLoggerName(global.ServerConfig.ConsulInfo.Name)
 	zap.S().Infof("[InitLogger] logName:%s", logName)
 
+	os.MkdirAll(logDir, os.ModeDir)
 	// 查看log文件夹，无则创建
 	dir, err := os.ReadDir(logDir)
 	if err != nil {
