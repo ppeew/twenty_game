@@ -20,6 +20,6 @@ ENV TZ Asia/Shanghai
 
 WORKDIR /app
 COPY --from=builder /app/my_app /app/my_app
-COPY --from=builder /app/config-pro.yaml /app/config-pro.yaml
+COPY --from=builder /app/config.yaml /app/config.yaml
 
 ENTRYPOINT ["./my_app"]

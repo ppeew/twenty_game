@@ -8,7 +8,7 @@ jwt:
   key: 123
 consul:
   host: 139.159.234.134
-  port: 8600
+  port: 8500
   name: store-web
 mysql:
   host: 139.159.234.134

@@ -4,7 +4,7 @@ game_srv:
   name: user-srv
 consul:
   host: 139.159.234.134
-  port: 8600
+  port: 8500
   name: hall-web
 mysql:
   host: 139.159.234.134

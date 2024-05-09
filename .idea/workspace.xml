@@ -5,10 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="开启房间销毁">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/30b9e3f5-eb49-4498-90c6-dc28ea49ade4.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/30b9e3f5-eb49-4498-90c6-dc28ea49ade4.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/mid-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/mid-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/config.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/nohup.out" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/user.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/config.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,6 +60,7 @@
     "Go 构建.go build main.go (2).executor": "Debug",
     "Go 构建.go build main.go (3).executor": "Debug",
     "Go 构建.go build main.go (4).executor": "Debug",
+    "Go 构建.go build main.go (5).executor": "Debug",
     "Go 构建.go build main.go.executor": "Debug",
     "Go 构建.go build process_web.executor": "Debug",
     "Go 构建.go build user_srv.executor": "Run",
@@ -94,15 +107,7 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build main.go (4)">
-    <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/cmd/Game-hall_web" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/cmd/Game-hall_web/main.go" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Go 构建.go build main.go (5)">
     <configuration name="go build main.go (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/Game-game_web" />
@@ -127,6 +132,14 @@
       <filePath value="$PROJECT_DIR$/cmd/Game-game_srv/main.go" />
       <method v="2" />
     </configuration>
+    <configuration name="go build main.go (5)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/cmd/Game-user_web" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/Game-user_web/main.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/Game-admin_web" />
@@ -137,11 +150,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build main.go (5)" />
         <item itemvalue="Go 构建.go build main.go (4)" />
         <item itemvalue="Go 构建.go build main.go" />
         <item itemvalue="Go 构建.go build main.go (3)" />
         <item itemvalue="Go 构建.go build main.go (2)" />
-        <item itemvalue="Go 构建.go build main.go (1)" />
       </list>
     </recent_temporary>
   </component>
