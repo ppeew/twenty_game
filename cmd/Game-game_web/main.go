@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	initialize.InitConfig()
+	initialize.InitConfig2()
 	initialize.InitLogger()
 	initialize.InitDB()
 	initialize.InitTasks()
