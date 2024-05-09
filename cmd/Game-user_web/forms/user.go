@@ -1,7 +1,7 @@
 package forms
 
 type RegisterForm struct {
-	Nickname string `form:"nickname" binding:"required,min=1,max=30"`
+	Nickname string `form:"nickname" binding:"required,min=1,max=100"`
 	Gender   string `form:"gender" binding:"required"`
 	Username string `form:"username" binding:"required,min=1,max=15"`
 	Password string `form:"password" binding:"required,max=20"`

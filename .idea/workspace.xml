@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="开启房间销毁">
+      <change afterPath="$PROJECT_DIR$/cmd/Game-user_web/tests/decode_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/handler/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/handler/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/forms/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/forms/user.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,6 +52,7 @@
     "Go 构建.go build main.go.executor": "Run",
     "Go 构建.go build process_web.executor": "Debug",
     "Go 构建.go build user_srv.executor": "Run",
+    "Go 测试.user_web/tests 中的 TestDecode.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
@@ -94,7 +96,7 @@
       <recent name="C:\Users\22378\GolandProjects\twenty-game\cmd" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build main.go (2)">
+  <component name="RunManager" selected="Go 测试.user_web/tests 中的 TestDecode">
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="twenty-game" />
       <working_directory value="$PROJECT_DIR$/cmd/Game-store_web" />
@@ -109,14 +111,6 @@
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/cmd/Game-hall_web/main.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build main.go (3)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="twenty-game" />
-      <working_directory value="$PROJECT_DIR$/cmd/Game-file_web" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/cmd/Game-file_web/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -136,13 +130,25 @@
       <filePath value="$PROJECT_DIR$/cmd/Game-user_srv/main.go" />
       <method v="2" />
     </configuration>
+    <configuration name="user_web/tests 中的 TestDecode" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="twenty-game" />
+      <working_directory value="$PROJECT_DIR$/cmd/Game-user_web/tests" />
+      <root_directory value="$PROJECT_DIR$/cmd/Game-user_web" />
+      <kind value="PACKAGE" />
+      <package value="user_web/tests" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestDecode\E$" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 测试.user_web/tests 中的 TestDecode" />
         <item itemvalue="Go 构建.go build main.go (2)" />
         <item itemvalue="Go 构建.go build main.go (1)" />
         <item itemvalue="Go 构建.go build user_srv" />
         <item itemvalue="Go 构建.go build main.go" />
-        <item itemvalue="Go 构建.go build main.go (3)" />
       </list>
     </recent_temporary>
   </component>
