@@ -3,7 +3,7 @@ version: "3"
 # 定义服务
 services:
   consul:
-    image: consul:latest
+    image: consul:1.9.9
     container_name: consul
     ports:
       - "8500:8500"  # Consul UI
@@ -31,21 +31,16 @@ services:
 
   mysql:
     image: mysql:5.7
+    container_name: mysql
     ports:
-      - 3306:3306
-    # 添加环境变量
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "518888"
     volumes:
-      - "/docker/mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf"
-      - "/docker/mysql/logs:/var/log/mysql"
+      - "/docker/mysql/conf:/etc/mysql/conf.d"
       - "/docker/mysql/data:/var/lib/mysql"
-      - "/docker/mysql/sql/init.sql:/docker-entrypoint-initdb.d/init.sql"
-      - "/etc/localtime:/etc/localtime"
     restart: always
-    command: --init-file /docker-entrypoint-initdb.d/init.sql
-    container_name: mysql
-    privileged: true
+
   mongodb:
     image: mongo:latest
     container_name: mongodb

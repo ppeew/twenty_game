@@ -1,7 +1,7 @@
 host: 139.159.234.134
 port: 6001
 game_srv:
-  name: game_srv
+  name: user-srv
 consul:
   host: 139.159.234.134
   port: 8600
