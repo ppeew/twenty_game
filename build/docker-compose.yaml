@@ -12,7 +12,7 @@ services:
       # 指定Dockerfile
       dockerfile: Dockerfile
     ports:
-      - 8100:8100
+      - 9007:9007
     volumes:
       - /root/game_log:/app/log
     privileged: true
@@ -29,7 +29,7 @@ services:
       # 指定Dockerfile
       dockerfile: Dockerfile
     ports:
-      - 8084:8084
+      - 9005:9005
     volumes:
       - /root/game_log:/app/log
     privileged: true
@@ -47,7 +47,7 @@ services:
       dockerfile: Dockerfile
 
     ports:
-      - 8083:8083
+      - 9003:9003
     volumes:
       - /root/game_log:/app/log
     privileged: true
@@ -64,7 +64,7 @@ services:
       # 指定Dockerfile
       dockerfile: Dockerfile
     ports:
-      - 8086:8086
+      - 9002:9002
     volumes:
       - /root/game_log:/app/log
     privileged: true
@@ -81,7 +81,7 @@ services:
       # 指定Dockerfile
       dockerfile: Dockerfile
     ports:
-      - 8085:8085
+      - 9004:9004
     volumes:
       - /root/game_log:/app/log
     privileged: true
@@ -98,7 +98,7 @@ services:
       # 指定Dockerfile
       dockerfile: Dockerfile
     ports:
-      - 8082:8082
+      - 9006:9006
     volumes:
       - /root/game_log:/app/log
     privileged: true
@@ -115,7 +115,7 @@ services:
       # 指定Dockerfile
       dockerfile: Dockerfile
     ports:
-      - 8081:8081
+      - 9001:9001
     volumes:
       - /root/game_log:/app/log
     privileged: true
@@ -133,7 +133,7 @@ services:
       dockerfile: Dockerfile
 
     ports:
-      - 6101:6101
+      - 6001:6001
     volumes:
       - /root/game_log:/app/log
     privileged: true
@@ -151,7 +151,7 @@ services:
       dockerfile: Dockerfile
 
     ports:
-      - 6102:6102
+      - 6002:6002
     volumes:
       - /root/game_log:/app/log
     privileged: true

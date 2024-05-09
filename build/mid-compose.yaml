@@ -28,6 +28,8 @@ services:
     container_name: redis
     # 使用该参数，container内的root拥有真正的root权限。
     privileged: true
+    environment:
+      - REDIS_PASSWORD=518888
 
   mysql:
     image: mysql:5.7
