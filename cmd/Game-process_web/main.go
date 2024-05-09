@@ -8,7 +8,6 @@ import (
 	"process_web/global"
 	"process_web/initialize"
 	game_proto "process_web/proto/game"
-	"process_web/utils"
 	"syscall"
 
 	"go.uber.org/zap"
@@ -21,7 +20,7 @@ func main() {
 	initialize.InitTasks()
 	initialize.InitSrvConn()
 	routers := initialize.InitRouters()
-	utils.CheckGoRoutines()
+	//utils.CheckGoRoutines()
 
 	if global.DEBUG {
 		//是debug
