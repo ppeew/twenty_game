@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"unicode/utf8"
 	"user_web/forms"
 	"user_web/global"
 	"user_web/global/response"
@@ -60,6 +61,11 @@ func UserRegister(ctx *gin.Context) {
 		})
 		return
 	}
+
+	//转化utf-8为中文
+	ch, _ := utf8.DecodeRuneInString(register.Nickname)
+	register.Nickname = string(ch)
+
 	var info *user.UserInfoResponse
 	var err error
 	info, err = global.UserSrvClient.CreateUser(context.Background(), &user.CreateUserInfo{

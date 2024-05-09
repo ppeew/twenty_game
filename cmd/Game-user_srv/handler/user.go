@@ -5,7 +5,6 @@ import (
 	"crypto/sha512"
 	"fmt"
 	"strings"
-	"unicode/utf8"
 	"user_srv/global"
 	"user_srv/model"
 	"user_srv/proto/user"
@@ -22,10 +21,6 @@ type UserServer struct {
 
 // 用户注册
 func (s *UserServer) CreateUser(ctx context.Context, req *user.CreateUserInfo) (*user.UserInfoResponse, error) {
-	//转化utf-8为中文
-	ch, _ := utf8.DecodeRuneInString(req.Nickname)
-	req.Nickname = string(ch)
-
 	//先查询用户是否存在
 	var u model.User
 	result := global.MysqlDB.Where("user_name = ?", req.UserName).First(&u)

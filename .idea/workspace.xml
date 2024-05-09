@@ -5,10 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="开启房间销毁">
-      <change afterPath="$PROJECT_DIR$/cmd/Game-user_web/tests/decode_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/handler/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/handler/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/forms/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/forms/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/api/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/api/user.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
