@@ -1,4 +1,5 @@
 package utils
 
 func CreateTable() {
+	
 }

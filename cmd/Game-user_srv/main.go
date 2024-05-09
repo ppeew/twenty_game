@@ -22,6 +22,7 @@ func main() {
 	initialize.InitDB()
 	initialize.InitTasks()
 	//initialize.InitSrvConn()
+	utils.CreateTable()
 	server := grpc.NewServer()
 	user.RegisterUserServer(server, &handler.UserServer{})
 

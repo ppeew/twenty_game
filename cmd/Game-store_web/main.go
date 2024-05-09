@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"store_web/global"
 	"store_web/initialize"
+	"store_web/utils"
 	"syscall"
 
 	"go.uber.org/zap"
@@ -17,7 +18,7 @@ func main() {
 	initialize.InitDB()
 	initialize.InitTasks()
 	routers := initialize.InitRouters()
-	//utils.CreateTable()
+	utils.CreateTable()
 	if global.DEBUG {
 		//是debug
 		global.ServerConfig.Port = 9001

@@ -19,7 +19,7 @@ func main() {
 	initialize.InitTasks()
 	go initialize.GetConsulServer()
 	routers := initialize.InitRouters()
-	//utils.CreateTable()
+	utils.CreateTable()
 	if global.DEBUG {
 		//是debug
 		global.ServerConfig.Port = 9006
