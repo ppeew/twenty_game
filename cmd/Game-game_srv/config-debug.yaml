@@ -1,7 +1,0 @@
-host: '139.159.234.134'
-port: 8848
-namespace: '23ed9822-8312-4554-ad37-c99a06c9100a'
-user: 'nacos'
-password: '518888'
-dataid: 'game-srv.json'
-group: 'dev'
