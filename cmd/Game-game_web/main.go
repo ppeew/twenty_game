@@ -22,16 +22,10 @@ func main() {
 	initialize.InitTasks()
 	initialize.InitSrvConn()
 	initialize.InitSentinel()
-	go initialize.GetConsulServer()
+	//go initialize.GetConsulServer()
 	routers := initialize.InitRouters()
 	//utils.CheckGoRoutines()
 
-	//自动获取可用端口号
-	//port, err := utils.GetFreePort()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//global.ServerConfig.Port = port
 	if global.DEBUG {
 		//是debug
 		global.ServerConfig.Port = 9003
@@ -60,8 +54,6 @@ func main() {
 	}
 	//资源释放 释放房间
 	for roomID, _ := range api.CHAN {
-		// 1.删除用户对应服务器连接
-
 		// 2.删除redis房间信息
 		global.GameSrvClient.DelRoomServer(context.Background(), &game_proto.RoomIDInfo{RoomID: roomID})
 		// 3.删除该房间对应的服务器信息

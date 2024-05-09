@@ -13,19 +13,13 @@ import (
 )
 
 func main() {
-	initialize.InitConfig()
+	initialize.InitConfig2()
 	initialize.InitLogger()
 	initialize.InitDB()
 	initialize.InitTasks()
 	initialize.InitSrvConn()
 
 	routers := initialize.InitRouters()
-	//自动找可用端口
-	//port, err := utils.GetFreePort()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//global.ServerConfig.Port = port
 	if global.DEBUG {
 		//是debug
 		global.ServerConfig.Port = 9004
@@ -43,19 +37,15 @@ func main() {
 	sig := <-quit
 	zap.S().Infof("接收到退出信号 %+v\n", sig)
 
-	// 资源释放
 	go func() {
 		// 强制退出
 		<-quit
 		zap.S().Info("两次ctrl+c强制退出")
 		syscall.Exit(0)
 	}()
+
+	// 资源释放
 	if err := consulClient.Agent().ServiceDeregister(serverID); err != nil {
 		zap.S().Info("注销服务失败")
 	}
-	//if err = register_client.DeRegister(serviceId); err != nil {
-	//	zap.S().Info("注销失败:", err.Error())
-	//}else{
-	//	zap.S().Info("注销成功:")
-	//}
 }

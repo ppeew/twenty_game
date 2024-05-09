@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	initialize.InitConfig()
+	initialize.InitConfig2()
 	initialize.InitLogger()
 	initialize.InitDB()
 	initialize.InitTasks()
@@ -23,12 +23,6 @@ func main() {
 	routers := initialize.InitRouters()
 	utils.CheckGoRoutines()
 
-	//自动获取可用端口号
-	//port, err := utils.GetFreePort()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//global.ServerConfig.Port = port
 	if global.DEBUG {
 		//是debug
 		global.ServerConfig.Port = 9002
@@ -38,8 +32,6 @@ func main() {
 			zap.S().Panic("启动失败:", err.Error())
 		}
 	}()
-	//服务注册及健康检查
-	consulClient, serverID := utils.RegistAndHealthCheck()
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Kill, os.Interrupt)
 	sig := <-quit
@@ -52,14 +44,7 @@ func main() {
 		syscall.Exit(0)
 	}()
 
-	if err := consulClient.Agent().ServiceDeregister(serverID); err != nil {
-		zap.S().Info("注销服务失败")
-	}
 	//资源释放 释放房间
-	// 1.删除用户对应服务器连接
-	//for id := range global.UsersConn {
-	//	global.GameSrvClient.DelConnData(context.Background(), &game_proto.DelConnInfo{Id: id})
-	//}
 	global.UsersConn.Range(func(key, value any) bool {
 		global.GameSrvClient.DelConnData(context.Background(), &game_proto.DelConnInfo{Id: key.(uint32)})
 		return true

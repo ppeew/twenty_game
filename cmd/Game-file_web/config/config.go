@@ -1,7 +1,7 @@
 package config
 
 type JWTConfig struct {
-	SigningKey string `json:"key"`
+	SigningKey string `mapstructure:"key"`
 }
 
 type ConsulConfig struct {
@@ -15,13 +15,13 @@ type UserSrvConfig struct {
 }
 
 type ServerConfig struct {
-	Host        string        `json:"host"`
-	Port        int           `json:"port"`
-	JWTInfo     JWTConfig     `json:"jwt"`
-	ConsulInfo  ConsulConfig  `json:"consul"`
-	UserSrvInfo UserSrvConfig `json:"user_srv"`
-	MongoInfo   MongoConfig   `json:"mongo"`
-	//OssInfo    OssConfig    `json:"ossInfo"`
+	Host        string        `mapstructure:"host"`
+	Port        int           `mapstructure:"port"`
+	JWTInfo     JWTConfig     `mapstructure:"jwt"`
+	ConsulInfo  ConsulConfig  `mapstructure:"consul"`
+	UserSrvInfo UserSrvConfig `mapstructure:"user_srv"`
+	MongoInfo   MongoConfig   `mapstructure:"mongo"`
+	//OssInfo    OssConfig    `mapstructure:"ossInfo"`
 }
 
 type OssConfig struct {

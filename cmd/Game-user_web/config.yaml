@@ -1,0 +1,16 @@
+host: 139.159.234.134
+port: 9001
+user_srv:
+  name: user-srv
+jwt:
+  key: 123
+consul:
+  host: 139.159.234.134
+  port: 8600
+  name: user-web
+mongo:
+  host: 139.159.234.134
+  port: 27017
+  user: root
+  password: 518888
+  database: game

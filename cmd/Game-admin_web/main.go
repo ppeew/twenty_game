@@ -14,19 +14,13 @@ import (
 
 func main() {
 	// 先获取配置才能初始化logger,db,task
-	initialize.InitConfig()
+	initialize.InitConfig2()
 	initialize.InitLogger()
 	initialize.InitDB()
 	initialize.InitTasks()
 	go initialize.GetConsulServer()
 	routers := initialize.InitRouters()
 	//utils.CreateTable()
-	//自动获取可用端口号
-	//port, err := utils.GetFreePort()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//global.ServerConfig.Port = port
 	if global.DEBUG {
 		//是debug
 		global.ServerConfig.Port = 9100

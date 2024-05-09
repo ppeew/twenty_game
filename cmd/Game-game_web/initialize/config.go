@@ -75,3 +75,10 @@ func InitConfig() {
 		zap.S().Fatalf("[InitConfig]反序列化ServerConfig失败:%s", err.Error())
 	}
 }
+
+func InitConfig2() {
+	v := viper.New()
+	v.SetConfigFile("config.yaml")
+	v.ReadInConfig()
+	v.Unmarshal(global.ServerConfig)
+}

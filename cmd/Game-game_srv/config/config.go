@@ -36,13 +36,13 @@ type UserSrvConfig struct {
 }
 
 type ServerConfig struct {
-	Host        string        `json:"host"`
-	Port        int           `json:"port"`
-	MysqlInfo   MysqlConfig   `json:"mysql"`
-	ConsulInfo  ConsulConfig  `json:"consul"`
-	RedisInfo   RedisConfig   `json:"redis"`
-	MongoInfo   MongoConfig   `json:"mongo"`
-	UserSrvInfo UserSrvConfig `json:"user_srv"`
+	Host        string        `mapstructure:"host"`
+	Port        int           `mapstructure:"port"`
+	MysqlInfo   MysqlConfig   `mapstructure:"mysql"`
+	ConsulInfo  ConsulConfig  `mapstructure:"consul"`
+	RedisInfo   RedisConfig   `mapstructure:"redis"`
+	MongoInfo   MongoConfig   `mapstructure:"mongo"`
+	UserSrvInfo UserSrvConfig `mapstructure:"user_srv"`
 }
 
 type MongoConfig struct {

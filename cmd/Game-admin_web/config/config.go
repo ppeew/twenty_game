@@ -1,7 +1,7 @@
 package config
 
 type JWTConfig struct {
-	SigningKey string `json:"key"`
+	SigningKey string `mapstructure:"key"`
 }
 
 type ConsulConfig struct {
@@ -11,15 +11,15 @@ type ConsulConfig struct {
 }
 
 type ServerConfig struct {
-	Host          string         `json:"host"`
-	Port          int            `json:"port"`
-	JWTInfo       JWTConfig      `json:"jwt"`
-	ConsulInfo    ConsulConfig   `json:"consul"`
-	MysqlInfo     MysqlConfig    `json:"mysql"`
-	RedisInfo     RedisConfig    `json:"redis"`
-	MongoInfo     MongoConfig    `json:"mongo"`
-	CheckServices []CheckService `json:"checkServices"`
-	SendMailBox   []string       `json:"sendMailBox"`
+	Host          string         `mapstructure:"host"`
+	Port          int            `mapstructure:"port"`
+	JWTInfo       JWTConfig      `mapstructure:"jwt"`
+	ConsulInfo    ConsulConfig   `mapstructure:"consul"`
+	MysqlInfo     MysqlConfig    `mapstructure:"mysql"`
+	RedisInfo     RedisConfig    `mapstructure:"redis"`
+	MongoInfo     MongoConfig    `mapstructure:"mongo"`
+	CheckServices []CheckService `mapstructure:"checkServices"`
+	SendMailBox   []string       `mapstructure:"sendMailBox"`
 }
 
 type NacosConfig struct {

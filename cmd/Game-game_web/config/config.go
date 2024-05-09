@@ -9,7 +9,7 @@ type UserSrvConfig struct {
 }
 
 type JWTConfig struct {
-	SigningKey string `json:"key"`
+	SigningKey string `mapstructure:"key"`
 }
 
 type ConsulConfig struct {
@@ -19,13 +19,13 @@ type ConsulConfig struct {
 }
 
 type ServerConfig struct {
-	Host        string        `json:"host"`
-	Port        int           `json:"port"`
-	GameSrvInfo GameSrvConfig `json:"game_srv"`
-	UserSrvInfo UserSrvConfig `json:"user_srv"`
-	JWTInfo     JWTConfig     `json:"jwt"`
-	ConsulInfo  ConsulConfig  `json:"consul"`
-	MongoInfo   MongoConfig   `json:"mongo"`
+	Host        string        `mapstructure:"host"`
+	Port        int           `mapstructure:"port"`
+	GameSrvInfo GameSrvConfig `mapstructure:"game_srv"`
+	UserSrvInfo UserSrvConfig `mapstructure:"user_srv"`
+	JWTInfo     JWTConfig     `mapstructure:"jwt"`
+	ConsulInfo  ConsulConfig  `mapstructure:"consul"`
+	MongoInfo   MongoConfig   `mapstructure:"mongo"`
 }
 
 type NacosConfig struct {

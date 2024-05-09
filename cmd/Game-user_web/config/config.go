@@ -15,12 +15,12 @@ type ConsulConfig struct {
 }
 
 type ServerConfig struct {
-	Host        string        `json:"host"`
-	Port        int           `json:"port"`
-	UserSrvInfo UserSrvConfig `json:"user_srv"`
-	JWTInfo     JWTConfig     `json:"jwt"`
-	ConsulInfo  ConsulConfig  `json:"consul"`
-	MongoInfo   MongoConfig   `json:"mongo"`
+	Host        string        `mapstructure:"host"`
+	Port        int           `mapstructure:"port"`
+	UserSrvInfo UserSrvConfig `mapstructure:"user_srv"`
+	JWTInfo     JWTConfig     `mapstructure:"jwt"`
+	ConsulInfo  ConsulConfig  `mapstructure:"consul"`
+	MongoInfo   MongoConfig   `mapstructure:"mongo"`
 }
 
 type NacosConfig struct {

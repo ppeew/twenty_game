@@ -17,19 +17,13 @@ import (
 )
 
 func main() {
-	initialize.InitConfig()
+	initialize.InitConfig2()
 	initialize.InitLogger()
 	initialize.InitDB()
 	initialize.InitTasks()
 	//initialize.InitSrvConn()
 	server := grpc.NewServer()
 	user.RegisterUserServer(server, &handler.UserServer{})
-
-	//自动获取可用端口号
-	//port, err := utils.GetFreePort()
-	//if err != nil {
-	//	zap.S().Fatalf("无法找到适用的端口号:%s", err)
-	//}
 
 	port := global.ServerConfig.Port
 	zap.S().Infof("开启端口是:%d", port)

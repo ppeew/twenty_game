@@ -36,13 +36,13 @@ type RedisConfig struct {
 }
 
 type ServerConfig struct {
-	Host        string        `json:"host"`
-	Port        int           `json:"port"`
-	MysqlInfo   MysqlConfig   `json:"mysql"`
-	ConsulInfo  ConsulConfig  `json:"consul"`
-	GameSrvInfo GameSrvConfig `json:"game_srv"`
-	RedisInfo   RedisConfig   `json:"redis"`
-	MongoInfo   MongoConfig   `json:"mongo"`
+	Host        string        `mapstructure:"host"`
+	Port        int           `mapstructure:"port"`
+	MysqlInfo   MysqlConfig   `mapstructure:"mysql"`
+	ConsulInfo  ConsulConfig  `mapstructure:"consul"`
+	GameSrvInfo GameSrvConfig `mapstructure:"game_srv"`
+	RedisInfo   RedisConfig   `mapstructure:"redis"`
+	MongoInfo   MongoConfig   `mapstructure:"mongo"`
 }
 
 type MongoConfig struct {

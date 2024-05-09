@@ -2,18 +2,17 @@ package main
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"syscall"
 	"user_web/global"
 	"user_web/initialize"
 	"user_web/utils"
-
-	"go.uber.org/zap"
 )
 
 func main() {
-	initialize.InitConfig()
+	initialize.InitConfig2()
 	initialize.InitLogger()
 	initialize.InitDB()
 	initialize.InitTasks()
@@ -22,12 +21,6 @@ func main() {
 
 	routers := initialize.InitRouters()
 
-	//自动找可用端口
-	//port, err := utils.GetFreePort()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//global.ServerConfig.Port = port
 	if global.DEBUG {
 		//是debug
 		global.ServerConfig.Port = 9005
@@ -38,8 +31,10 @@ func main() {
 			zap.S().Panic("启动失败:", err.Error())
 		}
 	}()
+
 	//服务注册及健康检查
 	consulClient, serverID := utils.RegistAndHealthCheck()
+
 	//终止信号
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Kill, os.Interrupt)
