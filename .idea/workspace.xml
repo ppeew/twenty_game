@@ -6,15 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="d6d338e6-1b0d-4c76-a707-cbde3124f134" name="更改" comment="开启房间销毁">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-hall_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-store_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-store_web/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/initialize/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Game-user_web/initialize/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_web/initialize/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/config-debug.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/config-pro.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-admin_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-admin_web/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-file_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-file_web/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_srv/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_srv/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-game_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-game_web/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-process_web/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-process_web/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/Game-user_srv/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/Game-user_srv/config.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

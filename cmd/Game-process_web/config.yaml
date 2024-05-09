@@ -3,13 +3,13 @@ port: 9004
 game_srv:
   name: game-srv
 user_srv:
-  name: user_srv
+  name: user-srv
 jwt:
   key: 123
 consul:
   host: 139.159.234.134
   port: 8500
-  name: store-web
+  name: process-web
 mysql:
   host: 139.159.234.134
   port: 3306
