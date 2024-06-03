@@ -9,7 +9,6 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/consul/api v1.20.0
-	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/mbobakov/grpc-consul-resolver v1.5.2
 	github.com/nacos-group/nacos-sdk-go v1.1.4
 	github.com/spf13/viper v1.15.0
@@ -17,6 +16,8 @@ require (
 	go.uber.org/zap v1.24.0
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
+	gorm.io/driver/mysql v1.5.6
+	gorm.io/gorm v1.25.10
 )
 
 require (
@@ -68,6 +69,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/go-toolsmith/astcast v1.1.0 // indirect
 	github.com/go-toolsmith/astcopy v1.1.0 // indirect
 	github.com/go-toolsmith/astequal v1.1.0 // indirect
@@ -111,6 +113,8 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jgautheron/goconst v1.5.1 // indirect
 	github.com/jingyugao/rowserrcheck v1.1.1 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jirfag/go-printf-func-name v0.0.0-20200119135958-7558a9eaa5af // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect

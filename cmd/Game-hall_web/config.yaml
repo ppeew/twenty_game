@@ -1,5 +1,5 @@
 host: 139.159.234.134
-port: 9006
+port: 9002
 jwt:
   key: 123
 consul:

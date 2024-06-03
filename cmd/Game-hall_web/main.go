@@ -22,7 +22,7 @@ func main() {
 	utils.CreateTable()
 	if global.DEBUG {
 		//是debug
-		global.ServerConfig.Port = 9006
+		global.ServerConfig.Port = 9002
 	}
 	go func() {
 		if err := routers.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
